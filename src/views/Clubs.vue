@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-container>
     Listing and information about clubs
-  </v-app>
+  </v-container>
 </template>

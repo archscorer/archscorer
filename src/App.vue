@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-model="drawer" app>
+    <v-navigation-drawer app v-model="drawer">
       <v-list dense>
         <v-list-item to="/">
           <v-list-item-icon>
@@ -57,8 +57,11 @@
     </v-app-bar>
 
     <v-content>
-      <router-view></router-view>
+      <v-container fluid>
+        <router-view></router-view>
+      </v-container>
     </v-content>
+
   </v-app>
 </template>
 

@@ -1,5 +1,12 @@
 # archscorer
 
+## Web UI for project management
+Vue has web based UI that among other things lets you serve, build and lint your project.
+```
+cd ..
+vue ui -H 0.0.0.0 -p 8000
+```
+
 ## Project setup
 ```
 npm install

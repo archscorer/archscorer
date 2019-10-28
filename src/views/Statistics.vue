@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-container>
     Some statisitics graphs.. scores etc.. blah
-  </v-app>
+  </v-container>
 </template>
