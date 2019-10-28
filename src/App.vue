@@ -1,36 +1,74 @@
 <template>
   <v-app>
-    <v-app-bar app>
+    <v-navigation-drawer v-model="drawer" app>
+      <v-list dense>
+        <v-list-item to="/">
+          <v-list-item-icon>
+            <v-icon>mdi-home</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Home</v-list-item-title>
+        </v-list-item>
+        <v-list-item to="/competitions">
+          <v-list-item-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Competitions</v-list-item-title>
+        </v-list-item>
+        <v-list-item to="/statistics">
+          <v-list-item-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Statistics</v-list-item-title>
+        </v-list-item>
+        <v-list-item to="/clubs">
+          <v-list-item-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Clubs</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+    <v-app-bar app dark color="primary">
       <v-toolbar-title class="headline text-uppercase">
-        <span>Vuetify</span>
-        <span class="font-weight-light">MATERIAL DESIGN</span>
+        <router-link
+          to="/"
+          tag="span"
+          style="cursor: pointer">
+          arch[scor]er
+        </router-link>
       </v-toolbar-title>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"
+        class="hidden-sm-and-up"></v-app-bar-nav-icon>
+      <v-toolbar-items class="hidden-xs-only">
+        <v-btn text
+          to="/competitions">
+          Competitons
+        </v-btn>
+        <v-btn text
+          to="/statistics">
+          Statistics
+        </v-btn>
+        <v-btn text
+          to="/clubs">
+          Clubs
+        </v-btn>
+      </v-toolbar-items>
       <v-spacer></v-spacer>
-      <v-btn
-        text
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-      >
-        <span class="mr-2">Latest Release</span>
+      <v-btn text rounded>
+        <span class="mr-2">login</span>
       </v-btn>
     </v-app-bar>
 
     <v-content>
-      <HelloWorld/>
+      <router-view></router-view>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld,
-  },
+  name: 'Arch[scor]er',
+
   data: () => ({
-    //
+    drawer: null,
   }),
 };
 </script>
