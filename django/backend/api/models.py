@@ -39,3 +39,19 @@ class User(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
+
+    class Meta:
+        ordering = ['-date_joined']
+
+class Competition(models.Model):
+    owner = models.ForeignKey('User', related_name='competitions', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+
+    start_date = models.DateField(default=timezone.localdate)
+    end_date = models.DateField(default=timezone.localdate)
+
+    name = models.CharField(max_length=150, blank=False)
+    description = models.TextField()
+
+    class Meta:
+        ordering = ['-start_date']

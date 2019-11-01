@@ -7,14 +7,12 @@
         <v-card-title>Browse</v-card-title>
         <v-list>
           <v-subheader v-if="competitions.length === 0">No competitions found in the database</v-subheader>
-          <v-list-item
-          v-for="(competition, i) in competitions"
-          :key="i"
-        >
-          <v-list-item-content>
-            <v-list-item-title v-text="item.name"></v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+          <v-list-item v-for="(competition, index) in competitions.results" :key="index">
+            <v-list-item-content>
+              <v-list-item-title v-text="competition.name"></v-list-item-title>
+              {{competition.description}}
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
       </v-card>
   </v-container>
