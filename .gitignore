@@ -19,3 +19,11 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+### Django ###
+db.sqlite3
