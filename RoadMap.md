@@ -40,7 +40,7 @@ All this requires some user management (Google/FB/email auth)
  * Participants
   * ID (uniq) - refers to Archers database (site users) [people registered by name only get every time new ID, once they register - all entries with such name are pulled together and tables are updated to new ID]
   * class (AMLB, etc)
-  * Arrow Scores
+  * ScoreCard
    * End ID - refers to competition Ends table?
    * arrow scores
    * end score (computed)
@@ -64,7 +64,7 @@ All this requires some user management (Google/FB/email auth)
 * New Archer
  * ID - uniq / numeric
  * Name
- * email - email is mandatory for site users (? different database?)
+ * email - email is mandatory for site users (? different table?)
  * club(s)
  * site related fields: roles, password ?
  * birthday (optional) - could be used to filter for eligible classes

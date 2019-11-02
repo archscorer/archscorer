@@ -3,7 +3,7 @@ from .models import Competition
 from rest_framework import serializers
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    competitions = serializers.PrimaryKeyRelatedField(many=True, queryset=Competition.objects.all())
+    competitions = serializers.HyperlinkedRelatedField(many=True, view_name='competition-detail', read_only=True)
 
     class Meta:
         model = User
