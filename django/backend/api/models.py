@@ -32,17 +32,7 @@ class LocalUserManager(BaseUserManager):
                                  **extra_fields)
 
 
-class Archer(models.Model):
-    full_name = models.CharField('full name', max_length=150, blank=False, default='Unnamed archer')  # full name <first_name last_name>
-    gender = models.CharField('gender', max_length=1, choices=[('M', 'Male'),
-                                                               ('F', 'Female')])
-    club = models.CharField('club', max_length=150, blank=True)
-    email = models.EmailField('email address', blank=True)
-    phone = models.SlugField('phone number', max_length=20, blank=True)
-    efaa_id = models.IntegerField('EFAA Archer ID')
-
 class User(AbstractUser):
-    archer = models.OneToOneField('Archer', on_delete=models.PROTECT)
     username = models.CharField('username', max_length=30, blank=True)
     email = models.EmailField('email address', unique=True)
 
@@ -54,15 +44,82 @@ class User(AbstractUser):
     class Meta:
         ordering = ['-date_joined']
 
-class AgeGroup(models.Model):
+class Club(models.Model):
+    creator = models.ForeignKey('User', related_name='clubs_created', null=True, on_delete=models.SET_NULL)
+    name = models.CharField('Club name', max_length=150, blank=False, default='Unnamed archery club')
+    contact = models.TextField('Contact Information')
+    description = models.TextField()
+
+    class Meta:
+        ordering = ['name']
+
+class Archer(models.Model):
+    full_name = models.CharField('Full Name', max_length=150, blank=False, default='Unnamed archer')  # full name <first_name last_name>
+    gender = models.CharField('gender', max_length=1, choices=[('M', 'Male'),
+                                                               ('F', 'Female')])
+    club = models.ForeignKey('Club', related_name='members', null=True, on_delete=models.CASCADE)
+    email = models.EmailField('email address', blank=True)
+    phone = models.CharField('phone number', max_length=20, blank=True)
+    efaa_id = models.CharField('EFAA Archer ID', max_length=7, blank=True)
+
+    # user = models.OneToOneField('User', default=-1, on_delete=models.PROTECT)
+
+    class Meta:
+        ordering = ['full_name']
+
+class Course(models.Model):
+    creator = models.ForeignKey('User', related_name='courses_created', null=True, on_delete=models.SET_NULL)
+    created = models.DateTimeField(auto_now_add=True)
+
+    name = models.CharField('Round name', max_length=150, default='Unnamed round', blank=False)
+    description = models.TextField()  # If creating custom non-standard course, describe its purpose
+    location = models.CharField(max_length=150, blank=True)
+
+    class Meta:
+        ordering = ['-created']
+
+class End(models.Model):
+    course = models.ForeignKey('Course', related_name='ends', on_delete=models.CASCADE)
+    order = models.IntegerField('End order', blank=False)
+    label = models.CharField(max_length=30, blank=True)  # i.e 70 yards walk-up
+    nr_of_arrows = models.PositiveSmallIntegerField(blank=False)  # number of max arrows that can be shot
+    scoring = models.CharField(max_length=150, blank=False)
+
+    class Meta:
+        ordering = ['order']
+
+class Competition(models.Model):
+    creator = models.ForeignKey('User', related_name='competitions_created', null=True, on_delete=models.SET_NULL)
+    created = models.DateTimeField(auto_now_add=True)
+
+    start_date = models.DateField(default=timezone.localdate)
+    end_date = models.DateField(default=timezone.localdate)
+    registration_open = models.BooleanField(default=True)
+    registration_due_date = models.DateField(default=timezone.localdate)
+
+    name = models.CharField(max_length=150, default='Unnamed competition', blank=False)
+    description = models.TextField()
+
+    class Meta:
+        ordering = ['-start_date']
+
+class Round(models.Model):
+    order = models.IntegerField('Round order', blank=False)
+    label = models.CharField('Label for round', max_length=150, blank=True)
+    course = models.ForeignKey('Course', related_name='competitions', on_delete=models.CASCADE)
+    competition = models.ForeignKey('Competition', related_name='rounds', on_delete=models.CASCADE)
+    is_open = models.BooleanField('is round open', default=False)
+
+    class Meta:
+        ordering = ['order']
+        unique_together = ['order', 'course', 'competition']
+
+class Participant(models.Model):
     AGEGROUP_CHOICES = [('C', 'Cub'),
                         ('J', 'Junior'),
                         ('A', 'Adult'),
                         ('V', 'Veteran'),
                         ('S', 'Senior')]
-    name = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
-
-class Style(models.Model):
     STYLE_CHOICES = [
         ('BB-C', 'Barebow Compound'),
         ('BB-R', 'Barebow Recurve'),
@@ -77,45 +134,28 @@ class Style(models.Model):
         ('LB', 'Longbow'),
         ('TR', 'Traditional Recurve')
     ]
-    name = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
-
-class Course(models.Model):
-    owner = models.ForeignKey('User', related_name='course', null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
-
-    name = models.CharField('Course name', max_length=150, default='Unnamed course', blank=False)
-    location = models.CharField(max_length=150, blank=True)
-
-class End(models.Model):
-    course = models.ForeignKey('Course', related_name='ends', on_delete=models.CASCADE)
-    nr = models.CharField(max_length=10, blank=False)
-    label = models.CharField(max_length=30, blank=True)
-    arrows = models.PositiveSmallIntegerField(blank=False)  # number of max arrows that can be shot
-    scoring = models.CharField(max_length=150, blank=False)
-
-class Competition(models.Model):
-    owner = models.ForeignKey('User', related_name='competitions', null=True, on_delete=models.SET_NULL)
-    created = models.DateTimeField(auto_now_add=True)
-
-    start_date = models.DateField(default=timezone.localdate)
-    end_date = models.DateField(default=timezone.localdate)
-    registration_open = models.BooleanField(default=True)
-    registration_due_date = models.DateField(default=timezone.localdate)
-
-    name = models.CharField(max_length=150, default='Unnamed competition', blank=False)
-    format = models.CharField(max_length=30, blank=True)
-    description = models.TextField()
-
-    courses = models.ManyToManyField('Course', related_name='competitions')
+    archer = models.ForeignKey(Archer, related_name='competitions', on_delete=models.CASCADE)
+    competition = models.ForeignKey(Competition, related_name='participants', on_delete=models.CASCADE)
+    age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
+    style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
 
     class Meta:
-        ordering = ['-start_date']
+        ordering = ['created']
+        unique_together = ['archer', 'competition', 'style']
 
-class Participant(models.Model):
-    archer = models.ForeignKey(Archer, on_delete=models.PROTECT)
-    competition = models.ForeignKey(Competition, on_delete=models.PROTECT)
-    style = models.ForeignKey(Style, on_delete=models.PROTECT)
-    age_group = models.ForeignKey(AgeGroup, on_delete=models.PROTECT)
+class ScoreCard(models.Model):
+    participant = models.ForeignKey(Participant, related_name='scorecards', on_delete=models.CASCADE)
+    round = models.ForeignKey(Round, related_name='rounds', on_delete=models.CASCADE)
 
-class ScoreSheet(models.Model):
-    participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
+    class Meta:
+        unique_together = ['participant', 'round']
+
+class Arrow(models.Model):
+    scorecard = models.ForeignKey(ScoreCard, related_name='arrows', on_delete=models.CASCADE)
+    end = models.ForeignKey(End, related_name='arrows', on_delete=models.CASCADE)
+    nr = models.IntegerField('arrow nr', blank=False)
+    score = models.IntegerField('arrow score', blank=False, default=0)
+
+    class Meta:
+        unique_together = ['scorecard', 'end', 'nr']
