@@ -27,3 +27,7 @@ __pycache__/
 
 ### Django ###
 db.sqlite3
+
+# as long I don't care about the data in my db, migrations don't matter
+# but if db is something I need to keep, they are required
+migrations/

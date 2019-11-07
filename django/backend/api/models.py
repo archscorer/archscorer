@@ -62,17 +62,18 @@ class Archer(models.Model):
     phone = models.CharField('phone number', max_length=20, blank=True)
     efaa_id = models.CharField('EFAA Archer ID', max_length=7, blank=True)
 
-    # user = models.OneToOneField('User', default=-1, on_delete=models.PROTECT)
+    user = models.OneToOneField('User', related_name='user', null=True, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['full_name']
+        unique_together = ['full_name', 'email', 'efaa_id']
 
 class Course(models.Model):
     creator = models.ForeignKey('User', related_name='courses_created', null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
 
     name = models.CharField('Round name', max_length=150, default='Unnamed round', blank=False)
-    description = models.TextField()  # If creating custom non-standard course, describe its purpose
+    description = models.TextField(blank=False)  # If creating custom non-standard course, describe its purpose
     location = models.CharField(max_length=150, blank=True)
 
     class Meta:
@@ -80,39 +81,39 @@ class Course(models.Model):
 
 class End(models.Model):
     course = models.ForeignKey('Course', related_name='ends', on_delete=models.CASCADE)
-    order = models.IntegerField('End order', blank=False)
+    ord = models.IntegerField('End order', blank=False)
     label = models.CharField(max_length=30, blank=True)  # i.e 70 yards walk-up
     nr_of_arrows = models.PositiveSmallIntegerField(blank=False)  # number of max arrows that can be shot
     scoring = models.CharField(max_length=150, blank=False)
 
     class Meta:
-        ordering = ['order']
+        ordering = ['ord']
 
 class Competition(models.Model):
     creator = models.ForeignKey('User', related_name='competitions_created', null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
 
-    start_date = models.DateField(default=timezone.localdate)
-    end_date = models.DateField(default=timezone.localdate)
+    date_start = models.DateField(default=timezone.localdate)
+    date_end = models.DateField(default=timezone.localdate)
     registration_open = models.BooleanField(default=True)
     registration_due_date = models.DateField(default=timezone.localdate)
 
     name = models.CharField(max_length=150, default='Unnamed competition', blank=False)
-    description = models.TextField()
+    description = models.TextField(blank=True)
 
     class Meta:
-        ordering = ['-start_date']
+        ordering = ['-date_start']
 
 class Round(models.Model):
-    order = models.IntegerField('Round order', blank=False)
+    ord = models.IntegerField('Round order', blank=False)
     label = models.CharField('Label for round', max_length=150, blank=True)
     course = models.ForeignKey('Course', related_name='competitions', on_delete=models.CASCADE)
     competition = models.ForeignKey('Competition', related_name='rounds', on_delete=models.CASCADE)
     is_open = models.BooleanField('is round open', default=False)
 
     class Meta:
-        ordering = ['order']
-        unique_together = ['order', 'course', 'competition']
+        ordering = ['ord']
+        unique_together = ['ord', 'course', 'competition']
 
 class Participant(models.Model):
     AGEGROUP_CHOICES = [('C', 'Cub'),
@@ -154,8 +155,8 @@ class ScoreCard(models.Model):
 class Arrow(models.Model):
     scorecard = models.ForeignKey(ScoreCard, related_name='arrows', on_delete=models.CASCADE)
     end = models.ForeignKey(End, related_name='arrows', on_delete=models.CASCADE)
-    nr = models.IntegerField('arrow nr', blank=False)
+    ord = models.IntegerField('arrow nr', blank=False)
     score = models.IntegerField('arrow score', blank=False, default=0)
 
     class Meta:
-        unique_together = ['scorecard', 'end', 'nr']
+        unique_together = ['scorecard', 'end', 'ord']

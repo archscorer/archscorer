@@ -1,39 +1,42 @@
 <template>
   <v-container>
-      <v-card class="my-2">
-        <v-card-title>Create New</v-card-title>
+    <v-row dense>
+      <v-col cols="12">
+      <v-card>
+        <v-card-title>Competitions</v-card-title>
+        <v-card-actions>
+            <AddCompetiton/>
+        </v-card-actions>
       </v-card>
-      <v-card class="my-2">
+      </v-col>
+      <v-col cols="12">
+      <v-card>
         <v-card-title>Browse</v-card-title>
-        <v-list>
-          <v-subheader v-if="competitions.length === 0">No competitions found in the database</v-subheader>
-          <v-list-item v-for="(competition, index) in competitions.results" :key="index">
-            <v-list-item-content>
-              <v-list-item-title v-text="competition.name"></v-list-item-title>
-              {{competition.description}}
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
+        <ListCompetitions/>
       </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+  import AddCompetiton from '@/components/AddCompetition.vue'
+  import ListCompetitions from '@/components/ListCompetitions.vue'
 
-export default {
-  data: () => ({
-    //
-  }),
-  computed: mapState({
-    competitions: state => state.competitions.competitions
-  }),
-  methods: mapActions('competitions', [
-    'addCompetiton',
-    'deleteCompetition'
-  ]),
-  created() {
-    this.$store.dispatch('competitions/getCompetitions')
-  }
-};
+  export default {
+    name: 'Competitions',
+    components: {
+      AddCompetiton,
+      ListCompetitions
+    },
+    data: () => ({
+      //
+    })
+  };
 </script>
+
+<style>
+  .v-input__prepend-outer {
+    margin-top: 0.55rem;
+  }
+</style>

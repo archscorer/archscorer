@@ -24,40 +24,40 @@ def build_base_data():
              Club.objects.create(creator=users[0], name='Tartu vibuklubi'),
              Club.objects.create(creator=users[2], name='Local mad archers')]
 
-    archers = [Archer.objects.create(full_name='Priit Adler', gender='M', club=clubs[1]),
-               Archer.objects.create(full_name='Ann Mets', gender='F', club=clubs[2]),
+    archers = [Archer.objects.create(full_name='Priit Adler', user=users[0], gender='M', club=clubs[1]),
+               Archer.objects.create(full_name='Ann Mets', user=users[2], gender='F', club=clubs[2]),
                Archer.objects.create(full_name='Volli Mets', gender='M', club=clubs[2])]
 
     course_1 = Course.objects.create(creator=users[0], name='Generic: 28 ends / animal')
     for i in range(28):
-        End.objects.create(course=course_1, order=i+1, nr_of_arrows=1, scoring=[20,18,16,14,12,10])
+        End.objects.create(course=course_1, ord=i+1, nr_of_arrows=1, scoring=[20,18,16,14,12,10])
 
     course_4 = Course.objects.create(creator=users[0], name='Generic: 28 ends / 4 arrows')
     for i in range(28):
-        End.objects.create(course=course_4, order=i+1, nr_of_arrows=4, scoring=[5,4,3])
+        End.objects.create(course=course_4, ord=i+1, nr_of_arrows=4, scoring=[5,4,3])
 
     course_5 = Course.objects.create(creator=users[2], name='Generic: 6 ends / 5 arrows')
     for i in range(6):
-        End.objects.create(course=course_5, order=i+1, nr_of_arrows=5, scoring=[5,4,3,2,1])
+        End.objects.create(course=course_5, ord=i+1, nr_of_arrows=5, scoring=[5,4,3,2,1])
 
-    indoor_training = Competition.objects.create(creator=users[2], name='Indoor training')
+    big_competition = Competition.objects.create(creator=users[1], name='Open type of comp')
+    Round.objects.create(ord=1, course=course_1, competition=big_competition, label='Animal round')
+    Round.objects.create(ord=2, course=course_4, competition=big_competition, label='Field round')
+    Round.objects.create(ord=3, course=course_4, competition=big_competition, label='Hunter round')
+
+    indoor_training = Competition.objects.create(creator=users[0], name='Indoor training')
     for r in range(2):
-        Round.objects.create(order=r+1, course=course_5, competition=indoor_training, label='20y ' + str(r+1) + '. round')
-
-    big_competition = Competition.objects.create(creator=users[0], name='Open type of comp')
-    Round.objects.create(order=1, course=course_1, competition=big_competition, label='Animal round')
-    Round.objects.create(order=2, course=course_4, competition=big_competition, label='Field round')
-    Round.objects.create(order=3, course=course_4, competition=big_competition, label='Hunter round')
+        Round.objects.create(ord=r+1, course=course_5, competition=indoor_training, label='20y ' + str(r+1) + '. round')
 
 
 def test_registration():
     # register all archers
     # to the first competition in the database
-    comp = Competition.objects.get(pk=1)
+    comp = Competition.objects.get(pk=2)
 
     Participant.objects.create(archer=Archer.objects.get(pk=1), competition=comp, age_group='A', style='LB')
 
-    comp = Competition.objects.get(pk=2)
+    comp = Competition.objects.get(pk=1)
 
     for a in Archer.objects.all():
         Participant.objects.create(archer=a, competition=comp, age_group='A', style='LB')
@@ -81,7 +81,7 @@ def test_scoring():
                 for a in range(e.nr_of_arrows):
                     scoring = eval(e.scoring) + [0]
                     score = choice(scoring)
-                    arrow, created = Arrow.objects.get_or_create(scorecard=c, end=e, nr=a)
+                    arrow, created = Arrow.objects.get_or_create(scorecard=c, end=e, ord=a)
                     arrow.score=score
                     arrow.save()
 
@@ -92,6 +92,6 @@ def test_scoring():
             cum_score = sum([a.score for a in c.arrows.all()])
             print(style, a_name, r_name, cum_score)
 
-# build_base_data()
-# test_registration()
+build_base_data()
+test_registration()
 test_scoring()

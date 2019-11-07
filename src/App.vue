@@ -69,7 +69,7 @@
 <script>
 
 export default {
-  name: 'archscorer',
+  name: 'ArchScorER',
 
   data: () => ({
     drawer: null,

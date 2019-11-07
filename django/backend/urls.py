@@ -23,6 +23,8 @@ router.register(r'clubs', views.ClubViewSet)
 router.register(r'courses', views.CourseViewSet)
 router.register(r'archers', views.ArcherViewSet)
 router.register(r'competitions', views.CompetitionViewSet)
+router.register(r'rounds', views.RoundViewSet)
+router.register(r'participants', views.ParticipantViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
