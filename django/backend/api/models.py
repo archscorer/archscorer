@@ -62,7 +62,7 @@ class Archer(models.Model):
     phone = models.CharField('phone number', max_length=20, blank=True)
     nat_id = models.CharField('National Archer ID', max_length=30, blank=True)
 
-    user = models.OneToOneField('User', related_name='user', null=True, on_delete=models.CASCADE)
+    user = models.OneToOneField('User', related_name='archer', null=True, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['full_name']

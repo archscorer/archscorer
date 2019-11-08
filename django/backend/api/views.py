@@ -1,9 +1,20 @@
 from rest_framework import viewsets
 from rest_framework import permissions
-from .models import (Club, Course, Archer, Event, Round, Participant)
-from .serializers import (ClubSerializer, CourseSerializer,
-                          ArcherSerializer, EventSerializer,
-                          RoundSerializer, ParticipantSerializer)
+from django.contrib.auth.models import AnonymousUser
+from .models import (User, Club, Course, Archer, Event, Round, Participant)
+from .serializers import (UserSerializer, ClubSerializer, CourseSerializer,
+                          ArcherSerializer, EventSerializer, RoundSerializer,
+                          ParticipantSerializer)
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        if isinstance(self.request.user, AnonymousUser):
+            return [User()]
+        else:
+            return [self.request.user]
 
 class ClubViewSet(viewsets.ModelViewSet):
     """

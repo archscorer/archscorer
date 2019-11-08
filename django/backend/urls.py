@@ -19,6 +19,7 @@ from rest_framework import routers
 from .api import views
 
 router = routers.DefaultRouter()
+router.register(r'user', views.UserViewSet, basename='')
 router.register(r'clubs', views.ClubViewSet)
 router.register(r'courses', views.CourseViewSet)
 router.register(r'archers', views.ArcherViewSet)

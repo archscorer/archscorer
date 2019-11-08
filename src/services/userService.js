@@ -1,17 +1,25 @@
+import api from '@/services/api'
+
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
 const apiAuth = axios.create({
-  baseURL: '/api-auth',
   timeout: 5000,
   headers: {
-    'Content-Type': 'application/json',
-    'X-CSRFToken': Cookies.get('csrftoken')
-  }
+    'Content-Type': 'multipart/form-data'
+  },
+  withCredentials: true
 })
 
 export default {
-  postAuth(action, payload = {}) {
-    return apiAuth.post(`${action}/`, payload)
+  postAuth(action, next = '', payload = {}) {
+    return apiAuth.post(`/api-auth/${action}/${next}`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+                  .then(response => {
+                    return response.data
+                  })
+  },
+  getUser() {
+    return api.get(`user`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+              .then(response => response.data)
   }
 }

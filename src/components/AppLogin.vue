@@ -1,5 +1,28 @@
 <template>
   <v-menu
+    v-if="user.id !== null"
+    v-model="logout_menu"
+    :close-on-content-click="false"
+    transition="slide-y-transition"
+    offset-y
+  >
+    <template v-slot:activator="{ on }">
+      <v-btn text
+        rounded
+        v-on="on">
+        <span class="mr-2">{{ user.email }}</span>
+      </v-btn>
+    </template>
+    <v-card>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text @click="logout_menu = false;userLogout()">Logout</v-btn>
+        <v-spacer></v-spacer>
+      </v-card-actions>
+    </v-card>
+  </v-menu>
+  <v-menu
+    v-else
     v-model="login_menu"
     :close-on-content-click="false"
     transition="slide-y-transition"
@@ -13,7 +36,7 @@
       </v-btn>
     </template>
     <v-form v-model="valid">
-      <v-card class="pa-5">
+      <v-card class="pa-5" min-width="250px">
         <v-row>
           <v-col cols="12">
             <v-text-field
@@ -52,6 +75,7 @@
   export default {
     data: () => ({
       login_menu: false,
+      logout_menu: false,
       passw_show: false,
       valid: false,
 
@@ -71,6 +95,10 @@
         'userLogin',
         'userLogout'
       ])
+    },
+    created() {
+      //do something after creating vue instance
+      this.$store.dispatch('user/checkUser')
     }
   }
 </script>

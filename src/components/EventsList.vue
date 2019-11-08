@@ -16,7 +16,7 @@
           <v-card-actions>
             <ListEventsRegister v-bind:comp_id="event.id"/>
             <v-spacer></v-spacer>
-            <v-btn color="error" @click="deleteEvent(event.id)">Delete</v-btn>
+            <v-btn v-if="user.email === event.creator" color="error" @click="deleteEvent(event.id)">Delete</v-btn>
           </v-card-actions>
         </v-card>
       </v-list-item-content>
@@ -34,7 +34,8 @@
     },
     computed: {
       ...mapState({
-        events: state => state.events.events
+        events: state => state.events.events,
+        user: state => state.user.user
       })
     },
     methods: {

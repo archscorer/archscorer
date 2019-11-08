@@ -1,4 +1,5 @@
 import api from '@/services/api'
+import Cookies from 'js-cookie'
 
 export default {
   fetchEvents(compId = '') {
@@ -8,19 +9,19 @@ export default {
               .then(response => response.data)
   },
   postEvent(payload) {
-    return api.post(`events/`, payload)
+    return api.post(`events/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   },
   deleteEvent(compId) {
-    return api.delete(`events/${compId}`)
+    return api.delete(`events/${compId}`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   },
   postRound(payload) {
-    return api.post(`rounds/`, payload)
+    return api.post(`rounds/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   },
   deleteRound(rId) {
-    return api.delete(`rounds/${rId}`)
+    return api.delete(`rounds/${rId}`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   }
 }

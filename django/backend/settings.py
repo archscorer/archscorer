@@ -52,6 +52,9 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
     # api pagination requires quite a bit more elaborate vuex side management
     # currelty it's not priority and omitting here. Might come back to this if
     # performance requires.

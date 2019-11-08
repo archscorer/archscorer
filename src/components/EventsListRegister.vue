@@ -36,7 +36,7 @@
 
 
 <script>
-  // import { mapState, mapActions } from 'vuex'
+  import { mapState, mapActions } from 'vuex'
   export default {
     // name: "listCompetitonRegister",
     props: {
@@ -49,6 +49,19 @@
       participant: {
         'full_name': '',
       }
-    })
+    }),
+    computed: {
+      ...mapState({
+        user: state => state.user.user
+      })
+    },
+    methods: {
+      ...mapActions('events', [
+        'deleteEvent'
+      ])
+    },
+    created() {
+      // this.$store.dispatch('events/getEvents')
+    }
   }
 </script>

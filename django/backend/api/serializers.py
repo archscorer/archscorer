@@ -1,4 +1,5 @@
-from .models import (Club,
+from .models import (User,
+                     Club,
                      Archer,
                      Course,
                      End,
@@ -40,7 +41,13 @@ class ArcherSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.is_active')
     class Meta:
         model = Archer
-        fields = ['id', 'full_name', 'gender', 'club', 'email', 'phone', 'efaa_id', 'events', 'user']
+        fields = ['id', 'full_name', 'gender', 'club', 'email', 'phone', 'nat_id', 'events', 'user']
+
+class UserSerializer(serializers.ModelSerializer):
+    archer = ArcherSerializer()
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'archer']
 
 class ClubSerializer(serializers.ModelSerializer):
     members = ArcherSerializer(many=True, read_only=True)

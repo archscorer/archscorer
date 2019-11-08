@@ -1,5 +1,9 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600px">
+  <v-dialog
+    v-if="user.id !== null"
+    v-model="dialog"
+    max-width="600px"
+  >
     <template v-slot:activator="{ on }">
       <v-btn text v-on="on" icon fab><v-icon>mdi-plus</v-icon></v-btn>
     </template>
@@ -183,7 +187,8 @@
         return this.dates.join(' ~ ')
       },
       ...mapState({
-        courses: state => state.courses.courses
+        courses: state => state.courses.courses,
+        user: state => state.user.user
       })
     },
     methods: {
