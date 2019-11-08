@@ -22,7 +22,7 @@ router = routers.DefaultRouter()
 router.register(r'clubs', views.ClubViewSet)
 router.register(r'courses', views.CourseViewSet)
 router.register(r'archers', views.ArcherViewSet)
-router.register(r'competitions', views.CompetitionViewSet)
+router.register(r'events', views.EventViewSet)
 router.register(r'rounds', views.RoundViewSet)
 router.register(r'participants', views.ParticipantViewSet)
 
