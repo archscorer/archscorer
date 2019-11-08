@@ -30,15 +30,15 @@
                   <v-row>
                     <v-col cols="6">
                       <v-text-field
-                        v-model="competition.name"
+                        v-model="event.name"
                         :rules="nameRules"
-                        label="Competition name"
+                        label="Event name"
                         required></v-text-field>
                     </v-col>
                     <v-col cols="6">
                       <v-menu
-                        ref="menu"
-                        v-model="menu"
+                        ref="date_menu"
+                        v-model="date_menu"
                         :close-on-content-click="false"
                         :return-value.sync="dates"
                         transition="scale-transition"
@@ -59,8 +59,8 @@
                           range
                         >
                           <v-spacer></v-spacer>
-                          <v-btn text @click="menu = false">Cancel</v-btn>
-                          <v-btn color="primary" @click="$refs.menu.save(dates)">OK</v-btn>
+                          <v-btn text @click="date_menu = false">Cancel</v-btn>
+                          <v-btn color="primary" @click="$refs.date_menu.save(dates)">OK</v-btn>
                         </v-date-picker>
                       </v-menu>
                     </v-col>
@@ -69,8 +69,8 @@
                     <v-col cols="12">
                       <v-textarea
                         outlined
-                        v-model="competition.description"
-                        label="Competition details"
+                        v-model="event.description"
+                        label="Event details"
                         required></v-textarea>
                     </v-col>
                   </v-row>
@@ -91,10 +91,10 @@
             <v-card-title>Add rounds/course</v-card-title>
             <v-form v-model="valid_e2">
               <v-container>
-                <v-row dense v-for="(round, index) in competition.rounds" :key="index">
+                <v-row dense v-for="(round, index) in event.rounds" :key="index">
                   <v-col cols="5">
                     <v-text-field
-                      v-model="competition.rounds[index].label"
+                      v-model="event.rounds[index].label"
                       label="Round description"
                     >
                       <template v-slot:prepend>
@@ -104,7 +104,7 @@
                   </v-col>
                   <v-col cols="6">
                     <v-autocomplete
-                      v-model="competition.rounds[index].course"
+                      v-model="event.rounds[index].course"
                       :rules="courseRules"
                       autocomplete
                       :items="courses"
@@ -136,12 +136,15 @@
         </v-stepper-content>
         <v-stepper-content step="3">
           <v-card>
+            registration is open and registration link to share.
+            catering options
+            ...
             <v-card-actions>
               <v-btn @click="e1 = 2">Back</v-btn>
               <v-spacer></v-spacer>
               <v-btn text @click="dialog = false">Close</v-btn>
               <v-btn color="primary"
-                @click="addCompetition(fixCompetitionDates()); dialog = false; e1 = 1">Finish</v-btn>
+                @click="addEvent(fixEventDates()); dialog = false; e1 = 1">Finish</v-btn>
             </v-card-actions>
           </v-card>
         </v-stepper-content>
@@ -153,12 +156,11 @@
 <script>
   import { mapState, mapActions } from 'vuex'
   export default {
-    // name: "addCompetiton",
     data: () => ({
       dialog: false,
       e1: 1,
 
-      competition: {
+      event: {
         name: '',
         date_start: '',
         date_end: '',
@@ -167,16 +169,11 @@
       },
 
       valid_e1: false,
-      nameRules: [
-        v => !!v || 'Name is required',
-      ],
-      dateRules: [
-        v => !!v || 'Start date is required'
-      ],
-      courseRules: [
-        v => !!v || 'Round course needs to be selected'
-      ],
-      menu: false,
+
+      nameRules: [v => !!v || 'Name is required'],
+      dateRules: [v => !!v || 'Start date is required'],
+      courseRules: [v => !!v || 'Round course needs to be selected'],
+      date_menu: false,
       dates: [],  // new Date().toISOString().substr(0, 10)
 
       valid_e2: false,
@@ -191,18 +188,18 @@
     },
     methods: {
       addRound() {
-        this.competition.rounds.push({label: '', course: null})
+        this.event.rounds.push({label: '', course: null})
       },
       delRound(index) {
-        this.competition.rounds.splice(index, 1)
+        this.event.rounds.splice(index, 1)
       },
-      fixCompetitionDates() {
-        this.competition.date_start = this.dates[0];
-        this.competition.date_end = this.dates.slice(-1)[0];
-        return this.competition
+      fixEventDates() {
+        this.event.date_start = this.dates[0];
+        this.event.date_end = this.dates.slice(-1)[0];
+        return this.event
       },
-      ...mapActions('competitions', [
-        'addCompetition'
+      ...mapActions('events', [
+        'addEvent'
       ])
     },
     created() {

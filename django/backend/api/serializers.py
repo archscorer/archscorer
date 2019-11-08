@@ -2,7 +2,7 @@ from .models import (Club,
                      Archer,
                      Course,
                      End,
-                     Competition,
+                     Event,
                      Round,
                      Participant)
 from rest_framework import serializers
@@ -21,26 +21,26 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = ['id', 'creator', 'name', 'description', 'location', 'ends']
 
 class RoundSerializer(serializers.ModelSerializer):
-    # competition = serializers.HyperlinkedRelatedField(view_name='competition-detail', read_only=True)
+    # event = serializers.HyperlinkedRelatedField(view_name='event-detail', read_only=True)
     # course = serializers.HyperlinkedRelatedField(view_name='course-detail', read_only=True)
     class Meta:
         model = Round
-        fields = ['id', 'ord', 'course', 'label', 'is_open', 'competition']
+        fields = ['id', 'ord', 'course', 'label', 'is_open', 'event']
 
 class ParticipantSerializer(serializers.ModelSerializer):
     # archer = serializers.HyperlinkedRelatedField(view_name='archer-detail', read_only=True)
-    # competition = serializers.HyperlinkedRelatedField(view_name='competition-detail', read_only=True)
+    # event = serializers.HyperlinkedRelatedField(view_name='event-detail', read_only=True)
     class Meta:
         model = Participant
-        fields = ['id', 'archer', 'age_group', 'style', 'competition']
+        fields = ['id', 'archer', 'age_group', 'style', 'event']
 
 class ArcherSerializer(serializers.ModelSerializer):
-    competitions = ParticipantSerializer(many=True, read_only=True)
+    events = ParticipantSerializer(many=True, read_only=True)
     # club = serializers.HyperlinkedRelatedField(view_name='club-detail', read_only=True)
     user = serializers.ReadOnlyField(source='user.is_active')
     class Meta:
         model = Archer
-        fields = ['id', 'full_name', 'gender', 'club', 'email', 'phone', 'efaa_id', 'competitions', 'user']
+        fields = ['id', 'full_name', 'gender', 'club', 'email', 'phone', 'efaa_id', 'events', 'user']
 
 class ClubSerializer(serializers.ModelSerializer):
     members = ArcherSerializer(many=True, read_only=True)
@@ -48,10 +48,10 @@ class ClubSerializer(serializers.ModelSerializer):
         model = Club
         fields = ['id', 'name', 'contact', 'members']
 
-class CompetitionSerializer(serializers.ModelSerializer):
+class EventSerializer(serializers.ModelSerializer):
     creator = serializers.ReadOnlyField(source='creator.email')
     participants = ParticipantSerializer(many=True, read_only=True)
     rounds = RoundSerializer(many=True, read_only=True)
     class Meta:
-        model = Competition
+        model = Event
         fields = ['id', 'creator', 'name', 'description', 'date_start', 'date_end', 'rounds', 'participants']

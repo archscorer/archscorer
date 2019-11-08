@@ -4,30 +4,30 @@
 
 Initial simple functionality should include
 
-* Create competition
+* Create event
  * From template (Field, Hunter, Animal, etc)
  * Custom: [number of targets, arrows per target, how to score]
 
-Site Needs to managed past and present competitions, site needs browse / search / blog function to
-find competitions. Past competition scores could be private (only participants can see) or public.
+Site Needs to managed past and present events, site needs browse / search / blog function to
+find events. Past event scores could be private (only participants can see) or public.
 
 * Add participants
  * by registration form (pre-filled for logged in user / can register others as well? / registration by link / payment by bank link?)
 * Arrange participants to targets (need some privileges)
  * By class / comp cum score / rating / manual
 * Scoring
- * Show running score for the competition
+ * Show running score for the event
  * Input end score - one arrow at a time, for each competitor at given end
 
 All this requires some user management (Google/FB/email auth)
 
 
-## Database model for a competition
+## Database model for a event
 
-* New competition
+* New event
  * ID - uniq / numeric
  * Name (IV klubide karikas)
- * Date (22.10.20) / Date range (multi day competitions)
+ * Date (22.10.20) / Date range (multi day events)
  * Description (bla, bla, maksab bla, süüa saab bla)
  * Course / place ID -- string (Räbiküla)
  * Format (Animal / Field, etc)
@@ -41,7 +41,7 @@ All this requires some user management (Google/FB/email auth)
   * ID (uniq) - refers to Archers database (site users) [people registered by name only get every time new ID, once they register - all entries with such name are pulled together and tables are updated to new ID]
   * class (AMLB, etc)
   * ScoreCard
-   * End ID - refers to competition Ends table?
+   * End ID - refers to event Ends table?
    * arrow scores
    * end score (computed)
   * Cum score (computed)
@@ -51,7 +51,7 @@ All this requires some user management (Google/FB/email auth)
 * New series
  * ID - uniq / numeric
  * Name (Klubide Karikas 2019)
- * Stages - list to competitions that belong to series
+ * Stages - list to events that belong to series
  * Rules -- not sure how to express that?
   * Allowed clubs (i.e club cup points are only awarded to Estonian clubs, others can participate, but no points will be awarded)
   * max points

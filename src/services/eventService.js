@@ -1,18 +1,18 @@
 import api from '@/services/api'
 
 export default {
-  fetchCompetitions(compId = '') {
-    // given argument - if omitter allows to get a list of all competitions or
-    // if defined just single competitions
-    return api.get(`competitions/${compId}`)
+  fetchEvents(compId = '') {
+    // given argument - if omitter allows to get a list of all events or
+    // if defined just single events
+    return api.get(`events/${compId}`)
               .then(response => response.data)
   },
-  postCompetition(payload) {
-    return api.post(`competitions/`, payload)
+  postEvent(payload) {
+    return api.post(`events/`, payload)
               .then(response => response.data)
   },
-  deleteCompetition(compId) {
-    return api.delete(`competitions/${compId}`)
+  deleteEvent(compId) {
+    return api.delete(`events/${compId}`)
               .then(response => response.data)
   },
   postRound(payload) {

@@ -1,8 +1,8 @@
 from rest_framework import viewsets
 from rest_framework import permissions
-from .models import (Club, Course, Archer, Competition, Round, Participant)
+from .models import (Club, Course, Archer, Event, Round, Participant)
 from .serializers import (ClubSerializer, CourseSerializer,
-                          ArcherSerializer, CompetitionSerializer,
+                          ArcherSerializer, EventSerializer,
                           RoundSerializer, ParticipantSerializer)
 
 class ClubViewSet(viewsets.ModelViewSet):
@@ -34,21 +34,21 @@ class ArcherViewSet(viewsets.ModelViewSet):
     serializer_class = ArcherSerializer
     queryset = Archer.objects.all()
 
-class CompetitionViewSet(viewsets.ModelViewSet):
+class EventViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows competitions to be viewed or edited.
+    API endpoint that allows events to be viewed or edited.
     Edit / create is privileged to registered users only.
     """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    serializer_class = CompetitionSerializer
-    queryset = Competition.objects.all()
+    serializer_class = EventSerializer
+    queryset = Event.objects.all()
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
 
 class RoundViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows competitions to be viewed or edited.
+    API endpoint that allows events to be viewed or edited.
     Edit / create is privileged to registered users only.
     """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -60,7 +60,7 @@ class RoundViewSet(viewsets.ModelViewSet):
 
 class ParticipantViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows competitions to be viewed or edited.
+    API endpoint that allows events to be viewed or edited.
     Edit / create is privileged to registered users only.
     """
     serializer_class = ParticipantSerializer

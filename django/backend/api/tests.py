@@ -9,7 +9,7 @@ from .models import (User,
                      Archer,
                      Course,
                      End,
-                     Competition,
+                     Event,
                      Participant,
                      Round,
                      ScoreCard,
@@ -40,41 +40,41 @@ def build_base_data():
     for i in range(6):
         End.objects.create(course=course_5, ord=i+1, nr_of_arrows=5, scoring=[5,4,3,2,1])
 
-    big_competition = Competition.objects.create(creator=users[1], name='Open type of comp')
-    Round.objects.create(ord=1, course=course_1, competition=big_competition, label='Animal round')
-    Round.objects.create(ord=2, course=course_4, competition=big_competition, label='Field round')
-    Round.objects.create(ord=3, course=course_4, competition=big_competition, label='Hunter round')
+    big_event = Event.objects.create(creator=users[1], name='Open type of comp')
+    Round.objects.create(ord=1, course=course_1, event=big_event, label='Animal round')
+    Round.objects.create(ord=2, course=course_4, event=big_event, label='Field round')
+    Round.objects.create(ord=3, course=course_4, event=big_event, label='Hunter round')
 
-    indoor_training = Competition.objects.create(creator=users[0], name='Indoor training')
+    indoor_training = Event.objects.create(creator=users[0], name='Indoor training')
     for r in range(2):
-        Round.objects.create(ord=r+1, course=course_5, competition=indoor_training, label='20y ' + str(r+1) + '. round')
+        Round.objects.create(ord=r+1, course=course_5, event=indoor_training, label='20y ' + str(r+1) + '. round')
 
 
 def test_registration():
     # register all archers
-    # to the first competition in the database
-    comp = Competition.objects.get(pk=2)
+    # to the first event in the database
+    comp = Event.objects.get(pk=2)
 
-    Participant.objects.create(archer=Archer.objects.get(pk=1), competition=comp, age_group='A', style='LB')
+    Participant.objects.create(archer=Archer.objects.get(pk=1), event=comp, age_group='A', style='LB')
 
-    comp = Competition.objects.get(pk=1)
+    comp = Event.objects.get(pk=1)
 
     for a in Archer.objects.all():
-        Participant.objects.create(archer=a, competition=comp, age_group='A', style='LB')
+        Participant.objects.create(archer=a, event=comp, age_group='A', style='LB')
         if a.full_name == 'Ann Mets':
             # test if archer can participate in multiple styles
-            Participant.objects.create(archer=a, competition=comp, age_group='A', style='BU')
+            Participant.objects.create(archer=a, event=comp, age_group='A', style='BU')
 
 
 def test_scoring():
     from random import choice
-    for comp in Competition.objects.all():
+    for comp in Event.objects.all():
 
         for a in comp.participants.all():
             for r in comp.rounds.all():
                 ScoreCard.objects.get_or_create(participant=a, round=r)
 
-        cards = ScoreCard.objects.filter(participant__competition__pk=comp.pk)
+        cards = ScoreCard.objects.filter(participant__event__pk=comp.pk)
 
         for c in cards:
             for e in c.round.course.ends.all():

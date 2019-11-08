@@ -3,7 +3,7 @@
     <v-row dense>
       <v-col cols="12">
       <v-card>
-        <v-card-title>Competitions</v-card-title>
+        <v-card-title>Events</v-card-title>
         <v-card-actions>
             <AddCompetiton/>
         </v-card-actions>
@@ -12,7 +12,7 @@
       <v-col cols="12">
       <v-card>
         <v-card-title>Browse</v-card-title>
-        <ListCompetitions/>
+        <ListEvents/>
       </v-card>
       </v-col>
     </v-row>
@@ -20,14 +20,14 @@
 </template>
 
 <script>
-  import AddCompetiton from '@/components/AddCompetition.vue'
-  import ListCompetitions from '@/components/ListCompetitions.vue'
+  import AddCompetiton from '@/components/EventsAdd.vue'
+  import ListEvents from '@/components/EventsList.vue'
 
   export default {
-    name: 'Competitions',
+    name: 'Events',
     components: {
       AddCompetiton,
-      ListCompetitions
+      ListEvents
     },
     data: () => ({
       //

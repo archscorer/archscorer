@@ -14,8 +14,8 @@
       <v-spacer></v-spacer>
       <v-toolbar-items class="hidden-xs-only">
         <v-btn text
-          to="/competitions">
-          Competitons
+          to="/events">
+          Events
         </v-btn>
         <v-btn text
           to="/statistics">
@@ -27,9 +27,7 @@
         </v-btn>
       </v-toolbar-items>
       <v-spacer></v-spacer>
-      <v-btn text rounded>
-        <span class="mr-2">login</span>
-      </v-btn>
+      <AppLogin/>
     </v-app-bar>
     <v-navigation-drawer app v-model="drawer">
       <v-list dense>
@@ -39,10 +37,10 @@
           </v-list-item-icon>
           <v-list-item-title>Home</v-list-item-title>
         </v-list-item>
-        <v-list-item to="/competitions">
+        <v-list-item to="/events">
           <v-list-item-icon>
           </v-list-item-icon>
-          <v-list-item-title>Competitions</v-list-item-title>
+          <v-list-item-title>Events</v-list-item-title>
         </v-list-item>
         <v-list-item to="/statistics">
           <v-list-item-icon>
@@ -67,12 +65,15 @@
 </template>
 
 <script>
+  import AppLogin from '@/components/AppLogin.vue'
 
-export default {
-  name: 'ArchScorER',
-
-  data: () => ({
-    drawer: null,
-  }),
-};
+  export default {
+    // name: 'ArchScorER',
+    components: {
+      AppLogin,
+    },
+    data: () => ({
+      drawer: null,
+    }),
+  };
 </script>

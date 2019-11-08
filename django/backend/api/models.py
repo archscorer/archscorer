@@ -60,13 +60,13 @@ class Archer(models.Model):
     club = models.ForeignKey('Club', related_name='members', null=True, on_delete=models.CASCADE)
     email = models.EmailField('email address', blank=True)
     phone = models.CharField('phone number', max_length=20, blank=True)
-    efaa_id = models.CharField('EFAA Archer ID', max_length=7, blank=True)
+    nat_id = models.CharField('National Archer ID', max_length=30, blank=True)
 
     user = models.OneToOneField('User', related_name='user', null=True, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['full_name']
-        unique_together = ['full_name', 'email', 'efaa_id']
+        unique_together = ['full_name', 'email', 'nat_id']
 
 class Course(models.Model):
     creator = models.ForeignKey('User', related_name='courses_created', null=True, on_delete=models.SET_NULL)
@@ -89,8 +89,8 @@ class End(models.Model):
     class Meta:
         ordering = ['ord']
 
-class Competition(models.Model):
-    creator = models.ForeignKey('User', related_name='competitions_created', null=True, on_delete=models.SET_NULL)
+class Event(models.Model):
+    creator = models.ForeignKey('User', related_name='events_created', null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
 
     date_start = models.DateField(default=timezone.localdate)
@@ -98,7 +98,7 @@ class Competition(models.Model):
     registration_open = models.BooleanField(default=True)
     registration_due_date = models.DateField(default=timezone.localdate)
 
-    name = models.CharField(max_length=150, default='Unnamed competition', blank=False)
+    name = models.CharField(max_length=150, default='Unnamed event', blank=False)
     description = models.TextField(blank=True)
 
     class Meta:
@@ -107,13 +107,13 @@ class Competition(models.Model):
 class Round(models.Model):
     ord = models.IntegerField('Round order', blank=False)
     label = models.CharField('Label for round', max_length=150, blank=True)
-    course = models.ForeignKey('Course', related_name='competitions', on_delete=models.CASCADE)
-    competition = models.ForeignKey('Competition', related_name='rounds', on_delete=models.CASCADE)
+    course = models.ForeignKey('Course', related_name='events', on_delete=models.CASCADE)
+    event = models.ForeignKey('Event', related_name='rounds', on_delete=models.CASCADE)
     is_open = models.BooleanField('is round open', default=False)
 
     class Meta:
         ordering = ['ord']
-        unique_together = ['ord', 'course', 'competition']
+        unique_together = ['ord', 'course', 'event']
 
 class Participant(models.Model):
     AGEGROUP_CHOICES = [('C', 'Cub'),
@@ -136,14 +136,14 @@ class Participant(models.Model):
         ('TR', 'Traditional Recurve')
     ]
     created = models.DateTimeField(auto_now_add=True)
-    archer = models.ForeignKey(Archer, related_name='competitions', on_delete=models.CASCADE)
-    competition = models.ForeignKey(Competition, related_name='participants', on_delete=models.CASCADE)
+    archer = models.ForeignKey(Archer, related_name='events', on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, related_name='participants', on_delete=models.CASCADE)
     age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
 
     class Meta:
         ordering = ['created']
-        unique_together = ['archer', 'competition', 'style']
+        unique_together = ['archer', 'event', 'style']
 
 class ScoreCard(models.Model):
     participant = models.ForeignKey(Participant, related_name='scorecards', on_delete=models.CASCADE)
