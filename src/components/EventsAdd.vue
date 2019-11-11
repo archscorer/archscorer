@@ -75,7 +75,7 @@
                         outlined
                         v-model="event.description"
                         label="Event details"
-                        required></v-textarea>
+                      ></v-textarea>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -159,6 +159,7 @@
 
 <script>
   import { mapState, mapActions } from 'vuex'
+
   export default {
     data: () => ({
       dialog: false,

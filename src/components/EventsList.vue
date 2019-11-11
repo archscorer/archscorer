@@ -14,7 +14,7 @@
         </v-list-item-subtitle>
         <v-card>
           <v-card-actions>
-            <ListEventsRegister v-bind:comp_id="event.id"/>
+            <ListEventsRegister v-bind:event="event"/>
             <v-spacer></v-spacer>
             <v-btn v-if="user.email === event.creator" color="error" @click="deleteEvent(event.id)">Delete</v-btn>
           </v-card-actions>

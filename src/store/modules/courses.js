@@ -23,9 +23,9 @@ const actions = {
       commit('addCourse', course)
     })
   },
-  deleteCourse({ commit }, compId) {
-    courseService.deleteCourse(compId)
-    commit('deleteCourse', compId)
+  deleteCourse({ commit }, cId) {
+    courseService.deleteCourse(cId)
+    commit('deleteCourse', cId)
   }
 }
 

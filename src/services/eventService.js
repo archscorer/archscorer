@@ -1,4 +1,5 @@
 import api from '@/services/api'
+
 import Cookies from 'js-cookie'
 
 export default {
@@ -22,6 +23,18 @@ export default {
   },
   deleteRound(rId) {
     return api.delete(`rounds/${rId}`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+              .then(response => response.data)
+  },
+  optsParticipant() {
+    return api.options(`participants/`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+              .then(response => response.data.actions.POST)
+  },
+  postParticipant(payload) {
+    return api.post(`participants/register/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+              .then(response => response.data)
+  },
+  deleteParticipant(pId) {
+    return api.delete(`participants/${pId}`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   }
 }

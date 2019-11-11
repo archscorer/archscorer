@@ -1,7 +1,9 @@
 import eventService from '@/services/eventService'
+/*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 
 const state = {
-  events: []
+  events: [],
+  participantModel: null
 }
 
 const getters = {
@@ -11,8 +13,8 @@ const getters = {
 }
 
 const actions = {
-  getEvents({ commit }) {
-    eventService.fetchEvents()
+  getEvents({ commit }, eId = '') {
+    eventService.fetchEvents(eId)
     .then(events => {
       commit('setEvents', events)
     })
@@ -39,10 +41,41 @@ const actions = {
       })
     })
   },
-  deleteEvent({ commit }, compId) {
-    eventService.deleteEvent(compId)
+  deleteEvent({ commit }, eId) {
+    eventService.deleteEvent(eId)
     .then(() => {
-      commit('deleteEvent', compId)      
+      commit('deleteEvent', eId)
+    })
+  },
+  getParticipantOpts({ commit }) {
+    eventService.optsParticipant()
+    .then(model => {
+      commit('setParticipantModel', model)
+    })
+  },
+  addParticipant({ commit }, participant) {
+    eventService.postParticipant(participant)
+    .then(participant => {
+      eventService.fetchEvents(participant.event.id)
+      .then(event => {
+        commit('updateEvent', event)
+      })
+    }).catch(error => {
+      // TODO this should not be here
+      console.log(error.response.data)
+    })
+  },
+  delParticipant({ commit }, eId, pId) {
+    // TODO
+    // should check
+    // can delete only if user === archer
+    // user === competition owner
+    eventService.deleteParticipant(pId)
+    .then(() => {
+      eventService.fetchEvents(eId)
+      .then(event => {
+        commit('updateEvent', event)
+      })
     })
   }
 }
@@ -56,10 +89,13 @@ const mutations = {
   },
   updateEvent(state, event) {
     const index = state.events.findIndex(obj => obj.id === event.id);
-    if (index !== -1)state.events.splice(index, 1, event)
+    if (index !== -1) state.events.splice(index, 1, event)
   },
-  deleteEvent(state, compId) {
-    state.events = state.events.filter(obj => obj.id !== compId)
+  deleteEvent(state, eId) {
+    state.events = state.events.filter(obj => obj.id !== eId)
+  },
+  setParticipantModel(state, model) {
+    state.participantModel = model
   }
 }
 

@@ -1,5 +1,3 @@
-/*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
-
 import userService from '@/services/userService'
 
 const state = {

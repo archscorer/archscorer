@@ -22,38 +22,43 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = ['id', 'creator', 'name', 'description', 'location', 'ends']
 
 class RoundSerializer(serializers.ModelSerializer):
-    # event = serializers.HyperlinkedRelatedField(view_name='event-detail', read_only=True)
-    # course = serializers.HyperlinkedRelatedField(view_name='course-detail', read_only=True)
     class Meta:
         model = Round
         fields = ['id', 'ord', 'course', 'label', 'is_open', 'event']
 
+class ParticipantArcherSerializer(serializers.ModelSerializer):
+    club = serializers.ReadOnlyField(source='club.name')
+    class Meta:
+        model = Archer
+        fields = ['id', 'full_name', 'gender', 'club']
+
 class ParticipantSerializer(serializers.ModelSerializer):
-    # archer = serializers.HyperlinkedRelatedField(view_name='archer-detail', read_only=True)
-    # event = serializers.HyperlinkedRelatedField(view_name='event-detail', read_only=True)
+    archer = ParticipantArcherSerializer(read_only=True)
     class Meta:
         model = Participant
-        fields = ['id', 'archer', 'age_group', 'style', 'event']
+        fields = ['id', 'archer', 'age_group', 'style', 'event', 'eats', 'comments']
 
 class ArcherSerializer(serializers.ModelSerializer):
     events = ParticipantSerializer(many=True, read_only=True)
-    # club = serializers.HyperlinkedRelatedField(view_name='club-detail', read_only=True)
     user = serializers.ReadOnlyField(source='user.is_active')
     class Meta:
         model = Archer
         fields = ['id', 'full_name', 'gender', 'club', 'email', 'phone', 'nat_id', 'events', 'user']
+        depth = 1
 
 class UserSerializer(serializers.ModelSerializer):
     archer = ArcherSerializer()
     class Meta:
         model = User
         fields = ['id', 'email', 'archer']
+        depth = 1
 
 class ClubSerializer(serializers.ModelSerializer):
     members = ArcherSerializer(many=True, read_only=True)
     class Meta:
         model = Club
         fields = ['id', 'name', 'contact', 'members']
+        depth = 1
 
 class EventSerializer(serializers.ModelSerializer):
     creator = serializers.ReadOnlyField(source='creator.email')

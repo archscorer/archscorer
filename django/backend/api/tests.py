@@ -28,26 +28,42 @@ def build_base_data():
                Archer.objects.create(full_name='Ann Mets', user=users[2], gender='F', club=clubs[2]),
                Archer.objects.create(full_name='Volli Mets', gender='M', club=clubs[2])]
 
-    course_1 = Course.objects.create(creator=users[0], name='Generic: 28 ends / animal')
+    course_1 = Course.objects.create(creator=users[0], name='Standard: 1 arrow / 28 ends')
     for i in range(28):
         End.objects.create(course=course_1, ord=i+1, nr_of_arrows=1, scoring=[20,18,16,14,12,10])
 
-    course_4 = Course.objects.create(creator=users[0], name='Generic: 28 ends / 4 arrows')
+    course_2 = Course.objects.create(creator=users[0], name='Standard: 2 arrows / 24 ends')
+    for i in range(24):
+        End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, scoring=[11,10,8,5])
+
+    course_2_2 = Course.objects.create(creator=users[0], name='Standard: 2 arrows / 28 ends')
+    for i in range(24):
+        End.objects.create(course=course_2_2, ord=i+1, nr_of_arrows=2, scoring=[10,8,5])
+
+    course_3 = Course.objects.create(creator=users[0], name='Standard: 3 arrows / 10 ends')
+    for i in range(28):
+        End.objects.create(course=course_3, ord=i+1, nr_of_arrows=4, scoring=[10,9,8,7,6,5,4,3,2,1])
+
+    course_4 = Course.objects.create(creator=users[0], name='Standard: 4 arrows / 28 ends')
     for i in range(28):
         End.objects.create(course=course_4, ord=i+1, nr_of_arrows=4, scoring=[5,4,3])
 
-    course_5 = Course.objects.create(creator=users[2], name='Generic: 6 ends / 5 arrows')
+    course_5 = Course.objects.create(creator=users[0], name='Standard: 5 arrows / 6 ends')
     for i in range(6):
         End.objects.create(course=course_5, ord=i+1, nr_of_arrows=5, scoring=[5,4,3,2,1])
 
-    big_event = Event.objects.create(creator=users[1], name='Open type of comp')
-    Round.objects.create(ord=1, course=course_1, event=big_event, label='Animal round')
-    Round.objects.create(ord=2, course=course_4, event=big_event, label='Field round')
-    Round.objects.create(ord=3, course=course_4, event=big_event, label='Hunter round')
+
+def test_event_creation():
+    users = User.objects.all()
+    courses = Course.objects.all()
+    big_event = Event.objects.create(creator=users[0], name='Open type of comp')
+    Round.objects.create(ord=1, course=courses[0], event=big_event, label='Animal round')
+    Round.objects.create(ord=2, course=courses[4], event=big_event, label='Field round')
+    Round.objects.create(ord=3, course=courses[4], event=big_event, label='Hunter round')
 
     indoor_training = Event.objects.create(creator=users[0], name='Indoor training')
     for r in range(2):
-        Round.objects.create(ord=r+1, course=course_5, event=indoor_training, label='20y ' + str(r+1) + '. round')
+        Round.objects.create(ord=r+1, course=courses[5], event=indoor_training, label='20y ' + str(r+1) + '. round')
 
 
 def test_registration():
@@ -92,6 +108,9 @@ def test_scoring():
             cum_score = sum([a.score for a in c.arrows.all()])
             print(style, a_name, r_name, cum_score)
 
-build_base_data()
-test_registration()
-test_scoring()
+
+def run_all_tests():
+    build_base_data()
+    test_event_creation()
+    test_registration()
+    test_scoring()

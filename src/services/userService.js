@@ -21,5 +21,13 @@ export default {
   getUser() {
     return api.get(`user`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
+  },
+  getArcher() {
+    return api.get(`archer`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+              .then(response => response.data)
+  },
+  postArcher(payload) {
+    return api.post(`archer`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+              .then(response => response.data)
   }
 }

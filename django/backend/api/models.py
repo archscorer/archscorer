@@ -66,7 +66,6 @@ class Archer(models.Model):
 
     class Meta:
         ordering = ['full_name']
-        unique_together = ['full_name', 'email', 'nat_id']
 
 class Course(models.Model):
     creator = models.ForeignKey('User', related_name='courses_created', null=True, on_delete=models.SET_NULL)
@@ -140,6 +139,8 @@ class Participant(models.Model):
     event = models.ForeignKey(Event, related_name='participants', on_delete=models.CASCADE)
     age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
+    eats = models.BooleanField(default=False)
+    comments = models.CharField(max_length=255, blank=True)
 
     class Meta:
         ordering = ['created']
