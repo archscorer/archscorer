@@ -9,12 +9,15 @@ const state = {
 const getters = {
   events: state => {
     return state.events
+  },
+  eventById: (state) => (id) => {
+    return state.events.find(obj => obj.id === id)
   }
 }
 
 const actions = {
-  getEvents({ commit }, eId = '') {
-    eventService.fetchEvents(eId)
+  getEvents({ commit }) {
+    eventService.fetchEvents()
     .then(events => {
       commit('setEvents', events)
     })

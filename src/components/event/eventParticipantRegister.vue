@@ -4,7 +4,7 @@
       <v-btn color="primary" v-on="on">Register</v-btn>
     </template>
     <v-card>
-      <v-card-title>Register to "{{ event.name }}"</v-card-title>
+      <v-card-title>Register to "{{ event ? event.name : '' }}"</v-card-title>
       <v-form v-model="valid">
         <v-container>
           <v-row dense>
@@ -102,26 +102,6 @@
           :disabled="!valid">Register</v-btn>
       </v-card-actions>
     </v-card>
-    <v-card>
-      <v-card-title>
-      Registered Archers
-      <v-spacer></v-spacer>
-      <v-text-field
-        v-model="p_search"
-        append-icon="mdi-magnify"
-        label="Search"
-        single-line
-        hide-details
-      ></v-text-field>
-    </v-card-title>
-      <v-data-table
-        dense
-        :headers="p_table_header"
-        :items="p_table"
-        :search="p_search"
-        :items-per-page="50"
-      ></v-data-table>
-    </v-card>
   </v-dialog>
 </template>
 
@@ -133,7 +113,7 @@
   export default {
     // name: "listCompetitonRegister",
     props: {
-      event: Object
+      id: Number
     },
     data: () => ({
       dialog: false,
@@ -155,13 +135,6 @@
         'comments': '',
         'eats': false
       },
-      p_search: '',
-      p_table_header: [
-        { text: 'Name', value: 'name' },
-        { text: 'Class', value: 'class' },
-        { text: 'Club', value: 'club' },
-        { text: 'Eats', value: 'eats' }
-      ],
       // TODO write validators for form fields: style, age, gender, full_name, email
       // TODO quicklink to register me (skip archer fields or autofill them)
     }),
@@ -171,16 +144,13 @@
         pModel: state => state.events.participantModel,
         clubs: state => state.clubs.clubs,
       }),
-      p_table() {
-        return this.event.participants.map(function(p) {
-          return {
-            name: p.archer.full_name,
-            class: p.age_group + p.archer.gender + p.style,
-            club: p.archer.club,
-            eats: (p.eats ? "Yes" : "No")
-          }
-        })
+      event() {
+        return this.$store.getters['events/eventById'](this.id)
       },
+      dummy() {
+        console.log(this)
+        return null
+      }
     },
     methods: {
       ...mapActions('events', [

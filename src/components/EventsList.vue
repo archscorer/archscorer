@@ -14,7 +14,7 @@
         </v-list-item-subtitle>
         <v-card>
           <v-card-actions>
-            <ListEventsRegister v-bind:event="event"/>
+            <v-btn color="primary" :to="{ name: 'event', params: { 'id': event.id}}">Enter</v-btn>
             <v-spacer></v-spacer>
             <v-btn v-if="user.email === event.creator" color="error" @click="deleteEvent(event.id)">Delete</v-btn>
           </v-card-actions>
@@ -25,13 +25,9 @@
 </template>
 
 <script>
-  import ListEventsRegister from '@/components/EventsListRegister.vue'
   import { mapState, mapActions } from 'vuex'
 
   export default {
-    components: {
-      ListEventsRegister
-    },
     computed: {
       ...mapState({
         events: state => state.events.events,
