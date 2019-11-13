@@ -44,23 +44,23 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="5">
+            <v-col cols="4">
               <v-text-field
-                v-model="archer.full_name"
+                v-model="participant.archer.full_name"
                 label="Your full name"
               >
               </v-text-field>
             </v-col>
-            <v-col cols="2">
+            <v-col cols="4">
               <v-select
-                v-model="archer.gender"
+                v-model="participant.archer.gender"
                 :items="[{'text': 'Male', 'value': 'M'}, {'text': 'Female', 'value': 'F'}]"
                 label="Gender"
               ></v-select>
             </v-col>
-            <v-col cols="5">
+            <v-col cols="4">
               <v-select
-                v-model="archer.club"
+                v-model="participant.archer.club"
                 :items="clubs ? clubs : []"
                 label="Choose Club"
                 item-text="name"
@@ -71,21 +71,21 @@
           <v-row>
             <v-col cols="4">
               <v-text-field
-                v-model="archer.email"
+                v-model="participant.archer.email"
                 label="Contact email address"
               >
               </v-text-field>
             </v-col>
             <v-col cols="5">
               <v-text-field
-                v-model="archer.phone"
+                v-model="participant.archer.phone"
                 label="Contact phone number"
               >
               </v-text-field>
             </v-col>
             <v-col cols="3">
               <v-text-field
-                v-model="archer.nat_id"
+                v-model="participant.archer.nat_id"
                 label="Archer ID"
                 hint="National Archer ID"
               >
@@ -98,7 +98,7 @@
         <v-spacer></v-spacer>
         <v-btn text @click="dialog = false">Close</v-btn>
         <v-btn color="primary"
-          @click="addParticipant(collectParticipant()); dialog = false"
+          @click="participant.event = parseInt($route.params.id); addParticipant(participant); dialog = false"
           :disabled="!valid">Register</v-btn>
       </v-card-actions>
     </v-card>
@@ -112,24 +112,20 @@
 
   export default {
     // name: "listCompetitonRegister",
-    props: {
-      id: Number
-    },
     data: () => ({
       dialog: false,
       valid: false,
 
-      archer: {
-        'full_name': '',
-        'gender': '',
-        'club': '',
-        'email': '',
-        'phone': '',
-        'nat_id': '',
-      },
       participant: {
         'event': null,
-        'archer': null,
+        'archer': {
+          'full_name': '',
+          'gender': '',
+          'club': '',
+          'email': '',
+          'phone': '',
+          'nat_id': '',
+        },
         'style': '',
         'age_group': '',
         'comments': '',
@@ -141,27 +137,18 @@
     computed: {
       ...mapState({
         user: state => state.user.user,
-        pModel: state => state.events.participantModel,
         clubs: state => state.clubs.clubs,
+        pModel: state => state.events.participantModel,
       }),
       event() {
-        return this.$store.getters['events/eventById'](this.id)
+        return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
       },
-      dummy() {
-        console.log(this)
-        return null
-      }
     },
     methods: {
       ...mapActions('events', [
         'addParticipant',
         'delParticipant',
       ]),
-      collectParticipant() {
-        this.participant.archer = this.archer;
-        this.participant.event = this.event.id;
-        return this.participant
-      },
     },
     created() {
       this.$store.dispatch('events/getParticipantOpts'),

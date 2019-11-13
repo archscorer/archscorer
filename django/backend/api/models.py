@@ -160,4 +160,5 @@ class Arrow(models.Model):
     score = models.IntegerField('arrow score', blank=False, default=0)
 
     class Meta:
+        ordering = ['end', 'ord']
         unique_together = ['scorecard', 'end', 'ord']

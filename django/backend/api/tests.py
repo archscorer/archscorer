@@ -1,5 +1,7 @@
 from django.test import TestCase
 
+from random import choice
+
 # Create your tests here.
 
 # I use it maybe a bit in adverse way, but place I can put code to autogenerate some test data
@@ -14,6 +16,25 @@ from .models import (User,
                      Round,
                      ScoreCard,
                      Arrow)
+
+first_names = ['Liam', 'Noah', 'William', 'James', 'Oliver', 'Benjamin', 'Elijah', 'Lucas',
+               'Mason', 'Logan', 'Alexander', 'Ethan', 'Jacob', 'Michael', 'Daniel', 'Henry',
+               'Jackson', 'Sebastian', 'Aiden', 'Matthew', 'Samuel', 'David', 'Joseph', 'Carter',
+               'Owen', 'Wyatt', 'John', 'Jack', 'Luke', 'Jayden', 'Dylan', 'Grayson', 'Levi', 'Isaac',
+               'Gabriel', 'Julian', 'Mateo', 'Anthony', 'Jaxon', 'Lincoln', 'Joshua', 'Christopher',
+               'Andrew', 'Theodore', 'Caleb', 'Ryan', 'Asher', 'Nathan', 'Thomas', 'Leo', 'Isaiah',
+               'Charles', 'Josiah', 'Hudson', 'Christian', 'Hunter', 'Connor', 'Eli', 'Ezra', 'Aaron',
+               'Landon', 'Adrian', 'Jonathan', 'Nolan', 'Jeremiah', 'Easton', 'Elias', 'Colton',
+               'Cameron', 'Carson', 'Robert', 'Angel', 'Maverick', 'Nicholas', 'Dominic', 'Jaxson',
+               'Greyson', 'Adam', 'Ian', 'Austin', 'Santiago', 'Jordan', 'Cooper', 'Brayden',
+               'Roman', 'Evan', 'Ezekiel', 'Xavier', 'Jose', 'Jace', 'Jameson', 'Leonardo', 'Bryson',
+               'Axel', 'Everett', 'Parker', 'Kayden', 'Miles', 'Sawyer', 'Jason']
+
+last_names = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis', 'Garcia',
+              'Rodriguez', 'Wilson', 'Martinez', 'Anderson', 'Taylor', 'Thomas', 'Hernandez',
+              'Moore', 'Martin', 'Jackson', 'Thompson', 'White', 'Lopez', 'Lee', 'Gonzalez',
+              'Harris', 'Clark', 'Lewi']
+
 
 def build_base_data():
     users = [User.objects.create_superuser('adler@ut.ee', 'testuser', first_name='Priit', last_name='Adler'),
@@ -57,13 +78,13 @@ def test_event_creation():
     users = User.objects.all()
     courses = Course.objects.all()
     big_event = Event.objects.create(creator=users[0], name='Open type of comp')
-    Round.objects.create(ord=1, course=courses[0], event=big_event, label='Animal round')
-    Round.objects.create(ord=2, course=courses[4], event=big_event, label='Field round')
-    Round.objects.create(ord=3, course=courses[4], event=big_event, label='Hunter round')
+    Round.objects.create(ord=1, course=courses[5], event=big_event, label='Animal round')
+    Round.objects.create(ord=2, course=courses[1], event=big_event, label='Field round')
+    Round.objects.create(ord=3, course=courses[1], event=big_event, label='Hunter round')
 
     indoor_training = Event.objects.create(creator=users[0], name='Indoor training')
     for r in range(2):
-        Round.objects.create(ord=r+1, course=courses[5], event=indoor_training, label='20y ' + str(r+1) + '. round')
+        Round.objects.create(ord=r+1, course=courses[0], event=indoor_training, label='20y ' + str(r+1) + '. round')
 
 
 def test_registration():
@@ -81,9 +102,12 @@ def test_registration():
             # test if archer can participate in multiple styles
             Participant.objects.create(archer=a, event=comp, age_group='A', style='BU')
 
+    for _ in range(20):
+        Participant.objects.create(archer=Archer.objects.create(full_name=choice(first_names) + ' ' + choice(last_names), gender='M'),
+                                   event=comp, age_group='A', style='LB')
+
 
 def test_scoring():
-    from random import choice
     for comp in Event.objects.all():
 
         for a in comp.participants.all():

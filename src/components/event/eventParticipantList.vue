@@ -16,6 +16,7 @@
       :headers="p_table_header"
       :items="p_table"
       :search="p_search"
+      group-by="class"
       :items-per-page="50"
     ></v-data-table>
   </v-card>
@@ -27,11 +28,7 @@
 
   export default {
 
-    props: {
-      id: Number,
-    },
     data: () => ({
-
       p_search: '',
       p_table_header: [
         { text: 'Name', value: 'name' },
@@ -45,7 +42,7 @@
         user: state => state.user.user,
       }),
       event() {
-        return this.$store.getters['events/eventById'](this.id)
+        return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
       },
       p_table() {
         if (this.event) {
@@ -61,6 +58,6 @@
           return []
         }
       },
-    },
+    }
   }
 </script>

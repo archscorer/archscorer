@@ -78,10 +78,11 @@ class ParticipantViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows participants to be added or viewed.
     """
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = ParticipantSerializer
     queryset = Participant.objects.all()
 
-    @action(detail=False, methods=['POST'])
+    @action(detail=False, methods=['POST'], permission_classes=[permissions.AllowAny])
     def register(self, request):
         """
         API endpoint that allows participants to be registered to an event. Does not need to be

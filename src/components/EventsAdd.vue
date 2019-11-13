@@ -5,7 +5,7 @@
     max-width="600px"
   >
     <template v-slot:activator="{ on }">
-      <v-btn text v-on="on" icon fab><v-icon>mdi-plus</v-icon></v-btn>
+      <v-btn text v-on="on" icon fab><v-icon size="35">mdi-plus</v-icon></v-btn>
     </template>
     <v-stepper v-model="e1" alt-labels>
       <v-stepper-header>
@@ -49,6 +49,7 @@
                         offset-y
                       >
                         <template v-slot:activator="{ on }">
+                          <!-- TODO default should be today and on-click clear v-model -->
                           <v-text-field
                             v-model="dateRangeText"
                             :rules="dateRules"
@@ -118,12 +119,14 @@
                     ></v-autocomplete>
                   </v-col>
                   <v-col cols="1">
-                    <v-btn text color="error" @click="delRound(index)" icon><v-icon>mdi-minus</v-icon></v-btn>
+                    <v-btn text color="error" @click="delRound(index)" icon><v-icon size="30">mdi-minus</v-icon></v-btn>
                   </v-col>
                 </v-row>
-                <v-row>
-                  <v-col>
-                    <v-btn text color="primary" @click="addRound" icon fab><v-icon>mdi-plus</v-icon></v-btn>
+                <v-row dense>
+                  <v-col cols="11">
+                  </v-col>
+                  <v-col cols="1">
+                    <v-btn text color="primary" @click="addRound" icon><v-icon size="35">mdi-plus</v-icon></v-btn>
                   </v-col>
                 </v-row>
               </v-container>

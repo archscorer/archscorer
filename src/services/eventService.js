@@ -26,7 +26,7 @@ export default {
               .then(response => response.data)
   },
   optsParticipant() {
-    return api.options(`participants/`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+    return api.options(`participants/register/`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data.actions.POST)
   },
   postParticipant(payload) {

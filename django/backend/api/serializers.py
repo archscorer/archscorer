@@ -5,7 +5,9 @@ from .models import (User,
                      End,
                      Event,
                      Round,
-                     Participant)
+                     Participant,
+                     ScoreCard,
+                     Arrow)
 from rest_framework import serializers
 
 class EndSerializer(serializers.ModelSerializer):
@@ -26,6 +28,17 @@ class RoundSerializer(serializers.ModelSerializer):
         model = Round
         fields = ['id', 'ord', 'course', 'label', 'is_open', 'event']
 
+class ArrowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Arrow
+        fields = ['id', 'end', 'ord', 'score']
+
+class ParticipantScoreCardSerializer(serializers.ModelSerializer):
+    arrows = ArrowSerializer(many=True, read_only=True)
+    class Meta:
+        model = ScoreCard
+        fields = ['id', 'round', 'arrows']
+
 class ParticipantArcherSerializer(serializers.ModelSerializer):
     club = serializers.ReadOnlyField(source='club.name')
     class Meta:
@@ -34,9 +47,10 @@ class ParticipantArcherSerializer(serializers.ModelSerializer):
 
 class ParticipantSerializer(serializers.ModelSerializer):
     archer = ParticipantArcherSerializer(read_only=True)
+    scorecards = ParticipantScoreCardSerializer(many=True, read_only=True)
     class Meta:
         model = Participant
-        fields = ['id', 'archer', 'age_group', 'style', 'event', 'eats', 'comments']
+        fields = ['id', 'archer', 'age_group', 'style', 'event', 'eats', 'comments', 'scorecards']
 
 class ArcherSerializer(serializers.ModelSerializer):
     events = ParticipantSerializer(many=True, read_only=True)

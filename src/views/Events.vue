@@ -5,7 +5,7 @@
       <v-card>
         <v-card-title>Events</v-card-title>
         <v-card-actions>
-            <AddCompetiton/>
+            <v-spacer></v-spacer><AddCompetiton/>
         </v-card-actions>
       </v-card>
       </v-col>
