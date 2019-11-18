@@ -17,6 +17,7 @@ export default {
     return api.delete(`events/${compId}`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   },
+
   postRound(payload) {
     return api.post(`rounds/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
@@ -25,6 +26,7 @@ export default {
     return api.delete(`rounds/${rId}`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   },
+
   optsParticipant() {
     return api.options(`participants/register/`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data.actions.POST)
@@ -35,6 +37,15 @@ export default {
   },
   deleteParticipant(pId) {
     return api.delete(`participants/${pId}`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+              .then(response => response.data)
+  },
+
+  fetchUserGroupScoreCards(payload) {
+    return api.post(`participants/scorecards/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+              .then(response => response.data)
+  },
+  putArrow(aId, payload) {
+    return api.patch(`participants/arrows/${aId}/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   }
 }

@@ -26,6 +26,7 @@ router.register(r'archers', views.ArcherViewSet)
 router.register(r'events', views.EventViewSet)
 router.register(r'rounds', views.RoundViewSet)
 router.register(r'participants', views.ParticipantViewSet)
+router.register(r'participants/arrows', views.ArrowViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

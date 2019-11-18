@@ -53,17 +53,17 @@ def build_base_data():
     for i in range(28):
         End.objects.create(course=course_1, ord=i+1, nr_of_arrows=1, scoring=[20,18,16,14,12,10])
 
-    course_2 = Course.objects.create(creator=users[0], name='Standard: 2 arrows / 24 ends')
-    for i in range(24):
-        End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, scoring=[11,10,8,5])
+    course_2 = Course.objects.create(creator=users[0], name='Standard: 2 arrows / 28 ends')
+    for i in range(28):
+        End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, scoring=[10,8,5])
 
-    course_2_2 = Course.objects.create(creator=users[0], name='Standard: 2 arrows / 28 ends')
+    course_2_2 = Course.objects.create(creator=users[0], name='Standard: 2 arrows / 24 ends')
     for i in range(24):
-        End.objects.create(course=course_2_2, ord=i+1, nr_of_arrows=2, scoring=[10,8,5])
+        End.objects.create(course=course_2_2, ord=i+1, nr_of_arrows=2, scoring=[11,10,8,5])
 
     course_3 = Course.objects.create(creator=users[0], name='Standard: 3 arrows / 10 ends')
-    for i in range(28):
-        End.objects.create(course=course_3, ord=i+1, nr_of_arrows=4, scoring=[10,9,8,7,6,5,4,3,2,1])
+    for i in range(10):
+        End.objects.create(course=course_3, ord=i+1, nr_of_arrows=3, scoring=[10,9,8,7,6,5,4,3,2,1])
 
     course_4 = Course.objects.create(creator=users[0], name='Standard: 4 arrows / 28 ends')
     for i in range(28):
@@ -92,45 +92,46 @@ def test_registration():
     # to the first event in the database
     comp = Event.objects.get(pk=2)
 
-    Participant.objects.create(archer=Archer.objects.get(pk=1), event=comp, age_group='A', style='LB')
+
+    Participant.objects.create(archer=Archer.objects.get(pk=1), event=comp, age_group='A', style='LB', start_group=choice(range(1,6)))
 
     comp = Event.objects.get(pk=1)
 
     for a in Archer.objects.all():
-        Participant.objects.create(archer=a, event=comp, age_group='A', style='LB')
+        Participant.objects.create(archer=a, event=comp, age_group='A', style='LB', start_group=choice(range(1,6)))
         if a.full_name == 'Ann Mets':
             # test if archer can participate in multiple styles
-            Participant.objects.create(archer=a, event=comp, age_group='A', style='BU')
+            Participant.objects.create(archer=a, event=comp, age_group='A', style='BU', start_group=choice(range(1,6)))
 
     for _ in range(20):
         Participant.objects.create(archer=Archer.objects.create(full_name=choice(first_names) + ' ' + choice(last_names), gender='M'),
-                                   event=comp, age_group='A', style='LB')
+                                   event=comp, age_group='A', style='LB', start_group=choice(range(1,6)))
 
 
 def test_scoring():
     for comp in Event.objects.all():
 
-        for a in comp.participants.all():
+        for p in comp.participants.all():
             for r in comp.rounds.all():
-                ScoreCard.objects.get_or_create(participant=a, round=r)
+                sc, created = ScoreCard.objects.get_or_create(participant=p, round=r)
+                if created:
+                    # fill scorecard with arrows
+                    for e in r.course.ends.all():
+                        for a in range(e.nr_of_arrows):
+                            Arrow.objects.create(scorecard=sc, end=e, ord=a)
+                for e in r.course.ends.all():
+                    for a in sc.arrows.filter(end__id=e.id):
+                        scoring = eval(e.scoring) + [0]
+                        score = choice(scoring)
+                        a.score=score
+                        a.save()
 
-        cards = ScoreCard.objects.filter(participant__event__pk=comp.pk)
-
-        for c in cards:
-            for e in c.round.course.ends.all():
-                for a in range(e.nr_of_arrows):
-                    scoring = eval(e.scoring) + [0]
-                    score = choice(scoring)
-                    arrow, created = Arrow.objects.get_or_create(scorecard=c, end=e, ord=a)
-                    arrow.score=score
-                    arrow.save()
-
-        for c in cards:
-            style = c.participant.age_group + c.participant.archer.gender + c.participant.style
-            a_name = c.participant.archer.full_name
-            r_name = c.round.label
-            cum_score = sum([a.score for a in c.arrows.all()])
-            print(style, a_name, r_name, cum_score)
+            for sc in p.scorecards.all():
+                style = p.age_group + p.archer.gender + p.style
+                a_name = p.archer.full_name
+                r_name = sc.round.label
+                cum_score = sum([a.score for a in sc.arrows.all()])
+                print(style, a_name, r_name, cum_score)
 
 
 def run_all_tests():

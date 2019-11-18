@@ -1,12 +1,13 @@
-from rest_framework import (status, viewsets, permissions)
+from rest_framework import (status, viewsets, mixins, permissions)
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.contrib.auth.models import AnonymousUser
 from django.db.utils import IntegrityError
-from .models import (User, Club, Course, Archer, Event, Round, Participant)
+from .models import (User, Club, Course, Archer, Event, Round, Participant, ScoreCard, Arrow)
 from .serializers import (UserSerializer, ClubSerializer, CourseSerializer,
                           ArcherSerializer, EventSerializer, RoundSerializer,
-                          ParticipantSerializer)
+                          ParticipantSerializer, ParticipantScoreCardSerializer,
+                          ArrowSerializer)
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -82,6 +83,35 @@ class ParticipantViewSet(viewsets.ModelViewSet):
     serializer_class = ParticipantSerializer
     queryset = Participant.objects.all()
 
+    @action(detail=False, methods=['POST'])
+    def scorecards(self, request):
+        """
+        Retrieve user group scorecards for specified round
+        """
+        # get user start_group first
+        event = Event.objects.get(pk=request.data['eId'])
+        round = Round.objects.get(pk=request.data['rId'])
+
+        user_participant = event.participants.get(archer__id=request.user.archer.id)
+
+        # get or create scorecards for given round in start group
+        for participant in event.participants.all():
+            if participant.start_group == user_participant.start_group:
+                sc, created = ScoreCard.objects.get_or_create(participant=participant, round=round)
+                if created:
+                    # fill in arrows, so we would have valid model always
+                    for e in round.course.ends.all():
+                        for a in range(e.nr_of_arrows):
+                            Arrow.objects.create(scorecard=sc, end=e, ord=a)
+
+        scorecards = ScoreCard.objects.filter(
+                                            participant__event__pk=event.id).filter(
+                                            participant__start_group=user_participant.start_group).filter(
+                                            round=round)
+
+        # return scorecards
+        return Response(ParticipantScoreCardSerializer(scorecards, many=True).data)
+
     @action(detail=False, methods=['POST'], permission_classes=[permissions.AllowAny])
     def register(self, request):
         """
@@ -128,3 +158,12 @@ class ParticipantViewSet(viewsets.ModelViewSet):
         else:
             return Response(participant_serialized.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
+class ArrowViewSet(mixins.UpdateModelMixin,
+                  viewsets.GenericViewSet):
+    """
+    Update arrow score
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ArrowSerializer
+    queryset = Arrow.objects.all()

@@ -11,8 +11,8 @@ const getters = {
 }
 
 const actions = {
-  getCourses({ commit }) {
-    courseService.fetchCourses()
+  getCourses({ commit }, cId = '') {
+    courseService.fetchCourses(cId)
     .then(courses => {
       commit('setCourses', courses)
     })

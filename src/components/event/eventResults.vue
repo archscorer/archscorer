@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-    Results [{{ event ? event.name : '' }}]
+    Results {{ event ? '-- ' + event.name : '' }} <v-btn @click="update_r_table()" icon fab><v-icon>mdi-refresh</v-icon></v-btn>
     <v-spacer></v-spacer>
     <v-text-field
       v-model="r_search"
@@ -49,9 +49,17 @@
   export default {
 
     data: () => ({
-
       r_search: '',
     }),
+    // watch: {
+    //   event: {
+    //     deep: true,
+    //
+    //     handler() {
+    //       console.log('event has changed!')
+    //     }
+    //   }
+    // },
     computed: {
       ...mapState({
         user: state => state.user.user,
@@ -69,7 +77,7 @@
             return { text: r.label, value: r.ord.toString() }
           }))
           header.push({ text: 'Sum', value: 'sum'})
-          // console.log(header)
+
           return header
         } else {
             return [
@@ -91,7 +99,7 @@
               return row[r.ord]
             })
             row['sum'] = sum( sums )
-            // console.log(row)
+
             return row
           }, this.event)
           return r_table.sort( cSumSc )
@@ -99,6 +107,11 @@
           return []
         }
       },
+    },
+    methods: {
+      update_r_table() {
+        this.$store.dispatch('events/updateEvent', this.event.id)
+      }
     }
   }
 </script>

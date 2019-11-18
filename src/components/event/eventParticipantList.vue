@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-    Registered Archers [{{ event ? event.name : '' }}]
+    Registered Archers {{ event ? '-- ' + event.name : '' }}
     <v-spacer></v-spacer>
     <v-text-field
       v-model="p_search"
@@ -58,6 +58,6 @@
           return []
         }
       },
-    }
+    },
   }
 </script>

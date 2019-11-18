@@ -141,6 +141,7 @@ class Participant(models.Model):
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     eats = models.BooleanField(default=False)
     comments = models.CharField(max_length=255, blank=True)
+    start_group = models.IntegerField(default=1)
 
     class Meta:
         ordering = ['created']
@@ -161,4 +162,3 @@ class Arrow(models.Model):
 
     class Meta:
         ordering = ['end', 'ord']
-        unique_together = ['scorecard', 'end', 'ord']

@@ -3,7 +3,8 @@ import eventService from '@/services/eventService'
 
 const state = {
   events: [],
-  participantModel: null
+  participantModel: null,
+  scorecards: []
 }
 
 const getters = {
@@ -20,6 +21,12 @@ const actions = {
     eventService.fetchEvents()
     .then(events => {
       commit('setEvents', events)
+    })
+  },
+  updateEvent({ commit }, eId) {
+    eventService.fetchEvents(eId)
+    .then(event => {
+      commit('updateEvent', event)
     })
   },
   addEvent({ commit }, event) {
@@ -50,6 +57,7 @@ const actions = {
       commit('deleteEvent', eId)
     })
   },
+
   getParticipantOpts({ commit }) {
     eventService.optsParticipant()
     .then(model => {
@@ -72,13 +80,28 @@ const actions = {
     // TODO
     // should check
     // can delete only if user === archer
-    // user === competition owner
+    // user === event owner
     eventService.deleteParticipant(pId)
     .then(() => {
       eventService.fetchEvents(eId)
       .then(event => {
         commit('updateEvent', event)
       })
+    })
+  },
+
+  getUserGroupScoreCards({ commit }, attr) {
+    eventService.fetchUserGroupScoreCards(attr)
+    .then(scorecards => {
+      commit('setScoreCards', scorecards)
+    })
+  },
+  putArrow({ commit }, attr) {
+    eventService.putArrow(attr.arrow.id, {score: attr.arrow.score})
+    .then(arrow => {
+      commit('updateArrow', {scId: attr.scId, arrow: arrow})
+    }).catch(error => {
+      console.log(error)
     })
   }
 }
@@ -94,11 +117,23 @@ const mutations = {
     const index = state.events.findIndex(obj => obj.id === event.id);
     if (index !== -1) state.events.splice(index, 1, event)
   },
+  updateArrow(state, attr) {
+    const sci = state.scorecards.findIndex(obj => obj.id === attr.scId)
+    if (sci !== -1) {
+      const ai = state.scorecards[sci].arrows.findIndex(obj => obj.id === attr.arrow.id)
+      if (ai !== -1) {
+        state.scorecards[sci].arrows.splice(ai, 1, attr.arrow)
+      }
+    }
+  },
   deleteEvent(state, eId) {
     state.events = state.events.filter(obj => obj.id !== eId)
   },
   setParticipantModel(state, model) {
     state.participantModel = model
+  },
+  setScoreCards(state, scorecards) {
+    state.scorecards = scorecards
   }
 }
 

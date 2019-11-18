@@ -37,7 +37,7 @@ class ParticipantScoreCardSerializer(serializers.ModelSerializer):
     arrows = ArrowSerializer(many=True, read_only=True)
     class Meta:
         model = ScoreCard
-        fields = ['id', 'round', 'arrows']
+        fields = ['id', 'participant', 'round', 'arrows']
 
 class ParticipantArcherSerializer(serializers.ModelSerializer):
     club = serializers.ReadOnlyField(source='club.name')
@@ -50,7 +50,7 @@ class ParticipantSerializer(serializers.ModelSerializer):
     scorecards = ParticipantScoreCardSerializer(many=True, read_only=True)
     class Meta:
         model = Participant
-        fields = ['id', 'archer', 'age_group', 'style', 'event', 'eats', 'comments', 'scorecards']
+        fields = ['id', 'archer', 'age_group', 'style', 'event', 'eats', 'comments', 'start_group', 'scorecards']
 
 class ArcherSerializer(serializers.ModelSerializer):
     events = ParticipantSerializer(many=True, read_only=True)
