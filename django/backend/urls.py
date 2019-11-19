@@ -29,7 +29,8 @@ router.register(r'participants', views.ParticipantViewSet)
 router.register(r'participants/arrows', views.ArrowViewSet)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('', views.index_view, name='index'),
+    path('api/admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

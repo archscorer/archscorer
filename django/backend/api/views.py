@@ -1,6 +1,8 @@
 from rest_framework import (status, viewsets, mixins, permissions)
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.views.generic import TemplateView
+from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import AnonymousUser
 from django.db.utils import IntegrityError
 from .models import (User, Club, Course, Archer, Event, Round, Participant, ScoreCard, Arrow)
@@ -8,6 +10,9 @@ from .serializers import (UserSerializer, ClubSerializer, CourseSerializer,
                           ArcherSerializer, EventSerializer, RoundSerializer,
                           ParticipantSerializer, ParticipantScoreCardSerializer,
                           ArrowSerializer)
+
+# Serve Vue Application
+index_view = never_cache(TemplateView.as_view(template_name='index.html'))
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
