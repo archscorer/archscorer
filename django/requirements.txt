@@ -2,3 +2,4 @@ django
 djangorestframework
 whitenoise
 django-oauth-toolkit
+gunicorn

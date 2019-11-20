@@ -34,7 +34,8 @@
         { text: 'Name', value: 'name' },
         { text: 'Class', value: 'class' },
         { text: 'Club', value: 'club' },
-        { text: 'Eats', value: 'eats' }
+        { text: 'Eats', value: 'eats' },
+        { text: 'Group', value: 'start_group'},
       ],
     }),
     computed: {
@@ -51,7 +52,8 @@
               name: p.archer.full_name,
               class: p.age_group + p.archer.gender + p.style,
               club: p.archer.club,
-              eats: (p.eats ? "Yes" : "No")
+              eats: (p.eats ? "Yes" : "No"),
+              start_group: p.start_group,
             }
           })
         } else {

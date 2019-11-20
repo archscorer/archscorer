@@ -5,7 +5,7 @@ import Cookies from 'js-cookie'
 export default {
   fetchCourses(cId = '') {
     // this allows to get a list of all course or just single course
-    return api.get(`courses/${cId}`)
+    return api.get(`courses/${cId ? cId + '/' : ''}`)
               .then(response => response.data)
   },
   postCourse(payload) {
@@ -13,7 +13,7 @@ export default {
               .then(response => response.data)
   },
   deleteCourse(cId) {
-    return api.delete(`courses/${cId}`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+    return api.delete(`courses/${cId}/`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   }
 }

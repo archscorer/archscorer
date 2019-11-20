@@ -3,49 +3,49 @@ import api from '@/services/api'
 import Cookies from 'js-cookie'
 
 export default {
-  fetchEvents(compId = '') {
+  fetchEvents(eId = '') {
     // given argument - if omitter allows to get a list of all events or
     // if defined just single events
-    return api.get(`events/${compId}`)
+    return api.get(`events/${eId ? eId + '/' : ''}`)
               .then(response => response.data)
   },
   postEvent(payload) {
     return api.post(`events/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   },
-  deleteEvent(compId) {
-    return api.delete(`events/${compId}`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+  deleteEvent(eId) {
+    return api.delete(`events/${eId}/`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   },
 
   postRound(payload) {
-    return api.post(`rounds/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+    return api.post(`events/rounds/add/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   },
   deleteRound(rId) {
-    return api.delete(`rounds/${rId}`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+    return api.delete(`events/rounds/${rId}/`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   },
 
   optsParticipant() {
-    return api.options(`participants/register/`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+    return api.options(`events/participants/register/`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data.actions.POST)
   },
   postParticipant(payload) {
-    return api.post(`participants/register/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+    return api.post(`events/participants/register/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   },
   deleteParticipant(pId) {
-    return api.delete(`participants/${pId}`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+    return api.delete(`events/participants/${pId}/`, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   },
 
   fetchUserGroupScoreCards(payload) {
-    return api.post(`participants/scorecards/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+    return api.post(`events/participants/scorecards/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   },
   putArrow(aId, payload) {
-    return api.patch(`participants/arrows/${aId}/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
+    return api.patch(`events/participants/arrows/${aId}/`, payload, { headers: {'X-CSRFToken': Cookies.get('csrftoken')} })
               .then(response => response.data)
   }
 }

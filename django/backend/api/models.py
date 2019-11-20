@@ -158,7 +158,7 @@ class Arrow(models.Model):
     scorecard = models.ForeignKey(ScoreCard, related_name='arrows', on_delete=models.CASCADE)
     end = models.ForeignKey(End, related_name='arrows', on_delete=models.CASCADE)
     ord = models.IntegerField('arrow nr', blank=False)
-    score = models.IntegerField('arrow score', blank=False, default=0)
+    score = models.IntegerField('arrow score', blank=True, null=True)
 
     class Meta:
         ordering = ['end', 'ord']

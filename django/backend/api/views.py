@@ -72,6 +72,10 @@ class RoundViewSet(viewsets.ModelViewSet):
     serializer_class = RoundSerializer
     queryset = Round.objects.all()
 
+    @action(detail=False, methods=['POST'])
+    def add(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
 class ArcherViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows archer to be viewed or edited.

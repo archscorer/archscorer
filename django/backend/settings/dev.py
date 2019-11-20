@@ -69,7 +69,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, '..', 'dist')],
+        'DIRS': [os.path.join(BASE_DIR, '..', '..', 'dist')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, '..', 'db.sqlite3'),
     }
 }
 
@@ -144,7 +144,7 @@ MIDDLEWARE_CLASSES = (
 
 STATIC_URL = '/static/'
 # Place static in the same location as webpack build files
-STATIC_ROOT = os.path.join(BASE_DIR, '..', 'dist', 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, '..', '..', 'dist', 'static')
 STATICFILES_DIRS = []
 
 ##########
