@@ -17,7 +17,7 @@
       <v-pagination
         v-model="end_view_pager"
         :length="course.ends ? course.ends.length : 0"
-        :total-visible="8"
+        :total-visible="14"
         circle></v-pagination>
       <v-window v-model="end_view"
         :show-arrows="false">

@@ -32,10 +32,11 @@ const routes = [
     path: '/clubs',
     name: 'clubs',
     component: () => import('@/views/Clubs.vue')
-  }
+  },
 ]
 
 const router = new VueRouter({
+  mode: 'history',
   routes
 })
 
