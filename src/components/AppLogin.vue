@@ -27,7 +27,7 @@
           </v-list-item>
         </v-list-item-group>
         <v-list-item-group>
-          <v-list-item @click="userLogout()">
+          <v-list-item @click="userLogout()" href="/api-auth/logout/?next=/">
             <v-list-item-icon>
               <v-icon>mdi-logout</v-icon>
             </v-list-item-icon>
@@ -40,7 +40,7 @@
     </v-card>
   </v-menu>
   <v-btn v-else text
-    :href="'/api-auth/login/?next=' + $route.path">
+    :href="'/api-auth/login/?next=/%23' + $route.path">
     <span class="mr-2">login</span>
   </v-btn>
 </template>
