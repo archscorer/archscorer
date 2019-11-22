@@ -1,5 +1,5 @@
 django
 djangorestframework
 whitenoise
-django-oauth-toolkit
 gunicorn
+django-allauth
