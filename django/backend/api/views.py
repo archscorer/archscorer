@@ -7,8 +7,8 @@ from django.contrib.auth.models import AnonymousUser
 from django.db.utils import IntegrityError
 from .models import (User, Club, Course, Archer, Event, Round, Participant, ScoreCard, Arrow)
 from .serializers import (UserSerializer, ClubSerializer, CourseSerializer,
-                          ArcherSerializer, EventSerializer, RoundSerializer,
-                          ParticipantSerializer, ParticipantScoreCardSerializer,
+                          ArcherSerializer, EventSerializer, EventSerializerList,
+                          RoundSerializer, ParticipantSerializer, ParticipantScoreCardSerializer,
                           ArrowSerializer)
 
 # Serve Vue Application
@@ -57,8 +57,12 @@ class EventViewSet(viewsets.ModelViewSet):
     Edit / create is privileged to registered users only.
     """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    serializer_class = EventSerializer
     queryset = Event.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return EventSerializerList
+        return EventSerializer
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)

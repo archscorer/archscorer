@@ -51,15 +51,6 @@
     data: () => ({
       r_search: '',
     }),
-    // watch: {
-    //   event: {
-    //     deep: true,
-    //
-    //     handler() {
-    //       console.log('event has changed!')
-    //     }
-    //   }
-    // },
     computed: {
       ...mapState({
         user: state => state.user.user,
@@ -88,7 +79,8 @@
         }
       },
       r_table() {
-        if (this.event) {
+        // this if is a bit of a hack, but simple solution
+        if (this.event && this.event.participants.length > 0 && this.event.participants[0].id) {
           let r_table = this.event.participants.map(function(p) {
             let row = {
               name: p.archer.full_name,

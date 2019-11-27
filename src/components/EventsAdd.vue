@@ -50,6 +50,7 @@
                       >
                         <template v-slot:activator="{ on }">
                           <!-- TODO default should be today and on-click clear v-model -->
+                          <!-- TODO start end date separate and toggle multi day event -->
                           <v-text-field
                             v-model="dateRangeText"
                             :rules="dateRules"

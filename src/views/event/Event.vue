@@ -38,14 +38,6 @@
 
   export default {
     // name: 'Event',
-    watch: {
-      // $route(to, from) {
-      //   // this does not seem to do what I expect
-      //   // it is called when addressbar change is made, but router link click
-      //   // does not call this code
-      //   // console.log('oh no', to, from)
-      // }
-    },
     components: {
       eventParticipantList,
       eventParticipantRegister,
@@ -71,7 +63,7 @@
     },
     created() {
       //do something after creating vue instance
-      this.$store.dispatch('events/getEvents')
+      this.$store.dispatch('events/updateEvent', parseInt(this.$route.params.id))
     }
   }
 </script>

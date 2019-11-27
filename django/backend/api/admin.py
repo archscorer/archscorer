@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import (User, Club, Archer, Participant, Event)
+from .models import (User, Club, Archer, Course, End, Participant, Event, Round)
 
 # Register your models here.
 @admin.register(User)
@@ -25,8 +25,12 @@ class myUserAdmin(UserAdmin):
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
 
+@admin.register(Club)
+class myClubAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
 @admin.register(Archer)
-class myUserAdmin(admin.ModelAdmin):
+class myArcherAdmin(admin.ModelAdmin):
     list_display = ('full_name', 'gender', 'email', 'club_name')
 
     def club_name(self, obj):
@@ -36,8 +40,30 @@ class myUserAdmin(admin.ModelAdmin):
             return ''
     club_name.short_description = 'Club'
 
+@admin.register(Course)
+class myCourseAdmin(admin.ModelAdmin):
+    list_display = ('name', 'creator')
+
+@admin.register(End)
+class myEndAdmin(admin.ModelAdmin):
+    list_display = ('has_label', 'course_name')
+
+    def has_label(self, obj):
+        if obj.label:
+            return obj.label
+        else:
+            return '..no label..'
+    has_label.short_description = 'Label for End'
+
+    def course_name(self, obj):
+        if isinstance(obj.course, Course):
+            return obj.course.name
+        else:
+            return ''
+    course_name.short_description = 'Course'
+
 @admin.register(Participant)
-class myUserAdmin(admin.ModelAdmin):
+class myParticipantAdmin(admin.ModelAdmin):
     list_display = ('archer_name', 'event_name', 'style', 'age_group')
 
     def archer_name(self, obj):
@@ -49,9 +75,30 @@ class myUserAdmin(admin.ModelAdmin):
     event_name.short_description = 'Event'
 
 @admin.register(Event)
-class myUserAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+class myEventAdmin(admin.ModelAdmin):
+    list_display = ('name', 'creator')
 
-@admin.register(Club)
-class myUserAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+@admin.register(Round)
+class myRoundAdmin(admin.ModelAdmin):
+    list_display = ('has_label', 'event_name', 'course_name')
+
+    def has_label(self, obj):
+        if obj.label:
+            return obj.label
+        else:
+            return '..no label..'
+    has_label.short_description = 'Label for Round'
+
+    def event_name(self, obj):
+        if isinstance(obj.event, Event):
+            return str(obj.id) + ': ' + obj.event.name
+        else:
+            return ''
+    event_name.short_description = 'Event'
+
+    def course_name(self, obj):
+        if isinstance(obj.course, Course):
+            return obj.course.name
+        else:
+            return ''
+    course_name.short_description = 'Course'

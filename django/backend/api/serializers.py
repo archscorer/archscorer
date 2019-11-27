@@ -11,7 +11,6 @@ from .models import (User,
 from rest_framework import serializers
 
 class EndSerializer(serializers.ModelSerializer):
-    # round = serializers.HyperlinkedRelatedField(view_name='round-detail', read_only=True)
     class Meta:
         model = End
         fields = ['id', 'course', 'ord', 'label', 'nr_of_arrows', 'scoring']
@@ -80,4 +79,15 @@ class EventSerializer(serializers.ModelSerializer):
     rounds = RoundSerializer(many=True, read_only=True)
     class Meta:
         model = Event
-        fields = ['id', 'creator', 'name', 'description', 'date_start', 'date_end', 'rounds', 'participants']
+        fields = '__all__'
+
+class EventSerializerList(serializers.ModelSerializer):
+    creator = serializers.ReadOnlyField(source='creator.email')
+    rounds = RoundSerializer(many=True, read_only=True)
+    participants = serializers.SerializerMethodField()
+    class Meta:
+        model = Event
+        fields = '__all__'
+
+    def get_participants(self, obj):
+        return len(obj.participants.all())

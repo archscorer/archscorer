@@ -6,43 +6,8 @@
     <v-card>
       <v-card-title>Register to "{{ event ? event.name : '' }}"</v-card-title>
       <v-form v-model="valid">
+        <eventParticipantDetails :participant="participant"/>
         <v-container>
-          <v-row dense>
-            <v-col cols="4">
-              <v-select
-                v-model="participant.style"
-                :items="pModel ? pModel.style.choices : []"
-                label="Style"
-                item-text="display_name"
-                dense
-              ></v-select>
-            </v-col>
-            <v-col cols="4">
-              <v-select
-                v-model="participant.age_group"
-                :items="pModel ? pModel.age_group.choices : []"
-                label="Age Group"
-                item-text="display_name"
-                dense
-              ></v-select>
-            </v-col>
-            <v-col cols="4">
-              <v-switch
-                v-model="participant.eats"
-                label="Catering"
-                color="primary"
-              ></v-switch>
-            </v-col>
-          </v-row>
-          <v-row dense>
-            <v-col cols="12">
-              <v-textarea
-                outlined
-                v-model="participant.comments"
-                label="Comments to organiser(s)"
-              ></v-textarea>
-            </v-col>
-          </v-row>
           <v-row>
             <v-col cols="4">
               <v-text-field
@@ -69,25 +34,17 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="4">
+            <v-col cols="6">
               <v-text-field
                 v-model="participant.archer.email"
                 label="Contact email address"
               >
               </v-text-field>
             </v-col>
-            <v-col cols="5">
+            <v-col cols="6">
               <v-text-field
                 v-model="participant.archer.phone"
                 label="Contact phone number"
-              >
-              </v-text-field>
-            </v-col>
-            <v-col cols="3">
-              <v-text-field
-                v-model="participant.archer.nat_id"
-                label="Archer ID"
-                hint="National Archer ID"
               >
               </v-text-field>
             </v-col>
@@ -110,8 +67,13 @@
   /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
   import { mapState, mapActions } from 'vuex'
 
+  import eventParticipantDetails from '@/components/event/eventParticipantDetails.vue'
+
   export default {
     // name: "listCompetitonRegister",
+    components: {
+      eventParticipantDetails,
+    },
     data: () => ({
       dialog: false,
       valid: false,
@@ -138,7 +100,6 @@
       ...mapState({
         user: state => state.user.user,
         clubs: state => state.clubs.clubs,
-        pModel: state => state.events.participantModel,
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
@@ -147,11 +108,9 @@
     methods: {
       ...mapActions('events', [
         'addParticipant',
-        'delParticipant',
       ]),
     },
     created() {
-      this.$store.dispatch('events/getParticipantOpts'),
       this.$store.dispatch('clubs/getClubs')
     }
   }

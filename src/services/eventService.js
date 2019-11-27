@@ -37,6 +37,10 @@ export default {
     return api.delete(`events/participants/${pId}/`)
               .then(response => response.data)
   },
+  putParticipant(pId, payload) {
+    return api.patch(`events/participants/${pId}/`, payload)
+              .then(response => response.data)
+  },
 
   fetchUserGroupScoreCards(payload) {
     return api.post(`events/participants/scorecards/`, payload)

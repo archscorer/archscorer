@@ -12,3 +12,14 @@
 * write my own views for login/logout/signup etc
 * write view for user/archer profile
 * add some kind of contact admin page?
+
+
+* add competition overview page (what rounds)
+* to competition owner can edit participants / rounds
+* competition to have visibility levels
+ * training / small competition - personal - only registered users can see
+ * club - visible to club members
+ * public - visible to all
+
+ * whether it is possible to register is options by owner. Owner can always add
+ participants

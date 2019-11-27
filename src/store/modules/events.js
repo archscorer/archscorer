@@ -67,7 +67,7 @@ const actions = {
   addParticipant({ commit }, participant) {
     eventService.postParticipant(participant)
     .then(participant => {
-      eventService.fetchEvents(participant.event.id)
+      eventService.fetchEvents(participant.event)
       .then(event => {
         commit('updateEvent', event)
       })
@@ -76,17 +76,31 @@ const actions = {
       console.log(error.response.data)
     })
   },
-  delParticipant({ commit }, eId, pId) {
-    // TODO
+  delParticipant({ commit }, attr) {
+    // TODO on django API side
     // should check
     // can delete only if user === archer
     // user === event owner
-    eventService.deleteParticipant(pId)
+    eventService.deleteParticipant(attr.pId)
     .then(() => {
-      eventService.fetchEvents(eId)
+      eventService.fetchEvents(attr.eId)
       .then(event => {
         commit('updateEvent', event)
       })
+    }).catch(error => {
+      // TODO this should not be here
+      console.log(error.response.data)
+    })
+  },
+  putParticipant({ commit }, attr) {
+    eventService.putParticipant(attr.pId, attr.participant)
+    .then(participant => {
+      eventService.fetchEvents(participant.event)
+      .then(event => {
+        commit('updateEvent', event)
+      })
+    }).catch(error => {
+      console.log(error.response.data)
     })
   },
 
@@ -101,7 +115,7 @@ const actions = {
     .then(arrow => {
       commit('updateArrow', {scId: attr.scId, arrow: arrow})
     }).catch(error => {
-      console.log(error)
+      console.log(error.response.data)
     })
   }
 }
@@ -115,7 +129,22 @@ const mutations = {
   },
   updateEvent(state, event) {
     const index = state.events.findIndex(obj => obj.id === event.id);
-    if (index !== -1) state.events.splice(index, 1, event)
+    if (index !== -1) {
+      state.events.splice(index, 1, event)
+    } else {
+      state.events.push(event)
+    }
+  },
+  deleteEvent(state, eId) {
+    state.events = state.events.filter(obj => obj.id !== eId)
+  },
+
+  setParticipantModel(state, model) {
+    state.participantModel = model
+  },
+
+  setScoreCards(state, scorecards) {
+    state.scorecards = scorecards
   },
   updateArrow(state, attr) {
     const sci = state.scorecards.findIndex(obj => obj.id === attr.scId)
@@ -126,15 +155,6 @@ const mutations = {
       }
     }
   },
-  deleteEvent(state, eId) {
-    state.events = state.events.filter(obj => obj.id !== eId)
-  },
-  setParticipantModel(state, model) {
-    state.participantModel = model
-  },
-  setScoreCards(state, scorecards) {
-    state.scorecards = scorecards
-  }
 }
 
 export default {

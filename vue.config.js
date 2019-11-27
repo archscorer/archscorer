@@ -10,7 +10,13 @@ module.exports = {
         target: 'http://localhost:8008',
         ws: true,
         changeOrigin: true
+      },
+      '^/accounts': {
+        target: 'http://localhost:8008',
+        ws: true,
+        changeOrigin: true
       }
+
     }
   }
 }

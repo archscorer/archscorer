@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card v-if="event">
     <v-card-title v-if="user.id === null">
       <p>You need to be logged in for scoring</p>
     </v-card-title>
@@ -59,7 +59,7 @@
             if (this.course.ends.length) this.$refs.end[this.end_view].isActive = true
           })
         }
-      }
+      },
     },
     computed: {
       ...mapState({

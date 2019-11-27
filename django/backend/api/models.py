@@ -89,16 +89,20 @@ class End(models.Model):
         ordering = ['ord']
 
 class Event(models.Model):
+    TYPE_CHOICES = [('private', 'Private'),
+                    ('club', 'Club'),
+                    ('open', 'Open')]
     creator = models.ForeignKey('User', related_name='events_created', null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
 
     date_start = models.DateField(default=timezone.localdate)
     date_end = models.DateField(default=timezone.localdate)
     registration_open = models.BooleanField(default=True)
-    registration_due_date = models.DateField(default=timezone.localdate)
 
     name = models.CharField(max_length=150, default='Unnamed event', blank=False)
     description = models.TextField(blank=True)
+    type = models.CharField('event type', max_length=10, default='private', choices=TYPE_CHOICES)
+    tags = models.CharField('event tags', max_length=255, blank=True)
 
     class Meta:
         ordering = ['-date_start']
@@ -109,6 +113,7 @@ class Round(models.Model):
     course = models.ForeignKey('Course', related_name='events', on_delete=models.CASCADE)
     event = models.ForeignKey('Event', related_name='rounds', on_delete=models.CASCADE)
     is_open = models.BooleanField('is round open', default=False)
+    start = models.DateTimeField('Round start time', blank=True, null=True)
 
     class Meta:
         ordering = ['ord']
