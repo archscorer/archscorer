@@ -27,7 +27,7 @@
       <v-col cols="8">
         <template v-for="score in sc_eval(end.scoring)">
           <v-btn :key="'score' + end.id + '_' + score.text"
-          @click="enter_score(score.value)">{{ score.text }}</v-btn>
+          @click.prevent="enter_score(score.value)">{{ score.text }}</v-btn>
         </template>
       </v-col>
       <v-col cols="2">
@@ -42,8 +42,6 @@
 </template>
 
 <script>
-  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
-
   export default {
 
     props: {
@@ -76,7 +74,6 @@
         return scores_choices
       },
       enter_score(sc) {
-        event.preventDefault()
         if (this.currentFocus === null) {
           this.$refs.arrow[0].focus()
           this.arrow_inc = 0

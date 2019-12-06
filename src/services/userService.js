@@ -5,8 +5,8 @@ export default {
     return api.get(`user/`)
               .then(response => response.data)
   },
-  getArcher() {
-    return api.get(`archer/`)
+  putArcher(aId, payload) {
+    return api.patch(`archer/${aId}/`, payload)
               .then(response => response.data)
   },
   postArcher(payload) {

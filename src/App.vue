@@ -27,7 +27,7 @@
         </v-btn>
       </v-toolbar-items>
       <v-spacer></v-spacer>
-      <AppLogin/>
+      <AppLoginMenu/>
     </v-app-bar>
     <v-navigation-drawer app v-model="drawer">
       <v-list dense>
@@ -44,11 +44,13 @@
         </v-list-item>
         <v-list-item to="/statistics">
           <v-list-item-icon>
+            <v-icon>mdi-matrix</v-icon>
           </v-list-item-icon>
           <v-list-item-title>Statistics</v-list-item-title>
         </v-list-item>
         <v-list-item to="/clubs">
           <v-list-item-icon>
+            <v-icon>mdi-account-group</v-icon>
           </v-list-item-icon>
           <v-list-item-title>Clubs</v-list-item-title>
         </v-list-item>
@@ -65,12 +67,12 @@
 </template>
 
 <script>
-  import AppLogin from '@/components/AppLogin.vue'
+  import AppLoginMenu from '@/components/accounts/AppLoginMenu.vue'
 
   export default {
     // name: 'ArchScorER',
     components: {
-      AppLogin,
+      AppLoginMenu,
     },
     data: () => ({
       drawer: null,

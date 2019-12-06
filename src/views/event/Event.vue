@@ -3,7 +3,7 @@
     <v-card class="my-2">
       <v-card-actions>
         <eventParticipantRegister/>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn v-if="user.email === (event ? event.creator: '')" color="error" @click="deleteEvent(event.id); $router.push('/events')">Delete</v-btn>
       </v-card-actions>
     </v-card>
@@ -29,7 +29,6 @@
 </template>
 
 <script>
-  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
   import eventParticipantList from '@/components/event/eventParticipantList.vue'
   import eventParticipantRegister from '@/components/event/eventParticipantRegister.vue'
   import eventResults from '@/components/event/eventResults.vue'

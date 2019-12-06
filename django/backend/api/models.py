@@ -62,7 +62,7 @@ class Archer(models.Model):
     phone = models.CharField('phone number', max_length=20, blank=True)
     nat_id = models.CharField('National Archer ID', max_length=30, blank=True)
 
-    user = models.OneToOneField('User', related_name='archer', null=True, on_delete=models.CASCADE)
+    user = models.OneToOneField('User', related_name='archer', null=True, on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ['full_name']
@@ -97,10 +97,11 @@ class Event(models.Model):
 
     date_start = models.DateField(default=timezone.localdate)
     date_end = models.DateField(default=timezone.localdate)
-    registration_open = models.BooleanField(default=True)
+    is_open = models.BooleanField(default=True)
 
     name = models.CharField(max_length=150, default='Unnamed event', blank=False)
     description = models.TextField(blank=True)
+    catering = models.BooleanField(default=False)
     type = models.CharField('event type', max_length=10, default='private', choices=TYPE_CHOICES)
     tags = models.CharField('event tags', max_length=255, blank=True)
 

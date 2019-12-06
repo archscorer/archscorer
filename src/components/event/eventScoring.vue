@@ -4,7 +4,7 @@
       <p>You need to be logged in for scoring</p>
     </v-card-title>
     <v-card-title v-else-if="is_user_regitered() !== true">
-      <p>It looks like you are not part of this event. Maybe you should register first</p>
+      <small>You need to register to the event first!</small>
     </v-card-title>
     <template v-else>
       <v-card-title>
@@ -37,7 +37,6 @@
 </template>
 
 <script>
-  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
   import { mapState} from 'vuex'
   import eventScoringEnd from '@/components/event/eventScoringEnd.vue'
 

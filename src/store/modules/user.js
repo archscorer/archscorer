@@ -3,7 +3,10 @@ import userService from '@/services/userService'
 const state = {
   user: {
     id: null,
-    email: ''
+    email: '',
+    archer: {
+      id: null,
+    }
   }
 }
 
@@ -15,13 +18,26 @@ const getters = {
 
 const actions = {
   userLogout({ commit }) {
-    commit('delUser')
+    commit('logout')
   },
   checkUser({ commit }) {
     userService.getUser()
     .then(user => {
       commit('setUser', user)
     }).catch(() => {})
+  },
+  updateArcher({ commit }, archer) {
+    if (archer.id !== null) {
+      userService.putArcher(archer.id, archer)
+      .then(archer => {
+        commit('updateArcher', archer)
+      })
+    } else {
+      userService.postArcher(archer)
+      .then(archer => {
+        commit('updateArcher', archer)
+      })
+    }
   }
 }
 
@@ -29,11 +45,17 @@ const mutations = {
   setUser(state, user) {
     state.user = user[0]
   },
-  delUser(state) {
+  logout(state) {
     state.user = {
       id: null,
-      email: ''
+      email: '',
+      archer: {
+        id: null,
+      }
     }
+  },
+  updateArcher(state, archer) {
+    state.user.archer = archer
   }
 }
 

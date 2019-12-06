@@ -33,6 +33,11 @@ const routes = [
     name: 'clubs',
     component: () => import('@/views/Clubs.vue')
   },
+  {
+    path: '/accounts/profile',
+    name: 'profile',
+    component: () => import('@/views/user/ArcherProfile.vue')
+  },
 ]
 
 const router = new VueRouter({

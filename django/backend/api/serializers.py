@@ -52,19 +52,17 @@ class ParticipantSerializer(serializers.ModelSerializer):
         fields = ['id', 'archer', 'age_group', 'style', 'event', 'eats', 'comments', 'start_group', 'scorecards']
 
 class ArcherSerializer(serializers.ModelSerializer):
-    events = ParticipantSerializer(many=True, read_only=True)
+    events = serializers.SlugRelatedField(many=True, read_only=True, slug_field='id')
     user = serializers.ReadOnlyField(source='user.is_active')
     class Meta:
         model = Archer
-        fields = ['id', 'full_name', 'gender', 'club', 'email', 'phone', 'nat_id', 'events', 'user']
-        depth = 1
+        fields = '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
     archer = ArcherSerializer()
     class Meta:
         model = User
         fields = ['id', 'email', 'archer']
-        depth = 1
 
 class ClubSerializer(serializers.ModelSerializer):
     members = ArcherSerializer(many=True, read_only=True)

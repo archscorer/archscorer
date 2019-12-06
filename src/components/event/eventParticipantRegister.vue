@@ -64,7 +64,6 @@
 
 
 <script>
-  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
   import { mapState, mapActions } from 'vuex'
 
   import eventParticipantDetails from '@/components/event/eventParticipantDetails.vue'

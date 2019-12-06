@@ -5,7 +5,14 @@
     max-width="600px"
   >
     <template v-slot:activator="{ on }">
-      <v-btn text v-on="on" icon fab><v-icon size="35">mdi-plus</v-icon></v-btn>
+      <v-btn v-on="on"
+        color="secondary"
+        dark
+        absolute
+        top
+        right
+        fab
+      ><v-icon>mdi-plus</v-icon></v-btn>
     </template>
     <v-stepper v-model="e1" alt-labels>
       <v-stepper-header>
@@ -108,7 +115,7 @@
                       </template>
                     </v-text-field>
                   </v-col>
-                  <v-col cols="6">
+                  <v-col cols="4">
                     <v-autocomplete
                       v-model="event.rounds[index].course"
                       :rules="courseRules"
@@ -118,6 +125,12 @@
                       item-text="name"
                       item-value="id"
                     ></v-autocomplete>
+                  </v-col>
+                  <v-col cols="2">
+                    <v-switch
+                      v-model="event.rounds[index].is_open"
+                      :label="event.rounds[index].is_open ? 'Open' : ''"
+                    ></v-switch>
                   </v-col>
                   <v-col cols="1">
                     <v-btn text color="error" @click="delRound(index)" icon><v-icon size="30">mdi-minus</v-icon></v-btn>
@@ -144,9 +157,39 @@
         </v-stepper-content>
         <v-stepper-content step="3">
           <v-card>
-            registration is open and registration link to share.
-            catering options
-            ...
+            <v-row>
+              <v-col cols="6">
+                <v-autocomplete
+                  v-model="event.type"
+                  autocomplete
+                  :items="event_type_choices"
+                  label="Event visibility class"
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="6">
+                <v-switch
+                  v-model="event.is_open"
+                  :label="event.is_open ? 'Others can register*' : 'Event is private'"
+                ></v-switch>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="6"></v-col>
+              <v-col cols="6">
+                <v-switch
+                  v-model="event.catering"
+                  :label="event.catering ? 'With catering**' : 'No catering'"
+                ></v-switch>
+              </v-col>
+            </v-row>
+            <small>
+              <p>* If event visibility is 'Private' and 'Others can register', they can do
+                so by event URL. Click 'Finish' first and then you can navigate to the event
+                and copy the URL. The 'Open' events are discoverable by anyone in event listing.
+                The 'Club' events are discoverable by the club memebers only.</p>
+              <p>** If catering is provided, the details (menu) should be added to the description of
+                the event.</p>
+            </small>
             <v-card-actions>
               <v-btn @click="e1 = 2">Back</v-btn>
               <v-spacer></v-spacer>
@@ -174,14 +217,31 @@
         date_start: '',
         date_end: '',
         description: '',
-        rounds: [{label: '', course: null}]
+        type: 'private',
+        is_open: false,
+        rounds: [{label: '', course: null, is_open: true}]
       },
+
+      event_type_choices: [
+        {
+          text: 'Private',
+          value: 'private'
+        },
+        {
+          text: 'Club',
+          value: 'club'
+        },
+        {
+          text: 'Open',
+          value: 'open'
+        }
+      ],
 
       valid_e1: false,
 
       nameRules: [v => !!v || 'Name is required'],
       dateRules: [v => !!v || 'Start date is required'],
-      courseRules: [v => !!v || 'Round course needs to be selected'],
+      courseRules: [v => !!v || 'Round course is mandatory'],
       date_menu: false,
       dates: [],  // new Date().toISOString().substr(0, 10)
 
@@ -198,7 +258,7 @@
     },
     methods: {
       addRound() {
-        this.event.rounds.push({label: '', course: null})
+        this.event.rounds.push({label: '', course: null, is_open: true})
       },
       delRound(index) {
         this.event.rounds.splice(index, 1)

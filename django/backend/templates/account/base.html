@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block head_title %}{% endblock %}</title>
+    {% block extra_head %}
+    {% endblock %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+      html {
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+      }
+      .content-base {
+        max-width: 400px;
+        margin: 100px auto;
+      }
+      .nav-base {
+        background-color: #1976d2 !important;
+        height: 64px;
+        box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+      }
+      .nav-headline {
+        text-transform: uppercase !important;
+        font-size: 1.5rem !important;
+        font-weight: 400;
+        line-height: 2rem;
+        letter-spacing: normal !important;
+        font-family: "Roboto", sans-serif !important;
+      }
+    </style>
+  </head>
+  <body>
+    {% block body %}
+    <nav class="navbar navbar-dark nav-base">
+      <a class="navbar-brand nav-headline" href="/">ARCH[SCOR]ER</a>
+    </nav>
+
+    {% if messages %}
+    <div class="container-sm">
+        {% for message in messages %}
+        <div class="alert alert-info">{{message}}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="content-base container">
+      {% block content %}
+      {% endblock %}
+    </div>
+    {% endblock %}
+    {% block extra_body %}
+    {% endblock %}
+  </body>
+</html>

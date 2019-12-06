@@ -1,21 +1,12 @@
 <template>
   <v-container>
-    <v-row dense>
-      <v-col cols="12">
-      <v-card>
-        <v-card-title>Events</v-card-title>
-        <v-card-actions>
-            <v-spacer></v-spacer><AddCompetiton/>
-        </v-card-actions>
-      </v-card>
-      </v-col>
-      <v-col cols="12">
-      <v-card>
-        <v-card-title>Browse</v-card-title>
+    <v-card>
+      <v-card-text class="py-8">
         <ListEvents/>
-      </v-card>
-      </v-col>
-    </v-row>
+        <small><p>events created by you are marked with '*'</p></small>
+        <AddCompetiton/>
+      </v-card-text>
+    </v-card>
   </v-container>
 </template>
 

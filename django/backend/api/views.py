@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import AnonymousUser
+from django.db.models import Q
 from django.db.utils import IntegrityError
 from .models import (User, Club, Course, Archer, Event, Round, Participant, ScoreCard, Arrow)
 from .serializers import (UserSerializer, ClubSerializer, CourseSerializer,
@@ -22,10 +23,14 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        if isinstance(self.request.user, AnonymousUser):
-            return [User()]
-        else:
-            return [self.request.user]
+        user = self.request.user
+        if isinstance(user, AnonymousUser):
+            user = User()
+        if not hasattr(user, 'archer'):
+            archer = Archer(user=user)
+
+        return [user]
+
 
 class ClubViewSet(viewsets.ModelViewSet):
     """
@@ -57,7 +62,26 @@ class EventViewSet(viewsets.ModelViewSet):
     Edit / create is privileged to registered users only.
     """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    queryset = Event.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if self.action == 'list':
+            # to list events show only those that should be listed
+            if isinstance(user, AnonymousUser):
+                return Event.objects.filter(Q(type = 'open'))
+            return Event.objects.filter(Q(creator__pk = user.id) |
+                                       (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
+                                        Q(participants__in = user.archer.events.all()) |
+                                        Q(type = 'open')).distinct()
+        else:
+            # In addition to 'my' events allow to discover events that are open
+            # for registration
+            return Event.objects.filter(Q(creator__pk = user.id) |
+                                       (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
+                                        Q(participants__in = user.archer.events.all()) |
+                                        Q(type = 'open') |
+                                        Q(is_open = True)).distinct()
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -80,13 +104,18 @@ class RoundViewSet(viewsets.ModelViewSet):
     def add(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
-class ArcherViewSet(viewsets.ModelViewSet):
+class ArcherViewSet(mixins.CreateModelMixin,
+                    mixins.UpdateModelMixin,
+                    viewsets.GenericViewSet):
     """
     API endpoint that allows archer to be viewed or edited.
     """
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ArcherSerializer
     queryset = Archer.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 class ParticipantViewSet(viewsets.ModelViewSet):
     """
@@ -173,7 +202,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
 class ArrowViewSet(mixins.UpdateModelMixin,
-                  viewsets.GenericViewSet):
+                   viewsets.GenericViewSet):
     """
     Update arrow score
     """

@@ -1,16 +1,19 @@
 <template>
   <v-card>
     <v-card-title>
-    Results {{ event ? '-- ' + event.name : '' }} <v-btn @click="update_r_table()" icon fab><v-icon>mdi-refresh</v-icon></v-btn>
-    <v-spacer></v-spacer>
-    <v-text-field
-      v-model="r_search"
-      append-icon="mdi-magnify"
-      label="Search"
-      single-line
-      hide-details
-    ></v-text-field>
-  </v-card-title>
+      <v-btn @click="update_r_table()" icon><v-icon>mdi-refresh</v-icon></v-btn>
+      Results
+      <v-spacer />
+      <h4>{{ event ? event.name : '' }}</h4>
+      <v-spacer />
+      <v-text-field
+        v-model="r_search"
+        append-icon="mdi-magnify"
+        label="Search"
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
     <v-data-table
       dense
       :headers="r_table_header"
@@ -24,7 +27,6 @@
 </template>
 
 <script>
-  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
   import { mapState} from 'vuex'
 
   function sum(arr) {

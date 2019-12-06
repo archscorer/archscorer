@@ -1,8 +1,10 @@
 <template>
   <v-card>
     <v-card-title>
-    Registered Archers {{ event ? '-- ' + event.name : '' }}
-    <v-spacer></v-spacer>
+    <small>Registered Archers</small>
+    <v-spacer />
+    <h4>{{ event ? event.name : '' }}</h4>
+    <v-spacer />
     <v-text-field
       v-model="p_search"
       append-icon="mdi-magnify"
@@ -67,7 +69,6 @@
 </template>
 
 <script>
-  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
   import { mapState, mapActions } from 'vuex'
 
   import eventParticipantDetails from '@/components/event/eventParticipantDetails.vue'

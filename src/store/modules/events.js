@@ -34,11 +34,10 @@ const actions = {
     eventService.postEvent(event)
     .then(event => {
       // because of async api the commit wont wait on rounds addition
-      // se when submiting round - retrieve event again and update store
+      // so when submiting round - retrieve event again and update store
       commit('addEvent', event)
       rounds.forEach(function (round, i) {
         round.ord = i + 1;  // could be there before
-        round.is_open = true;  // could be there before
         round.event = event.id;
         eventService.postRound(round)
         .then(() => {
