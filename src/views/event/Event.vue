@@ -47,6 +47,13 @@
       tab: null,
       tabs: ['Results', 'Scoring', 'Participants']
     }),
+    watch: {
+      event: {
+        handler() {
+          if (this.event.is_open) this.tab = 2
+        }
+      }
+    },
     computed: {
       ...mapState({
         user: state => state.user.user

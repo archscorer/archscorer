@@ -55,8 +55,9 @@ class Club(models.Model):
 
 class Archer(models.Model):
     full_name = models.CharField('Full Name', max_length=150, blank=False, default='Unnamed archer')  # full name <first_name last_name>
-    gender = models.CharField('gender', max_length=1, choices=[('M', 'Male'),
-                                                               ('F', 'Female')])
+    gender = models.CharField('gender', max_length=1, default='U', choices=[('M', 'Male'),
+                                                                            ('F', 'Female'),
+                                                                            ('U', 'Unisex')])
     club = models.ForeignKey('Club', related_name='members', null=True, on_delete=models.CASCADE)
     email = models.EmailField('email address', blank=True)
     phone = models.CharField('phone number', max_length=20, blank=True)

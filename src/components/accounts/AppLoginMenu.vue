@@ -45,8 +45,6 @@
 </template>
 
 <script>
-  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
-
   import axios from 'axios'
   import Cookies from 'js-cookie'
 

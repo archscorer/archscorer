@@ -25,3 +25,10 @@ python3 manage.py createsuperuser
 ```
 python3 manage.py runserver 0:8008
 ```
+
+# Setting up new instance
+
+```
+python3 manage.py loaddata initdata
+```
+This needs to be still added by https://docs.djangoproject.com/en/2.2/howto/initial-data/

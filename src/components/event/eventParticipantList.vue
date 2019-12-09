@@ -21,7 +21,7 @@
       group-by="class"
       :items-per-page="50"
     >
-      <template v-slot:item.start_group="props">
+      <template v-slot:item.start_group="props" v-if="user.email === event.creator">
         <v-edit-dialog
           :return-value="props.item.start_group"
           :key="props.item.id"

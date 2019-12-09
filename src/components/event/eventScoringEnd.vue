@@ -85,6 +85,7 @@
           arrow.score = sc
           arrow.color = 'warning'
           this.$store.dispatch('events/putArrow', {scId: scId, arrow: arrow})
+          this.$refs.arrow[this.arrow_inc].blur()
         }
         this.arrow_inc++
         if (this.arrow_inc >= this.$refs.arrow.length + 2) {

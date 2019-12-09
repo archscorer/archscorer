@@ -25,10 +25,18 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if isinstance(user, AnonymousUser):
+            # for AnonymousUser swap to User model and add archer
             user = User()
-        if not hasattr(user, 'archer'):
-            archer = Archer(user=user)
+            _ = Archer(user=user)
+            return [user]
 
+        if not hasattr(user, 'archer'):
+            # in case logged in user does not yet have archer model or it has
+            # been deleted ?
+            archer = Archer.objects.create(full_name=user.get_full_name(),
+                                           email=user.email,
+                                           user=user,
+                                           club=Club.objects.get(pk=1))
         return [user]
 
 
@@ -65,11 +73,11 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-
+        if isinstance(user, AnonymousUser):
+            # not logged in users can see and discover only 'open' type of events
+            return Event.objects.filter(Q(type = 'open'))
         if self.action == 'list':
             # to list events show only those that should be listed
-            if isinstance(user, AnonymousUser):
-                return Event.objects.filter(Q(type = 'open'))
             return Event.objects.filter(Q(creator__pk = user.id) |
                                        (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
                                         Q(participants__in = user.archer.events.all()) |

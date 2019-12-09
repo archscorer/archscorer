@@ -67,7 +67,8 @@
             { text: 'Class', value: 'class' },
           ]
           header.push(...this.event.rounds.map(function(r) {
-            return { text: r.label, value: r.ord.toString() }
+            return { text: r.ord.toString() + '. ' + r.label, 
+                    value: r.ord.toString() }
           }))
           header.push({ text: 'Sum', value: 'sum'})
 

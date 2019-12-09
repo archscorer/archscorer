@@ -12,4 +12,7 @@
 * to competition owner can edit participants / rounds
 
  * whether it is possible to register is options by owner. Owner can always add
- participants
+ participants.
+
+* Two archers with same name and no email creates internal server error. When updateing
+archer details in profile view check and merge / delete identical archer profiles?

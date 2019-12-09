@@ -52,7 +52,7 @@ class ParticipantSerializer(serializers.ModelSerializer):
         fields = ['id', 'archer', 'age_group', 'style', 'event', 'eats', 'comments', 'start_group', 'scorecards']
 
 class ArcherSerializer(serializers.ModelSerializer):
-    events = serializers.SlugRelatedField(many=True, read_only=True, slug_field='id')
+    events = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     user = serializers.ReadOnlyField(source='user.is_active')
     class Meta:
         model = Archer
