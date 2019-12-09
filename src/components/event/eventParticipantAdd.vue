@@ -1,13 +1,13 @@
 <template>
   <v-dialog v-model="dialog" max-width="600px">
     <template v-slot:activator="{ on }">
-      <v-btn color="primary" v-on="on">Register</v-btn>
+      <v-btn color="primary" text v-on="on">{{ action }}</v-btn>
     </template>
     <v-card>
-      <v-card-title>Register to "{{ event ? event.name : '' }}"</v-card-title>
+      <v-card-title>{{ action }} to "{{ event ? event.name : '' }}"</v-card-title>
       <v-form v-model="valid">
         <eventParticipantDetails :participant="participant"/>
-        <v-container>
+        <v-container v-if="action !== 'Add Me'">
           <v-row>
             <v-col cols="4">
               <v-text-field
@@ -55,8 +55,8 @@
         <v-spacer></v-spacer>
         <v-btn text @click="dialog = false">Close</v-btn>
         <v-btn color="primary"
-          @click="participant.event = parseInt($route.params.id); addParticipant(participant); dialog = false"
-          :disabled="!valid">Register</v-btn>
+          @click="addParticipantProxy()"
+          :disabled="!valid">{{ action }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -72,6 +72,9 @@
     // name: "listCompetitonRegister",
     components: {
       eventParticipantDetails,
+    },
+    props: {
+      action: String,
     },
     data: () => ({
       dialog: false,
@@ -108,6 +111,14 @@
       ...mapActions('events', [
         'addParticipant',
       ]),
+      addParticipantProxy() {
+        this.participant.event = parseInt(this.$route.params.id);
+        if (this.action === "Add Me") {
+          this.participant.archer = this.user.archer
+        }
+        this.addParticipant(this.participant);
+        this.dialog = false
+      }
     },
     created() {
       this.$store.dispatch('clubs/getClubs')

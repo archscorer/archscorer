@@ -29,7 +29,7 @@
           </v-list-item>
         </v-list-item-group>
         <v-list-item-group>
-          <v-list-item @click="passLogout()">
+          <v-list-item @click="passUserLogout()">
             <v-list-item-icon>
               <v-icon>mdi-logout</v-icon>
             </v-list-item-icon>
@@ -59,6 +59,15 @@
     components: {
       AppLoginDialog,
     },
+    watch: {
+      user: {
+        handler() {
+          if (this.user.id !== null && this.user.archer.full_name === '') {
+            if (this.$route.name !== 'profile') this.$router.push('/accounts/profile')
+          }
+        }
+      }
+    },
     computed: {
       ...mapState({
         user: state => state.user.user
@@ -71,7 +80,7 @@
       ...mapActions('user', [
         'userLogout'
       ]),
-      passLogout() {
+      passUserLogout() {
         axios({
           method: 'post',
           url: '/accounts/logout/',

@@ -1,55 +1,67 @@
 <template>
-  <v-card>
-    <v-card-title>
-    <small>Registered Archers</small>
-    <v-spacer />
-    <h4>{{ event ? event.name : '' }}</h4>
-    <v-spacer />
-    <v-text-field
-      v-model="p_search"
-      append-icon="mdi-magnify"
-      label="Search"
-      single-line
-      hide-details
-    ></v-text-field>
-  </v-card-title>
-    <v-data-table
-      dense
-      :headers="p_table_header"
-      :items="p_table"
-      :search="p_search"
-      group-by="class"
-      :items-per-page="50"
-    >
-      <template v-slot:item.start_group="props" v-if="user.email === event.creator">
-        <v-edit-dialog
-          :return-value="props.item.start_group"
-          :key="props.item.id"
-          @save="save(props.item.id, {start_group: props.item.start_group})"
-          @cancel="cancel"
-        > {{ props.item.start_group }}
-          <template v-slot:input>
-            <v-text-field
-              v-model="props.item.start_group"
-              :rules="start_group_rules"
-              type="number"
-              single-line
-              autofocus
-            ></v-text-field>
-          </template>
-        </v-edit-dialog>
+  <v-sheet>
+    <v-toolbar dense flat>
+      <eventParticipantAdd action="Register" v-if="event.is_open"/>
+      <v-spacer />
+      <eventParticipantAdd action="Add Me" v-if="p_user === null"/>
+      <template v-if="user.email === event.creator">
+        <eventParticipantAdd action="Add Archer"/>
+        <v-btn color="error"
+               @click="deleteEvent(event.id); $router.push('/events')">Delete</v-btn>
       </template>
-      <template v-slot:item.action="{ item }">
-        <template v-if="user.archer.id === item.aId || user.email === event.creator">
-          <v-icon small class="mr-2" @click="editP(item.id)">
-            mdi-pencil
-          </v-icon>
-          <v-icon small @click="deleteP(item.id)">
-            mdi-delete
-          </v-icon>
+    </v-toolbar>
+    <v-card>
+      <v-card-title>
+      <small>Registered Archers</small>
+      <v-spacer />
+      <h4>{{ event ? event.name : '' }}</h4>
+      <v-spacer />
+      <v-text-field
+        v-model="p_search"
+        append-icon="mdi-magnify"
+        label="Search"
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
+      <v-data-table
+        dense
+        :headers="p_table_header"
+        :items="p_table"
+        :search="p_search"
+        group-by="class"
+        :items-per-page="50"
+      >
+        <template v-slot:item.start_group="props" v-if="user.email === event.creator">
+          <v-edit-dialog
+            :return-value="props.item.start_group"
+            :key="props.item.id"
+            @save="save(props.item.id, {start_group: props.item.start_group})"
+            @cancel="cancel"
+          > {{ props.item.start_group }}
+            <template v-slot:input>
+              <v-text-field
+                v-model="props.item.start_group"
+                :rules="start_group_rules"
+                type="number"
+                single-line
+                autofocus
+              ></v-text-field>
+            </template>
+          </v-edit-dialog>
         </template>
-      </template>
-    </v-data-table>
+        <template v-slot:item.action="{ item }">
+          <template v-if="(user.archer.id === item.aId && event.is_open) || user.email === event.creator">
+            <v-icon small class="mr-2" @click="editP(item.id)">
+              mdi-pencil
+            </v-icon>
+            <v-icon small @click="deleteP(item.id)">
+              mdi-delete
+            </v-icon>
+          </template>
+        </template>
+      </v-data-table>
+    </v-card>
     <v-dialog v-model="dialog" max-width="500px">
       <v-card>
         <v-card-title>Edit participant info for {{ p_meta.name }}</v-card-title>
@@ -65,18 +77,23 @@
       {{ snackText }}
       <v-btn text @click="snack = false">Close</v-btn>
     </v-snackbar>
-  </v-card>
+  </v-sheet>
 </template>
 
 <script>
   import { mapState, mapActions } from 'vuex'
 
   import eventParticipantDetails from '@/components/event/eventParticipantDetails.vue'
+  import eventParticipantAdd from '@/components/event/eventParticipantAdd.vue'
 
   export default {
 
     components: {
       eventParticipantDetails,
+      eventParticipantAdd,
+    },
+    props: {
+      p_user: Object,
     },
     data: () => ({
       p_search: '',
@@ -137,6 +154,7 @@
         'addParticipant',
         'delParticipant',
         'putParticipant',
+        'deleteEvent',
       ]),
       save(pId, attr) {
         let p = this.event.participants.find(obj => obj.id === pId)

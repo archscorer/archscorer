@@ -3,7 +3,7 @@
     <v-card-title v-if="user.id === null">
       <p>You need to be logged in for scoring</p>
     </v-card-title>
-    <v-card-title v-else-if="is_user_regitered() !== true">
+    <v-card-title v-else-if="p_user === null">
       <small>You need to register to the event first!</small>
     </v-card-title>
     <template v-else>
@@ -45,21 +45,14 @@
     components: {
       eventScoringEnd
     },
+    props: {
+      p_user: Object,
+    },
     data: () => ({
-      end_view: null,
+      end_view: 0,
       arrow_inc: 0,
       currentRound: null,
     }),
-    watch: {
-      course: {
-        deep: true,
-        handler() {
-          this.$nextTick(() => {
-            if (this.course.ends.length) this.$refs.end[this.end_view].isActive = true
-          })
-        }
-      },
-    },
     computed: {
       ...mapState({
         user: state => state.user.user,
@@ -79,23 +72,12 @@
       }
     },
     methods: {
-      is_user_regitered() {
-        let p_user = this.event.participants.find(obj => obj.archer.id === this.user.archer.id)
-        if (p_user) {
-          if (this.end_view === null) {
-            this.end_view = p_user.start_group - 1
-          }
-          return true
-        } else {
-          return false
-        }
-      },
       get_course(cId) {
         this.$store.dispatch('courses/getCourses', cId)
       },
       get_scorecards(eId, rId) {
+        this.end_view = this.p_user.start_group - 1
         this.currentRound = rId
-
         this.$store.dispatch('events/getUserGroupScoreCards', {eId: eId, rId: rId})
       },
       update_end_view(e) {

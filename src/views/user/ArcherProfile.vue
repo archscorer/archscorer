@@ -9,9 +9,10 @@
           <v-container>
             <v-row>
               <v-col cols="4">
-                <v-text-field
+                <v-text-field autofocus
                   v-model="user.archer.full_name"
                   label="Your full name"
+                  hint="Your full name can not be empty string!"
                 >
                 </v-text-field>
               </v-col>
