@@ -37,48 +37,59 @@ last_names = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis
 
 
 def build_base_data():
-    users = [User.objects.create_superuser('adler@ut.ee', 'testuser', first_name='Priit', last_name='Adler'),
-             User.objects.create_user('ex@ample.com', 'testuser', first_name='Ex', last_name='Ample'),
-             User.objects.create_user('ann@mail.ee', 'testuser', first_name='Ann', last_name='Mets')]
 
-    clubs = [Club.objects.create(creator=users[0], name='Not assigned to any club'),
-             Club.objects.create(creator=users[0], name='Tartu vibuklubi'),
-             Club.objects.create(creator=users[2], name='Local mad archers')]
+    clubs = [Club.objects.create(creator=None, name='..no club..')]
 
-    archers = [Archer.objects.create(full_name='Priit Adler', user=users[0], gender='M', club=clubs[1]),
-               Archer.objects.create(full_name='Ann Mets', user=users[2], gender='F', club=clubs[2]),
-               Archer.objects.create(full_name='Volli Mets', gender='M', club=clubs[2])]
-
-    course_1 = Course.objects.create(creator=users[0], name='Standard: 28 ends / 1 arrow')
+    course_1 = Course.objects.create(creator=None, name='28 ends / 1 arrow / 20,18,16,14,12,10')
     for i in range(28):
         End.objects.create(course=course_1, ord=i+1, nr_of_arrows=1, scoring=[20,18,16,14,12,10])
 
-    course_2 = Course.objects.create(creator=users[0], name='Standard: 28 ends / 2 arrows')
+    course_1 = Course.objects.create(creator=None, name='14 ends / 1 arrow / 20,18,16,14,12,10')
+    for i in range(14):
+        End.objects.create(course=course_1, ord=i+1, nr_of_arrows=1, scoring=[20,18,16,14,12,10])
+
+    course_2 = Course.objects.create(creator=None, name='28 ends / 2 arrows / 10,8,5')
     for i in range(28):
         End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, scoring=[10,8,5])
 
-    course_2_2 = Course.objects.create(creator=users[0], name='Standard: 24 ends / 2 arrows')
-    for i in range(24):
-        End.objects.create(course=course_2_2, ord=i+1, nr_of_arrows=2, scoring=[11,10,8,5])
+    course_2 = Course.objects.create(creator=None, name='14 ends / 2 arrows / 10,8,5')
+    for i in range(14):
+        End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, scoring=[10,8,5])
 
-    course_3 = Course.objects.create(creator=users[0], name='Standard: 10 ends / 3 arrows')
+    course_2 = Course.objects.create(creator=None, name='24 ends / 2 arrows / 11,10,8,5')
+    for i in range(24):
+        End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, scoring=[11,10,8,5])
+
+    course_2 = Course.objects.create(creator=None, name='12 ends / 2 arrows / 11,10,8,5')
+    for i in range(12):
+        End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, scoring=[11,10,8,5])
+
+    course_3 = Course.objects.create(creator=None, name='10 ends / 3 arrows / 10,9,8,7,6,5,4,3,2,1')
     for i in range(10):
         End.objects.create(course=course_3, ord=i+1, nr_of_arrows=3, scoring=[10,9,8,7,6,5,4,3,2,1])
 
-    course_4 = Course.objects.create(creator=users[0], name='Standard: 28 ends / 4 arrows')
+    course_4 = Course.objects.create(creator=None, name='28 ends / 4 arrows / 5,4,3')
     for i in range(28):
         End.objects.create(course=course_4, ord=i+1, nr_of_arrows=4, scoring=[5,4,3])
 
-    course_4_2 = Course.objects.create(creator=users[0], name='Standard: 7 ends / 4 arrows')
-    for i in range(7):
-        End.objects.create(course=course_4_2, ord=i+1, nr_of_arrows=4, scoring=[5,4,3])
+    course_4 = Course.objects.create(creator=None, name='14 ends / 4 arrows / 5,4,3')
+    for i in range(14):
+        End.objects.create(course=course_4, ord=i+1, nr_of_arrows=4, scoring=[5,4,3])
 
-    course_5 = Course.objects.create(creator=users[0], name='Standard: 6 ends / 5 arrows')
+    course_4 = Course.objects.create(creator=None, name='7 ends / 4 arrows / 5,4,3')
+    for i in range(7):
+        End.objects.create(course=course_4, ord=i+1, nr_of_arrows=4, scoring=[5,4,3])
+
+    course_5 = Course.objects.create(creator=None, name='6 ends / 5 arrows / 5,4,3,2,1')
     for i in range(6):
         End.objects.create(course=course_5, ord=i+1, nr_of_arrows=5, scoring=[5,4,3,2,1])
 
 
 def test_event_creation():
+    users = [User.objects.create_superuser('adler@ut.ee', 'testuser', first_name='Priit', last_name='Adler'),
+             User.objects.create_user('ex@ample.com', 'testuser', first_name='Ex', last_name='Ample'),
+             User.objects.create_user('ann@mail.ee', 'testuser', first_name='Ann', last_name='Mets')]
+
     users = User.objects.all()
     courses = Course.objects.all()
     big_event = Event.objects.create(creator=users[0], name='Open type of comp')
@@ -95,6 +106,9 @@ def test_registration():
     # register all archers
     # to the first event in the database
     comp = Event.objects.get(pk=2)
+    archers = [Archer.objects.create(full_name='Priit Adler', user=users[0], gender='M', club=clubs[1]),
+               Archer.objects.create(full_name='Ann Mets', user=users[2], gender='F', club=clubs[2]),
+               Archer.objects.create(full_name='Volli Mets', gender='M', club=clubs[2])]
 
 
     Participant.objects.create(archer=Archer.objects.get(pk=1), event=comp, age_group='A', style='LB', start_group=choice(range(1,6)))

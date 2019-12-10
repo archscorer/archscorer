@@ -39,42 +39,55 @@
               <v-form v-model="valid_e1">
                 <v-container>
                   <v-row>
-                    <v-col cols="6">
+                    <v-col cols="4">
                       <v-text-field
                         v-model="event.name"
                         :rules="nameRules"
                         label="Event name"
                         required></v-text-field>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col cols="4">
                       <v-menu
-                        ref="date_menu"
-                        v-model="date_menu"
+                        v-model="date_start_menu"
                         :close-on-content-click="false"
-                        :return-value.sync="dates"
+                        :nudge-right="40"
                         transition="scale-transition"
                         offset-y
+                        min-width="270px"
                       >
                         <template v-slot:activator="{ on }">
-                          <!-- TODO default should be today and on-click clear v-model -->
-                          <!-- TODO start end date separate and toggle multi day event -->
                           <v-text-field
-                            v-model="dateRangeText"
-                            :rules="dateRules"
-                            label="Select date(s)"
+                            v-model="event.date_start"
+                            label="Start date"
                             prepend-icon="mdi-calendar"
-                            readonly
+                            :rules="dateStartRules"
                             v-on="on"
                           ></v-text-field>
                         </template>
-                        <v-date-picker
-                          v-model="dates"
-                          range
-                        >
-                          <v-spacer></v-spacer>
-                          <v-btn text @click="date_menu = false">Cancel</v-btn>
-                          <v-btn color="primary" @click="$refs.date_menu.save(dates)">OK</v-btn>
-                        </v-date-picker>
+                        <v-date-picker v-model="event.date_start" @input="date_start_menu = false"></v-date-picker>
+                      </v-menu>
+                    </v-col>
+                    <v-col cols="4">
+                      <v-switch v-model="multi_day" v-if="multi_day === false"
+                                label="Multiple days?"/>
+                      <v-menu
+                        v-else
+                        v-model="date_end_menu"
+                        :close-on-content-click="false"
+                        :nudge-right="40"
+                        transition="scale-transition"
+                        offset-y
+                        min-width="270px"
+                      >
+                        <template v-slot:activator="{ on }">
+                          <v-text-field
+                            v-model="event.date_end"
+                            label="End date"
+                            prepend-icon="mdi-calendar"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker v-model="event.date_end" @input="date_end_menu = false"></v-date-picker>
                       </v-menu>
                     </v-col>
                   </v-row>
@@ -195,7 +208,7 @@
               <v-spacer></v-spacer>
               <v-btn text @click="dialog = false">Close</v-btn>
               <v-btn color="primary"
-                @click="addEvent(fixEventDates()); dialog = false; e1 = 1">Finish</v-btn>
+                @click="addEvent(checkEventDates()); dialog = false; e1 = 1">Finish</v-btn>
             </v-card-actions>
           </v-card>
         </v-stepper-content>
@@ -214,7 +227,7 @@
 
       event: {
         name: '',
-        date_start: '',
+        date_start: new Date().toISOString().substr(0, 10),
         date_end: '',
         description: '',
         type: 'private',
@@ -223,30 +236,29 @@
       },
 
       event_type_choices: [
-        {
-          text: 'Private',
-          value: 'private'
-        },
-        {
-          text: 'Club',
-          value: 'club'
-        },
-        {
-          text: 'Open',
-          value: 'open'
-        }
+        { text: 'Private', value: 'private' },
+        { text: 'Club', value: 'club' },
+        { text: 'Open', value: 'open' }
       ],
 
       valid_e1: false,
 
       nameRules: [v => !!v || 'Name is required'],
-      dateRules: [v => !!v || 'Start date is required'],
+      dateStartRules: [v => !!v || 'Start date is required'],
       courseRules: [v => !!v || 'Round course is mandatory'],
-      date_menu: false,
-      dates: [],  // new Date().toISOString().substr(0, 10)
+      date_start_menu: false,
+      date_end_menu: false,
+      multi_day: false,
 
       valid_e2: false,
     }),
+    watch: {
+      multi_day: {
+        handler() {
+          this.event.date_end = this.event.date_start
+        }
+      }
+    },
     computed: {
       dateRangeText () {
         return this.dates.join(' ~ ')
@@ -263,9 +275,10 @@
       delRound(index) {
         this.event.rounds.splice(index, 1)
       },
-      fixEventDates() {
-        this.event.date_start = this.dates[0];
-        this.event.date_end = this.dates.slice(-1)[0];
+      checkEventDates() {
+        if (this.event.date_end === '' || new Date(this.event.date_end) <  new Date(this.event.date_start)) {
+          this.event.date_end = this.event.date_start
+        }
         return this.event
       },
       ...mapActions('events', [
