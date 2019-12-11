@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" max-width="600px">
     <template v-slot:activator="{ on }">
-      <v-btn color="primary" text v-on="on">{{ action }}</v-btn>
+      <v-btn color="primary" :text="action === 'Register' ? false : true" v-on="on">{{ action }}</v-btn>
     </template>
     <v-card>
       <v-card-title>{{ action }} to "{{ event ? event.name : '' }}"</v-card-title>

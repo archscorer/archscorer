@@ -2,8 +2,8 @@
   <v-sheet>
     <v-toolbar dense flat>
       <eventParticipantAdd action="Register" v-if="event.is_open"/>
+      <eventParticipantAdd action="Add Me" v-if="user.id !== null && p_user === null"/>
       <v-spacer />
-      <eventParticipantAdd action="Add Me" v-if="p_user === null"/>
       <template v-if="user.email === event.creator">
         <eventParticipantAdd action="Add Archer"/>
         <v-btn color="error"

@@ -65,7 +65,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'archer']
 
 class ClubSerializer(serializers.ModelSerializer):
-    members = ArcherSerializer(many=True, read_only=True)
+    members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Club
         fields = ['id', 'name', 'contact', 'members']
