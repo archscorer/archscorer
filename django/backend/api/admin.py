@@ -31,7 +31,7 @@ class myClubAdmin(admin.ModelAdmin):
 
 @admin.register(Archer)
 class myArcherAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'gender', 'email', 'club_name')
+    list_display = ('full_name', 'gender', 'email', 'club_name', 'user')
 
     def club_name(self, obj):
         if isinstance(obj.club, Club):

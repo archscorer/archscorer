@@ -40,16 +40,17 @@ class ParticipantScoreCardSerializer(serializers.ModelSerializer):
 
 class ParticipantArcherSerializer(serializers.ModelSerializer):
     club = serializers.ReadOnlyField(source='club.name')
+    user = serializers.ReadOnlyField(source='user.is_active')
     class Meta:
         model = Archer
-        fields = ['id', 'full_name', 'gender', 'club']
+        fields = ['id', 'full_name', 'gender', 'club', 'user']
 
 class ParticipantSerializer(serializers.ModelSerializer):
     archer = ParticipantArcherSerializer(read_only=True)
     scorecards = ParticipantScoreCardSerializer(many=True, read_only=True)
     class Meta:
         model = Participant
-        fields = ['id', 'archer', 'age_group', 'style', 'event', 'eats', 'comments', 'start_group', 'scorecards']
+        fields = '__all__'
 
 class ArcherSerializer(serializers.ModelSerializer):
     events = serializers.PrimaryKeyRelatedField(many=True, read_only=True)

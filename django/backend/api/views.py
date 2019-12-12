@@ -6,11 +6,12 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
 from django.db.utils import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 from .models import (User, Club, Course, Archer, Event, Round, Participant, ScoreCard, Arrow)
 from .serializers import (UserSerializer, ClubSerializer, CourseSerializer,
                           ArcherSerializer, EventSerializer, EventSerializerList,
-                          RoundSerializer, ParticipantSerializer, ParticipantScoreCardSerializer,
-                          ArrowSerializer)
+                          RoundSerializer, ParticipantArcherSerializer,ParticipantSerializer,
+                          ParticipantScoreCardSerializer, ArrowSerializer)
 
 # Serve Vue Application
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
@@ -125,6 +126,17 @@ class ArcherViewSet(mixins.CreateModelMixin,
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    @action(detail=False, methods=['POST'])
+    def search(self, request):
+        """
+        Search archer profiles by name
+        """
+        archers = Archer.objects.filter(full_name__contains=request.data['query'])
+        if len(archers) == 0:
+            return Response([{ 'header': 'no matching archer profiles' }],
+                            status=status.HTTP_200_OK)
+        return Response(ParticipantArcherSerializer(archers, many=True).data)
+
 class ParticipantViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows participants to be added or viewed.
@@ -175,30 +187,40 @@ class ParticipantViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
         req_archer = request.data['archer']
-        archer_serialized = ArcherSerializer(data=req_archer)
-        if archer_serialized.is_valid():
-            archer, created = Archer.objects.get_or_create(full_name=req_archer['full_name'],
-                                                           email=req_archer['email'])
-            if created:
-                # if new archer is created fill in additional submitted information
-                for key in req_archer:
-                    if req_archer[key]:
-                        if key == 'club':
-                            # expects to be club instance not its primary key
-                            req_archer[key] = Club.objects.get(pk=req_archer[key])
-                        setattr(archer, key, req_archer[key])
-                archer.save()
+        if 'id' in req_archer:
+            archer_serialized = ParticipantArcherSerializer(data=req_archer)
+            if archer_serialized.is_valid():
+                try:
+                    archer = Archer.objects.get(pk=req_archer['id'])
+                except ObjectDoesNotExist:
+                    return Response({'details': 'Referenced archer does not exist.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(archer_serialized.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(archer_serialized.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+            archer_serialized = ArcherSerializer(data=req_archer)
+            if ArcherSerializer(data=req_archer).is_valid():
+                if 'club' in req_archer:
+                    try:
+                        req_archer['club'] = Club.objects.get(pk=req_archer['club'])
+                    except ObjectDoesNotExist:
+                        # if club does not exist just remove it silently
+                        del req_archer['club']
+                archer = Archer.objects.create(**req_archer)
+            else:
+                return Response(archer_serialized.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
 
         req_participant = request.data
         req_participant['archer'] = archer
-        # TODO like for archer we use arcer base serializer here we could have same for
-        # participant.
         participant_serialized = ParticipantSerializer(data=req_participant)
         if participant_serialized.is_valid():
-            req_participant['event'] = Event.objects.get(pk=req_participant['event'])
+            try:
+                req_participant['event'] = Event.objects.get(pk=req_participant['event'])
+            except ObjectDoesNotExist:
+                return Response({'details': 'Referenced event does not exist.'},
+                                status=status.HTTP_400_BAD_REQUEST)
             try:
                 participant = Participant.objects.create(**req_participant)
             except IntegrityError:

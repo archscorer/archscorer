@@ -5,7 +5,8 @@
         <v-select
           v-model="participant.style"
           :items="pModel.style.choices"
-          label="Style"
+          label="Style*"
+          :rules="[v => !!v || 'Bow style is required']"
           item-text="display_name"
           dense
         ></v-select>
@@ -14,7 +15,8 @@
         <v-select
           v-model="participant.age_group"
           :items="pModel.age_group.choices"
-          label="Age Group"
+          label="Age Group*"
+          :rules="[v => !!v || 'Age Group is required']"
           item-text="display_name"
           dense
         ></v-select>
@@ -43,17 +45,14 @@
 </template>
 
 <script>
-  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
   import { mapState } from 'vuex'
 
   export default {
-    // name: "listCompetitonRegister",
     props: {
       participant: Object,
     },
     data: () => ({
-      // TODO write validators for form fields: style, age, gender, full_name, email
-      // TODO quicklink to register me (skip archer fields or autofill them)
+      //
     }),
     computed: {
       ...mapState({
