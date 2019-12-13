@@ -3,7 +3,12 @@ import api from '@/services/api'
 export default {
   getUser() {
     return api.get(`user/`)
-              .then(response => response.data)
+              .then(response => {
+                // every time user object is updated update csrftoken as well
+                api.defaults.headers.common['X-CSRFToken'] = response.data[0].csrftoken
+                return response.data
+              })
+    //
   },
   postArcher(payload) {
     return api.post(`archer/`, payload)

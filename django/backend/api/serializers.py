@@ -61,9 +61,15 @@ class ArcherSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     archer = ArcherSerializer()
+    csrftoken = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id', 'email', 'archer']
+        fields = ['id', 'email', 'archer', 'csrftoken']
+
+    def get_csrftoken(self, obj):
+        if hasattr(obj, 'csrftoken'):
+            return obj.csrftoken
+        return None
 
 class ClubSerializer(serializers.ModelSerializer):
     members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)

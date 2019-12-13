@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import AnonymousUser
+from django.middleware.csrf import get_token
 from django.db.models import Q
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
@@ -38,6 +39,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
                                            email=user.email,
                                            user=user,
                                            club=Club.objects.get(pk=1))
+        setattr(user, 'csrftoken', get_token(self.request))
         return [user]
 
 
@@ -126,7 +128,7 @@ class ArcherViewSet(mixins.CreateModelMixin,
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    @action(detail=False, methods=['POST'])
+    @action(detail=False, methods=['POST'], permission_classes=[permissions.AllowAny])
     def search(self, request):
         """
         Search archer profiles by name
