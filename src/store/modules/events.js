@@ -104,10 +104,13 @@ const actions = {
   },
 
   getUserGroupScoreCards({ commit }, attr) {
-    eventService.fetchUserGroupScoreCards(attr)
+    return eventService.fetchUserGroupScoreCards(attr)
     .then(scorecards => {
       commit('setScoreCards', scorecards)
     })
+  },
+  resetUserGroupScoreCards({ commit }) {
+    commit('setScoreCards', [])
   },
   putArrow({ commit }, attr) {
     eventService.putArrow(attr.arrow.id, {score: attr.arrow.score})

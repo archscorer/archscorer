@@ -79,3 +79,9 @@
     }),
   };
 </script>
+
+<style>
+  .v-input__prepend-outer {
+    margin-top: 0.55rem;
+  }
+</style>

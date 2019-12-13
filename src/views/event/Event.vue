@@ -7,13 +7,17 @@
     </v-tabs>
     <v-tabs-items v-model="tab">
       <v-tab-item>
+        <v-sheet class="py-5">
+          <h1 v-text="event.name"></h1>
+          <p v-html="event_desciption"></p>
+        </v-sheet>
+        <eventParticipantList :p_user="p_user"/>
+      </v-tab-item>
+      <v-tab-item>
         <eventResults/>
       </v-tab-item>
       <v-tab-item>
         <eventScoring :p_user="p_user"/>
-      </v-tab-item>
-      <v-tab-item>
-        <eventParticipantList :p_user="p_user"/>
       </v-tab-item>
     </v-tabs-items>
   </v-container>
@@ -40,7 +44,7 @@
     },
     data: () => ({
       tab: null,
-      tabs: ['Results', 'Scoring', 'Participants']
+      tabs: ['Overview', 'Results', 'Scoring']
     }),
     computed: {
       ...mapState({
@@ -56,11 +60,16 @@
         }
         return p_user ? p_user : null
       },
+      event_desciption() {
+        // TODO this is probably temp fix. some kind of html editor like https://www.vuetoolbox.com/projects/tiptap
+        // or already ready made solution https://github.com/iliyaZelenko/tiptap-vuetify
+        return this.event.description.split('\n').join('</p><p>')
+      }
     },
     created() {
       //do something after creating vue instance
       this.$store.dispatch('events/updateEvent', parseInt(this.$route.params.id))
-      if (this.action === 'register') this.tab = 2
+      if (this.action === 'register') this.tab = 0
     }
   }
 </script>

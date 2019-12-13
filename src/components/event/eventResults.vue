@@ -2,9 +2,9 @@
   <v-card>
     <v-card-title>
       <v-btn @click="update_r_table()" icon><v-icon>mdi-refresh</v-icon></v-btn>
-      Results
+      <small>Results</small>
       <v-spacer />
-      <h4>{{ event ? event.name : '' }}</h4>
+      {{ event.name }}
       <v-spacer />
       <v-text-field
         v-model="r_search"
@@ -67,7 +67,7 @@
             { text: 'Class', value: 'class' },
           ]
           header.push(...this.event.rounds.map(function(r) {
-            return { text: r.ord.toString() + '. ' + r.label, 
+            return { text: r.ord.toString() + '. ' + r.label,
                     value: r.ord.toString() }
           }))
           header.push({ text: 'Sum', value: 'sum'})
@@ -82,8 +82,7 @@
         }
       },
       r_table() {
-        // this if is a bit of a hack, but simple solution
-        if (this.event && this.event.participants.length > 0 && this.event.participants[0].id) {
+        if (Array.isArray(this.event.participants)) {
           let r_table = this.event.participants.map(function(p) {
             let row = {
               name: p.archer.full_name,

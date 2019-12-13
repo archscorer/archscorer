@@ -4,9 +4,9 @@
       <v-btn color="primary" :text="action === 'Register' ? false : true" v-on="on">{{ action }}</v-btn>
     </template>
     <v-card>
-      <v-card-title>{{ action }} to "{{ event ? event.name : '' }}"</v-card-title>
+      <v-card-title>{{ action }} to "{{ event.name }}"</v-card-title>
       <v-form v-model="valid">
-        <eventParticipantDetails :participant="participant"/>
+        <eventParticipantDetails :participant="participant" :catering="event.catering"/>
         <v-container v-if="action !== 'Add Me'">
           <v-row>
             <v-autocomplete

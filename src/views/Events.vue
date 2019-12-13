@@ -1,33 +1,27 @@
 <template>
   <v-container>
     <v-card>
-      <v-card-text class="py-8">
-        <ListEvents/>
+      <v-card-text class="pt-8 mt-5">
+        <EventsList/>
         <small><p>events created by you are marked with '*'</p></small>
-        <AddCompetiton/>
+        <EventsAdd/>
       </v-card-text>
     </v-card>
   </v-container>
 </template>
 
 <script>
-  import AddCompetiton from '@/components/EventsAdd.vue'
-  import ListEvents from '@/components/EventsList.vue'
+  import EventsAdd from '@/components/EventsAdd.vue'
+  import EventsList from '@/components/EventsList.vue'
 
   export default {
     name: 'Events',
     components: {
-      AddCompetiton,
-      ListEvents
+      EventsAdd,
+      EventsList
     },
     data: () => ({
       //
     })
   };
 </script>
-
-<style>
-  .v-input__prepend-outer {
-    margin-top: 0.55rem;
-  }
-</style>

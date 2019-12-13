@@ -23,8 +23,9 @@
       </v-col>
       <v-col cols="4">
         <v-switch
+          v-if="catering"
           v-model="participant.eats"
-          label="Catering"
+          :label="participant.eats ? 'I will eat' : 'I will not eat'"
           color="primary"
         ></v-switch>
       </v-col>
@@ -50,6 +51,7 @@
   export default {
     props: {
       participant: Object,
+      catering: Boolean,
     },
     data: () => ({
       //

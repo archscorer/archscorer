@@ -27,7 +27,7 @@
         <v-divider></v-divider>
 
         <v-stepper-step step="3">Additional details
-          <small>Registration, etc.</small>
+          <small>Allow registration, etc.</small>
         </v-stepper-step>
       </v-stepper-header>
 
@@ -42,9 +42,8 @@
                     <v-col cols="4">
                       <v-text-field
                         v-model="event.name"
-                        :rules="nameRules"
-                        label="Event name"
-                        required></v-text-field>
+                        :rules="[v => !!v || 'Name is required']"
+                        label="Event name"></v-text-field>
                     </v-col>
                     <v-col cols="4">
                       <v-menu
@@ -60,7 +59,7 @@
                             v-model="event.date_start"
                             label="Start date"
                             prepend-icon="mdi-calendar"
-                            :rules="dateStartRules"
+                            :rules="[v => !!v || 'Start date is required']"
                             v-on="on"
                           ></v-text-field>
                         </template>
@@ -131,7 +130,7 @@
                   <v-col cols="4">
                     <v-autocomplete
                       v-model="event.rounds[index].course"
-                      :rules="courseRules"
+                      :rules="[v => !!v || 'Round course is mandatory']"
                       autocomplete
                       :items="courses"
                       label="Round type"
@@ -146,7 +145,7 @@
                     ></v-switch>
                   </v-col>
                   <v-col cols="1">
-                    <v-btn text color="error" @click="delRound(index)" icon><v-icon size="30">mdi-minus</v-icon></v-btn>
+                    <v-btn text class="lowered" color="error" @click="delRound(index)" icon><v-icon size="30">mdi-minus</v-icon></v-btn>
                   </v-col>
                 </v-row>
                 <v-row dense>
@@ -243,9 +242,6 @@
 
       valid_e1: false,
 
-      nameRules: [v => !!v || 'Name is required'],
-      dateStartRules: [v => !!v || 'Start date is required'],
-      courseRules: [v => !!v || 'Round course is mandatory'],
       date_start_menu: false,
       date_end_menu: false,
       multi_day: false,
@@ -264,8 +260,8 @@
         return this.dates.join(' ~ ')
       },
       ...mapState({
+        user: state => state.user.user,
         courses: state => state.courses.courses,
-        user: state => state.user.user
       })
     },
     methods: {
@@ -292,7 +288,7 @@
 </script>
 
 <style scoped>
-  .v-btn {
+  .lowered {
     margin-top: 0.55rem;
   }
 </style>

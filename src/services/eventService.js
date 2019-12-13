@@ -24,6 +24,10 @@ export default {
     return api.delete(`events/rounds/${rId}/`)
               .then(response => response.data)
   },
+  putRound(rId, payload) {
+    return api.delete(`events/rounds/${rId}/`, payload)
+              .then(response => response.data)
+  },
 
   optsParticipant() {
     return api.options(`events/participants/register/`)

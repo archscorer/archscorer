@@ -99,6 +99,9 @@ class Event(models.Model):
     date_start = models.DateField(default=timezone.localdate)
     date_end = models.DateField(default=timezone.localdate)
     is_open = models.BooleanField(default=True)
+    # archive is implemented on client level, api currenlty is unaware of it
+    # this is TODO
+    archive = models.BooleanField(default=False)
 
     name = models.CharField(max_length=150, default='Unnamed event', blank=False)
     description = models.TextField(blank=True)

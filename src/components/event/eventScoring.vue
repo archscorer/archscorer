@@ -6,6 +6,9 @@
     <v-card-title v-else-if="p_user === null">
       <small>You need to register to the event first!</small>
     </v-card-title>
+    <v-card-title v-else-if="event.archive === true">
+      <small>This event in archived and can not be edited!</small>
+    </v-card-title>
     <template v-else>
       <v-card-title>
         Round <v-spacer/>
@@ -26,13 +29,21 @@
           :key="'e' + currentRound + ':' + end.id"
           ref="end"
         >
-          <eventScoringEnd :event="event"
+          <v-sheet v-if="scorecards_loading === true" class="text-center py-10">
+            <v-progress-circular indeterminate size="64" color="secondary"></v-progress-circular>
+          </v-sheet>
+          <eventScoringEnd v-else
+                           :event="event"
                            :end="end"
                            :scorecards="scorecards"
                            @end_nav="update_end_view"/>
         </v-window-item>
       </v-window>
     </template>
+    <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
+      {{ snackText }}
+      <v-btn text @click="snack = false">Close</v-btn>
+    </v-snackbar>
   </v-card>
 </template>
 
@@ -52,6 +63,11 @@
       end_view: 0,
       arrow_inc: 0,
       currentRound: null,
+      scorecards_loading: false,
+
+      snack: false,
+      snackText: '',
+      snackColor: ''
     }),
     computed: {
       ...mapState({
@@ -76,9 +92,22 @@
         this.$store.dispatch('courses/getCourses', cId)
       },
       get_scorecards(eId, rId) {
+        // before getting new set, the current set should be destroyed
+        this.$store.dispatch('events/resetUserGroupScoreCards')
         this.end_view = this.p_user.start_group - 1
         this.currentRound = rId
+        this.scorecards_loading = true
         this.$store.dispatch('events/getUserGroupScoreCards', {eId: eId, rId: rId})
+        .then(() => {
+          this.scorecards_loading = false
+        }).catch(err => {
+          this.scorecards_loading = false
+          if (err.code === 'ECONNABORTED') {
+            this.snack = true
+            this.snackColor = 'error'
+            this.snackText = 'Operation timed out. Try again in few seconds.'
+          }
+        })
       },
       update_end_view(e) {
         e === '+' ? this.end_view++ : this.end_view--
