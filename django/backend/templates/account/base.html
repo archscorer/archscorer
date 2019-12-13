@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <style>
+      /* TODO move this to app specific static file, that django collectstatic knows how to put to correct place */
       html {
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
@@ -29,6 +31,15 @@
         line-height: 2rem;
         letter-spacing: normal !important;
         font-family: "Roboto", sans-serif !important;
+      }
+      .google {
+        background: url('{% static "/img/btn_google_signin_dark_normal_web@2x.png" %}') no-repeat center center;
+        background-size: contain;
+        width: 198px;
+        height: 47px;
+        margin: 30px auto;
+        padding: 0px 0px;
+        overflow: hidden;
       }
     </style>
   </head>

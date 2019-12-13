@@ -29,7 +29,8 @@
           </v-list-item>
         </v-list-item-group>
         <v-list-item-group>
-          <v-list-item @click="passUserLogout()">
+          <!-- this is a normal hyperlink -->
+          <v-list-item href="/accounts/logout/">
             <v-list-item-icon>
               <v-icon>mdi-logout</v-icon>
             </v-list-item-icon>
@@ -41,24 +42,17 @@
       </v-list>
     </v-card>
   </v-menu>
-  <AppLoginDialog v-else :csrf="getCSRFCookie"/>
+  <!-- this is a normal hyperlink -->
+  <v-btn v-else text :href="'/accounts/login/?next=/%23' + $route.path">Login</v-btn>
 </template>
 
 <script>
-  import axios from 'axios'
-  import Cookies from 'js-cookie'
-
-  import AppLoginDialog from '@/components/accounts/AppLoginDialog.vue'
-
-  import { mapState, mapActions } from 'vuex'
+  import { mapState } from 'vuex'
 
   export default {
     data: () => ({
       user_menu: false,
     }),
-    components: {
-      AppLoginDialog,
-    },
     watch: {
       user: {
         handler() {
@@ -72,27 +66,6 @@
       ...mapState({
         user: state => state.user.user
       }),
-      getCSRFCookie() {
-        return Cookies.get('csrftoken')
-      }
-    },
-    methods: {
-      ...mapActions('user', [
-        'userLogout'
-      ]),
-      passUserLogout() {
-        axios({
-          method: 'post',
-          url: '/accounts/logout/',
-          next: '/',
-          headers: {
-            'X-CSRFToken': this.getCSRFCookie,
-          }
-        }).then(() => {
-          this.userLogout()
-          if (this.$route.path !== '/') this.$router.push('/')
-        })
-      },
     },
     created() {
       //do something after creating vue instance
