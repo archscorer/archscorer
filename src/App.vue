@@ -29,7 +29,7 @@
       <v-spacer></v-spacer>
       <AppLoginMenu/>
     </v-app-bar>
-    <v-navigation-drawer app v-model="drawer">
+    <v-navigation-drawer app disable-resize-watcher v-model="drawer">
       <v-list dense>
         <v-list-item to="/">
           <v-list-item-icon>
@@ -75,7 +75,7 @@
       AppLoginMenu,
     },
     data: () => ({
-      drawer: null,
+      drawer: false,
     }),
   };
 </script>

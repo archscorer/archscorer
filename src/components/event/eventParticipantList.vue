@@ -5,8 +5,47 @@
       <eventParticipantAdd action="Add Me" v-if="user.id !== null && p_user === null"/>
       <v-spacer />
       <template v-if="user.email === event.creator">
-        <eventParticipantAdd action="Add Archer"/>
-        <eventEdit/>
+        <template v-if="$vuetify.breakpoint.smAndUp">
+          <eventParticipantAdd action="Add Archer"/>
+          <eventEdit/>
+        </template>
+        <template v-else>
+          <v-menu
+            v-model="creator_menu"
+          >
+            <template v-slot:activator="{ on }">
+              <v-btn icon
+                v-on="on">
+                <v-icon>mdi-dots-vertical</v-icon>
+              </v-btn>
+            </template>
+            <v-card
+              class="text-uppercase"
+              tile>
+              <v-list dense>
+                <v-subheader>admin menu</v-subheader>
+                <v-list-item-group>
+                  <v-list-item>
+                    <v-list-item-content>
+                    </v-list-item-content>
+                    <v-list-item-action>
+                      <eventParticipantAdd action="Add Archer"/>
+                    </v-list-item-action>
+                  </v-list-item>
+                </v-list-item-group>
+                <v-list-item-group>
+                  <v-list-item>
+                    <v-list-item-content>
+                    </v-list-item-content>
+                    <v-list-item-action>
+                      <eventEdit/>
+                    </v-list-item-action>
+                  </v-list-item>
+                </v-list-item-group>
+              </v-list>
+            </v-card>
+          </v-menu>
+        </template>
       </template>
     </v-toolbar>
     <v-card>
@@ -119,6 +158,7 @@
         v => !!v || 'required',
       ],
       dialog: false,
+      creator_menu: false,
       snack: false,
       snackColor: '',
       snackText: '',
