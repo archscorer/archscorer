@@ -15,7 +15,7 @@ export default {
               .then(response => response.data)
   },
   putArcher(aId, payload) {
-    return api.patch(`archer/${aId}/`, payload)
+    return api.put(`archer/${aId}/`, payload)
               .then(response => response.data)
   },
   searchArcher(payload) {

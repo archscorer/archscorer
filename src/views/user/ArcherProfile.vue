@@ -61,7 +61,7 @@
         </v-form>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="updateArcher(user.archer); $router.go(-1)">Save</v-btn>
+          <v-btn color="primary" @click="putArcher(user.archer); $router.go(-1)">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-col>
@@ -84,7 +84,7 @@
     },
     methods: {
       ...mapActions('user', [
-        'updateArcher'
+        'putArcher'
       ]),
     },
     created() {

@@ -27,7 +27,7 @@ const actions = {
       commit('setUser', user)
     }).catch(() => {})
   },
-  updateArcher({ commit }, archer) {
+  putArcher({ commit }, archer) {
     if (archer.id !== null) {
       userService.putArcher(archer.id, archer)
       .then(archer => {

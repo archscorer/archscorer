@@ -113,7 +113,7 @@ const actions = {
     commit('setScoreCards', [])
   },
   putArrow({ commit }, attr) {
-    eventService.putArrow(attr.arrow.id, {score: attr.arrow.score})
+    eventService.putArrow(attr.arrow.id, attr.arrow)
     .then(arrow => {
       commit('updateArrow', {scId: attr.scId, arrow: arrow})
     }).catch(error => {

@@ -115,8 +115,7 @@ class RoundViewSet(viewsets.ModelViewSet):
     def add(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
-class ArcherViewSet(mixins.CreateModelMixin,
-                    mixins.UpdateModelMixin,
+class ArcherViewSet(mixins.UpdateModelMixin,
                     viewsets.GenericViewSet):
     """
     API endpoint that allows archer to be viewed or edited.

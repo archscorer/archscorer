@@ -153,7 +153,6 @@
         'addParticipant',
         'delParticipant',
         'putParticipant',
-        'deleteEvent',
       ]),
       save(pId, attr) {
         let p = this.event.participants.find(obj => obj.id === pId)
@@ -176,6 +175,7 @@
           eats: p.eats,
           comments: p.comments,
           start_group: p.start_group,
+          event: this.event.id,
         }
         this.dialog = true
       },

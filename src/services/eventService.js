@@ -42,7 +42,7 @@ export default {
               .then(response => response.data)
   },
   putParticipant(pId, payload) {
-    return api.patch(`events/participants/${pId}/`, payload)
+    return api.put(`events/participants/${pId}/`, payload)
               .then(response => response.data)
   },
 
@@ -51,7 +51,7 @@ export default {
               .then(response => response.data)
   },
   putArrow(aId, payload) {
-    return api.patch(`events/participants/arrows/${aId}/`, payload)
+    return api.put(`events/participants/arrows/${aId}/`, payload)
               .then(response => response.data)
   }
 }
