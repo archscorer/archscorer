@@ -145,7 +145,6 @@
         style: '',
         eats: '',
         comments: '',
-        start_group: '',
       },
       p_table_header: [
         { text: 'Name', value: 'name' },
@@ -196,8 +195,8 @@
         'putParticipant',
       ]),
       save(pId, attr) {
-        let p = this.event.participants.find(obj => obj.id === pId)
-        this.putParticipant({pId: p.id, participant: attr})
+        let p = Object.assign({}, this.event.participants.find(obj => obj.id === pId), attr)
+        this.putParticipant({pId: p.id, participant: p})
         this.snack = true
         this.snackColor = 'success'
         this.snackText = 'Changes have been saved'
@@ -215,8 +214,6 @@
           style: p.style,
           eats: p.eats,
           comments: p.comments,
-          start_group: p.start_group,
-          event: this.event.id,
         }
         this.dialog = true
       },
