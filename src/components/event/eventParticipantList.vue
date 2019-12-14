@@ -11,6 +11,7 @@
         </template>
         <template v-else>
           <v-menu
+            :close-on-content-click="false"
             v-model="creator_menu"
           >
             <template v-slot:activator="{ on }">
@@ -25,7 +26,7 @@
               <v-list dense>
                 <v-subheader>admin menu</v-subheader>
                 <v-list-item-group>
-                  <v-list-item>
+                  <v-list-item inactive>
                     <v-list-item-content>
                     </v-list-item-content>
                     <v-list-item-action>
@@ -34,7 +35,7 @@
                   </v-list-item>
                 </v-list-item-group>
                 <v-list-item-group>
-                  <v-list-item>
+                  <v-list-item inactive>
                     <v-list-item-content>
                     </v-list-item-content>
                     <v-list-item-action>
