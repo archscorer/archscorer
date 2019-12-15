@@ -46,8 +46,18 @@ const actions = {
           .then(event => {
             commit('updateEvent', event)
           })
+        }).catch(error => {
+          console.log(error.response.data)
         })
       })
+    })
+  },
+  putEvent({ commit }, attr) {
+    eventService.putEvent(attr.eId, attr.event)
+    .then(event => {
+      commit('updateEvent', event)
+    }).catch(error => {
+      console.log(error.response.data)
     })
   },
   deleteEvent({ commit }, eId) {

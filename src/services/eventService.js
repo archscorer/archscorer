@@ -15,6 +15,10 @@ export default {
     return api.delete(`events/${eId}/`)
               .then(response => response.data)
   },
+  putEvent(eId, payload) {
+    return api.put(`events/${eId}/`, payload)
+              .then(response => response.data)
+  },
 
   postRound(payload) {
     return api.post(`events/rounds/add/`, payload)

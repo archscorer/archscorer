@@ -12,9 +12,16 @@
     <template v-else>
       <v-card-title>
         Round <v-spacer/>
-        <template v-for="round in event.rounds">
-          <v-btn @click="get_scorecards(event.id, round.id); get_course(round.course)" :key="round.id">{{ round.ord }}</v-btn>
-        </template>
+        <v-select
+          max-width="250px"
+          label="Select round for scoring."
+          v-model="round"
+          :items="event_rounds"
+          return-object></v-select>
+        <v-btn
+          :disabled="round ? round.is_open ? false : true : true"
+          @click="get_scorecards(event.id, round.id); get_course(round.course)"
+          >Go!</v-btn>
       </v-card-title>
       <v-divider/>
       <v-pagination
@@ -34,6 +41,7 @@
           </v-sheet>
           <eventScoringEnd v-else
                            :event="event"
+                           :round="round"
                            :end="end"
                            :scorecards="scorecards"
                            @end_nav="update_end_view"/>
@@ -63,6 +71,8 @@
       end_view: 0,
       arrow_inc: 0,
       currentRound: null,
+      course: {ends: []},
+      round: {},
       scorecards_loading: false,
 
       snack: false,
@@ -72,11 +82,18 @@
     computed: {
       ...mapState({
         user: state => state.user.user,
-        course: state => state.courses.courses,
+        courses: state => state.courses.courses,
         scorecards: state => state.events.scorecards
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
+      },
+      event_rounds() {
+        return this.event.rounds.map(r => {
+          let text = r.ord + '. ' + r.label + ' (' + r.course_name + ')'
+          let disabled = !r.is_open
+          return Object.assign({}, r, {text: text, disabled: disabled})
+        })
       },
       end_view_pager: {
         get: function() {
@@ -90,6 +107,9 @@
     methods: {
       get_course(cId) {
         this.$store.dispatch('courses/getCourses', cId)
+        .then(() => {
+          this.course = this.courses.find(obj => obj.id === cId)
+        })
       },
       get_scorecards(eId, rId) {
         // before getting new set, the current set should be destroyed
@@ -119,5 +139,9 @@
 <style scoped>
   .v-pagination >>> * {
     transform: scale(0.75);
+  }
+  .v-select {
+    max-width: 250px;
+    margin: 0 25px;
   }
 </style>

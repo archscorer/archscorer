@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="event">
+  <v-container v-if="event" :class="{'px-0': $vuetify.breakpoint.xsOnly}">
     <v-tabs v-model="tab" grow>
       <v-tab v-for="label in tabs" :key="label">
         {{ label }}
@@ -11,6 +11,14 @@
           <h1 v-text="event.name"></h1>
           <p v-html="event_desciption"></p>
         </v-sheet>
+        <v-list dense>
+          <v-subheader>Rounds</v-subheader>
+          <v-list-item v-for="round in event.rounds" :key="'round_' + round.id">
+            <v-list-item-title>
+              {{ round.ord }}. {{ round.label }} {{ round.course_name ? '(' + round.course_name + ')' : ''}}
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
         <eventParticipantList :p_user="p_user"/>
       </v-tab-item>
       <v-tab-item>
@@ -48,7 +56,8 @@
     }),
     computed: {
       ...mapState({
-        user: state => state.user.user
+        user: state => state.user.user,
+        courses: state => state.courses.courses,
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))

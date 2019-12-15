@@ -13,7 +13,7 @@ from rest_framework import serializers
 class EndSerializer(serializers.ModelSerializer):
     class Meta:
         model = End
-        fields = ['id', 'course', 'ord', 'label', 'nr_of_arrows', 'scoring']
+        fields = '__all__'
 
 class CourseSerializer(serializers.ModelSerializer):
     creator = serializers.ReadOnlyField(source='creator.email')
@@ -23,14 +23,19 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = ['id', 'creator', 'name', 'description', 'location', 'ends']
 
 class RoundSerializer(serializers.ModelSerializer):
+    course_name = serializers.SerializerMethodField()
     class Meta:
         model = Round
-        fields = ['id', 'ord', 'course', 'label', 'is_open', 'event']
+        fields = '__all__'
+
+    def get_course_name(self, obj):
+        return obj.course.name
+
 
 class ArrowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Arrow
-        fields = ['id', 'end', 'ord', 'score']
+        fields = '__all__'
 
 class ParticipantScoreCardSerializer(serializers.ModelSerializer):
     arrows = ArrowSerializer(many=True, read_only=True)

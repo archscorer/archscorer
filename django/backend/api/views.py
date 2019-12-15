@@ -179,9 +179,8 @@ class ParticipantViewSet(viewsets.ModelViewSet):
     def register(self, request):
         """
         API endpoint that allows participants to be registered to an event. Does not need to be
-        logged in to the API to do that. Will automatically create new archer if by 'full_name'
-        and 'email' it does not exist. If it exists, existing one will be used (note: existing
-        archer additional details will not be updated).
+        logged in to the API to do that. If archer object contains ID, tries to use existing object.
+        Otherwise creates new Archer instance.
         """
         if 'archer' not in request.data:
             return Response({'details': 'invalid request'},
@@ -240,3 +239,6 @@ class ArrowViewSet(mixins.UpdateModelMixin,
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ArrowSerializer
     queryset = Arrow.objects.all()
+
+    def perform_update(self, serializer):
+        serializer.save(updated_by=self.request.user.email)

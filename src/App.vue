@@ -58,9 +58,9 @@
     </v-navigation-drawer>
 
     <v-content>
-      <v-container>
+      <!-- <v-container fluid> -->
         <router-view></router-view>
-      </v-container>
+      <!-- </v-container> -->
     </v-content>
 
   </v-app>

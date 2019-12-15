@@ -1,6 +1,10 @@
 <template>
   <v-sheet light>
-    <h4> End: {{ end.ord }} {{ end.label ? '(' + end.label + ')' : '' }}</h4>
+    <h4> End: {{ end.ord }} {{ end.label ? '(' + end.label + ')' : '' }}
+      <small>
+        -- Round: {{ round.ord }} {{ round.label ? '(' + round.label + ')': ''}} --
+      </small>
+    </h4>
     <v-row class="oflow flex-nowrap" dense
       v-for="(sc, si) in scorecards"
       :key="'sc' + sc.id">
@@ -14,6 +18,7 @@
           :items="sc_eval(end.scoring)"
           append-icon=""
           :color="a.color"
+          :background-color="a.x ? '#FFC300' : a.score === 0 ? '#9E9E9E': ''"
           ref="arrow"
           readonly outlined dense
           @focus="currentFocus = [sc.id, a.id]; arrow_inc = si * sc.arrows.filter(obj => obj.end == end.id).length + ai">
@@ -25,9 +30,9 @@
         <v-btn @click="currentFocus = null; $emit('end_nav', '-')" icon><v-icon>mdi-chevron-left</v-icon></v-btn>
       </v-col>
       <v-col cols="8">
-        <template v-for="score in sc_eval(end.scoring)">
+        <template v-for="score in sc_eval(end.scoring, end.x)">
           <v-btn :key="'score' + end.id + '_' + score.text"
-          @click.prevent="enter_score(score.value)">{{ score.text }}</v-btn>
+          @click.prevent="enter_score(score)">{{ score.text }}</v-btn>
         </template>
       </v-col>
       <v-col cols="2">
@@ -46,6 +51,7 @@
 
     props: {
       event: Object,
+      round: Object,
       end: Object,
       scorecards: Array,
     },
@@ -66,10 +72,11 @@
         }
         return {archer: {full_name: null}}
       },
-      sc_eval(arr) {
+      sc_eval(arr, x) {
         let scores_choices = eval(arr).map(function(v) {
           return {'text': v, 'value': v}
         })
+        if (x) scores_choices.unshift({'text': 'X', 'value': scores_choices[0].value})
         scores_choices.push({'text': 'M', 'value': 0})
         return scores_choices
       },
@@ -82,7 +89,9 @@
           let [scId, aId] = this.currentFocus
           let arrow = this.scorecards.find(obj => obj.id === scId)
                               .arrows.find(obj => obj.id === aId)
-          arrow.score = sc
+
+          arrow.x = sc.text === 'X' ? true : false
+          arrow.score = sc.value
           arrow.color = 'warning'
           this.$store.dispatch('events/putArrow', {scId: scId, arrow: arrow})
           this.$refs.arrow[this.arrow_inc].blur()

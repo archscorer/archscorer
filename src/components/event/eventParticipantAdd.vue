@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600px">
+  <v-dialog v-model="dialog" max-width="600px" v-if="!event.archive">
     <template v-slot:activator="{ on }">
       <v-btn color="primary" :text="action === 'Register' ? false : true" v-on="on">{{ action }}</v-btn>
     </template>

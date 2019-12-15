@@ -73,7 +73,7 @@ class Course(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     name = models.CharField('Round name', max_length=150, default='Unnamed round', blank=False)
-    description = models.TextField(blank=False)  # If creating custom non-standard course, describe its purpose
+    description = models.TextField(blank=True)  # If creating custom non-standard course, describe its purpose
     location = models.CharField(max_length=150, blank=True)
 
     class Meta:
@@ -85,6 +85,7 @@ class End(models.Model):
     label = models.CharField(max_length=30, blank=True)  # i.e 70 yards walk-up
     nr_of_arrows = models.PositiveSmallIntegerField(blank=False)  # number of max arrows that can be shot
     scoring = models.CharField(max_length=150, blank=False)
+    x = models.BooleanField('Target has x', default=True)
 
     class Meta:
         ordering = ['ord']
@@ -169,6 +170,10 @@ class Arrow(models.Model):
     end = models.ForeignKey(End, related_name='arrows', on_delete=models.CASCADE)
     ord = models.IntegerField('arrow nr', blank=False)
     score = models.IntegerField('arrow score', blank=True, null=True)
+    x = models.BooleanField(default=False)
+
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.EmailField(blank=True, null=True)
 
     class Meta:
         ordering = ['end', 'ord']
