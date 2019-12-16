@@ -123,9 +123,9 @@
       // TODO quicklink to register me (skip archer fields or autofill them)
     }),
     watch: {
-      query: function(newQ) {
-        if (newQ && newQ.length >= 3) {
-          this.searchArcher(newQ)
+      query: function(val) {
+        if (val && val.length >= 3) {
+          this.searchArcher(val)
         } else {
           this.clearSearch([{ header: 'be more specific' }])
         }

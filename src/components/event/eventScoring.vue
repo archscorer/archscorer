@@ -17,11 +17,8 @@
           label="Select round for scoring."
           v-model="round"
           :items="event_rounds"
+          @input="get_scorecards(event.id, round.id); get_course(round.course)"
           return-object></v-select>
-        <v-btn
-          :disabled="round ? round.is_open ? false : true : true"
-          @click="get_scorecards(event.id, round.id); get_course(round.course)"
-          >Go!</v-btn>
       </v-card-title>
       <v-divider/>
       <v-pagination
@@ -32,7 +29,7 @@
       <v-window v-model="end_view"
         :show-arrows="false">
         <v-window-item
-          v-for="end in course.ends"
+          v-for="(end, ei) in course.ends"
           :key="'e' + currentRound + ':' + end.id"
           ref="end"
         >
@@ -44,6 +41,7 @@
                            :round="round"
                            :end="end"
                            :scorecards="scorecards"
+                           :isActive="end_view === ei ? true : false"
                            @end_nav="update_end_view"/>
         </v-window-item>
       </v-window>

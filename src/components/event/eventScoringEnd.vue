@@ -47,6 +47,7 @@
 </template>
 
 <script>
+
   export default {
 
     props: {
@@ -54,6 +55,7 @@
       round: Object,
       end: Object,
       scorecards: Array,
+      isActive: Boolean,
     },
     data: () => ({
       arrow_inc: 0,
@@ -62,6 +64,15 @@
       snackText: '',
       snackColor: 'info',
     }),
+    watch: {
+      isActive: function(val) {
+        if (val === true && this.currentFocus === null) {
+          this.$nextTick(() => {
+            this.focus_first_empty()
+          })
+        }
+      }
+    },
     methods: {
       get_participant(pId) {
         if (this.event) {
@@ -81,10 +92,6 @@
         return scores_choices
       },
       enter_score(sc) {
-        if (this.currentFocus === null) {
-          this.$refs.arrow[0].focus()
-          this.arrow_inc = 0
-        }
         if (this.currentFocus) {
           let [scId, aId] = this.currentFocus
           let arrow = this.scorecards.find(obj => obj.id === scId)
@@ -95,6 +102,8 @@
           arrow.color = 'warning'
           this.$store.dispatch('events/putArrow', {scId: scId, arrow: arrow})
           this.$refs.arrow[this.arrow_inc].blur()
+        } else {
+          this.arrow_inc = this.$refs.arrow.length + 1
         }
         this.arrow_inc++
         if (this.arrow_inc >= this.$refs.arrow.length + 2) {
@@ -111,7 +120,22 @@
           })
         }
       },
+      focus_first_empty() {
+        for (let a in this.$refs.arrow) {
+          if (this.$refs.arrow[a].value === null) {
+            this.$nextTick(() => {
+              this.$refs.arrow[a].focus()
+            })
+            break
+          }
+        }
+      }
     },
+    mounted() {
+      this.$nextTick(() => {
+        this.focus_first_empty()
+      })
+    }
   }
 </script>
 
