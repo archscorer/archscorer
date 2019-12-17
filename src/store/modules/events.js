@@ -60,10 +60,29 @@ const actions = {
       console.log(error.response.data)
     })
   },
-  deleteEvent({ commit }, eId) {
-    eventService.deleteEvent(eId)
+  delEvent({ commit }, eId) {
+    eventService.delEvent(eId)
     .then(() => {
-      commit('deleteEvent', eId)
+      commit('delEvent', eId)
+    })
+  },
+
+  addRound({ commit }, round) {
+    eventService.postRound(round)
+    .then(round => {
+      commit('updateRound', round)
+    })
+  },
+  putRound({ commit }, round) {
+    eventService.putRound(round.id, round)
+    .then(round => {
+      commit('updateRound', round)
+    })
+  },
+  delRound({ commit }, attr) {
+    eventService.delRound(attr.rId)
+    .then(() => {
+      commit('delRound', attr)
     })
   },
 
@@ -147,8 +166,29 @@ const mutations = {
       state.events.push(event)
     }
   },
-  deleteEvent(state, eId) {
+  delEvent(state, eId) {
     state.events = state.events.filter(obj => obj.id !== eId)
+  },
+
+  updateRound(state, round) {
+    const ei = state.events.findIndex(obj => obj.id === round.event)
+    if (ei !== -1) {
+      const index = state.events[ei].rounds.findIndex(obj => obj.id === round.id);
+      if (index !== -1) {
+        state.events[ei].rounds.splice(index, 1, round)
+      } else {
+        state.events[ei].rounds.push(round)
+      }
+    }
+  },
+  delRound(state, attr) {
+    const ei = state.events.findIndex(obj => obj.id === attr.eId)
+    if (ei !== -1) {
+      const ri = state.events[ei].rounds.findIndex(obj => obj.id === attr.rId)
+      if (ri !== -1) {
+        state.events[ei].rounds.splice(ri, 1)
+      }
+    }
   },
 
   setParticipantModel(state, model) {

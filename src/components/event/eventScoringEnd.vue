@@ -121,6 +121,7 @@
         }
       },
       focus_first_empty() {
+        // for this code to actually work it needs to be double $nextTick
         for (let a in this.$refs.arrow) {
           if (this.$refs.arrow[a].value === null) {
             this.$nextTick(() => {

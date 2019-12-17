@@ -111,13 +111,13 @@
         <v-card-title>Manage Rounds</v-card-title>
         <v-card-text>
           <v-row dense v-for="(round, index) in event.rounds" :key="index">
-            <v-col cols="5">
+            <v-col cols="4">
               <v-text-field
                 v-model="event.rounds[index].label"
                 label="Round description"
               >
                 <template v-slot:prepend>
-                  <strong class="primary--text">{{ index + 1}}.</strong>
+                  <strong class="lowered">{{ index + 1}}.</strong>
                 </template>
               </v-text-field>
             </v-col>
@@ -126,6 +126,7 @@
                 v-model="event.rounds[index].course"
                 :rules="[v => !!v || 'Round course is mandatory']"
                 autocomplete
+                :disabled="round.scorecards.length ? true : false"
                 :items="courses"
                 label="Round type"
                 item-text="name"
@@ -135,19 +136,27 @@
             <v-col cols="2">
               <v-switch
                 v-model="event.rounds[index].is_open"
-                :label="event.rounds[index].is_open ? 'Open' : ''"
+                :label="event.rounds[index].is_open ? 'Open' : 'Closed'"
+                :error="event.rounds[index].is_open ? false : true"
               ></v-switch>
             </v-col>
-            <v-col cols="1">
-              <v-btn text class="lowered" color="error" @click="delRound(index)" icon><v-icon size="30">mdi-minus</v-icon></v-btn>
-            </v-col>
+              <v-btn v-if="event.rounds[index].id"
+                text
+                class="lowered"
+                color="primary"
+                @click="putRound(event.rounds[index])">Update</v-btn>
+              <v-btn v-else
+                text
+                class="lowered"
+                :disabled="event.rounds[index].course ? false : true"
+                color="primary"
+                @click="addRound(Object.assign(event.rounds[index], {ord: index+1, event: event.id})); event.rounds.splice(index, 1)">Confirm</v-btn>
           </v-row>
           <v-row dense>
-            <v-col cols="11">
+            <v-col cols="5">
             </v-col>
-            <v-col cols="1">
-              <v-btn text color="primary" @click="addRound" icon><v-icon size="35">mdi-plus</v-icon></v-btn>
-            </v-col>
+              <v-btn class="mx-5" color="error" @click="delRound({eId: event.id, rId: event.rounds.pop().id})" >Remove last round</v-btn>
+              <v-btn class="mx-5" color="primary" @click="newRound">Add new round</v-btn>
           </v-row>
         </v-card-text>
       </v-card>
@@ -178,18 +187,18 @@
     },
     methods: {
       ...mapActions('events', [
-        'deleteEvent',
-        'putEvent'
+        'delEvent',
+        'putEvent',
+        'addRound',
+        'delRound',
+        'putRound',
       ]),
-      addRound() {
-        this.event.rounds.push({label: '', course: null, is_open: true})
-      },
-      delRound(index) {
-        this.event.rounds.splice(index, 1)
+      newRound() {
+        this.event.rounds.push({label: '', course: null, is_open: true, scorecards: []})
       },
       deleteE(eId) {
         confirm('Event "' + this.event.name + '" will be removed permanently') &&
-        this.deleteEvent(eId) &&
+        this.delEvent(eId) &&
         this.$router.push('/events')
       },
       e_edit() {
@@ -206,6 +215,6 @@
 
 <style scoped>
   .lowered {
-    margin-top: 0.55rem;
+    margin-top: 0.3rem;
   }
 </style>

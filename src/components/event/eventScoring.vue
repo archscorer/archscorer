@@ -21,30 +21,32 @@
           return-object></v-select>
       </v-card-title>
       <v-divider/>
-      <v-pagination
-        v-model="end_view_pager"
-        :length="course.ends ? course.ends.length : 0"
-        :total-visible="14"
-        circle></v-pagination>
-      <v-window v-model="end_view"
-        :show-arrows="false">
-        <v-window-item
-          v-for="(end, ei) in course.ends"
-          :key="'e' + currentRound + ':' + end.id"
-          ref="end"
-        >
-          <v-sheet v-if="scorecards_loading === true" class="text-center py-10">
-            <v-progress-circular indeterminate size="64" color="secondary"></v-progress-circular>
-          </v-sheet>
-          <eventScoringEnd v-else
-                           :event="event"
-                           :round="round"
-                           :end="end"
-                           :scorecards="scorecards"
-                           :isActive="end_view === ei ? true : false"
-                           @end_nav="update_end_view"/>
-        </v-window-item>
-      </v-window>
+      <template v-if="round.id !== null">
+        <v-pagination
+          v-model="end_view_pager"
+          :length="course.ends ? course.ends.length : 0"
+          :total-visible="14"
+          circle></v-pagination>
+        <v-window v-model="end_view"
+          :show-arrows="false">
+          <v-window-item
+            v-for="(end, ei) in course.ends"
+            :key="'e' + currentRound + ':' + end.id"
+            ref="end"
+          >
+            <v-sheet v-if="scorecards_loading === true" class="text-center py-10">
+              <v-progress-circular indeterminate size="64" color="secondary"></v-progress-circular>
+            </v-sheet>
+            <eventScoringEnd v-else
+                             :event="event"
+                             :round="round"
+                             :end="end"
+                             :scorecards="scorecards"
+                             :isActive="end_view === ei ? true : false"
+                             @end_nav="update_end_view"/>
+          </v-window-item>
+        </v-window>
+      </template>
     </template>
     <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
       {{ snackText }}
@@ -70,13 +72,24 @@
       arrow_inc: 0,
       currentRound: null,
       course: {ends: []},
-      round: {},
+      round: {id: null},
       scorecards_loading: false,
 
       snack: false,
       snackText: '',
       snackColor: ''
     }),
+    watch: {
+      event: {
+        deep: true,
+        handler () {
+          let r = this.event.rounds.find(obj => obj.id === this.round.id)
+          if (r && r.is_open === false) {
+            this.round = {id: null}
+          }
+        }
+      }
+    },
     computed: {
       ...mapState({
         user: state => state.user.user,

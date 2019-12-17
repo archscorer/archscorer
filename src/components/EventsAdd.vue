@@ -41,6 +41,7 @@
                   <v-row>
                     <v-col cols="4">
                       <v-text-field
+                        autofocus
                         v-model="event.name"
                         :rules="[v => !!v || 'Name is required']"
                         label="Event name"></v-text-field>
@@ -117,13 +118,13 @@
             <v-form v-model="valid_e2">
               <v-container>
                 <v-row dense v-for="(round, index) in event.rounds" :key="index">
-                  <v-col cols="5">
+                  <v-col cols="4">
                     <v-text-field
                       v-model="event.rounds[index].label"
                       label="Round description"
                     >
                       <template v-slot:prepend>
-                        <strong class="primary--text">{{ index + 1}}.</strong>
+                        <strong class="lowered">{{ index + 1}}.</strong>
                       </template>
                     </v-text-field>
                   </v-col>
@@ -144,15 +145,15 @@
                       :label="event.rounds[index].is_open ? 'Open' : ''"
                     ></v-switch>
                   </v-col>
-                  <v-col cols="1">
-                    <v-btn text class="lowered" color="error" @click="delRound(index)" icon><v-icon size="30">mdi-minus</v-icon></v-btn>
+                  <v-col cols="2">
+                    <v-btn text class="lowered" color="error" @click="delRound(index)" icon fab><v-icon size="30">mdi-minus</v-icon></v-btn>
                   </v-col>
                 </v-row>
                 <v-row dense>
-                  <v-col cols="11">
+                  <v-col cols="10">
                   </v-col>
-                  <v-col cols="1">
-                    <v-btn text color="primary" @click="addRound" icon><v-icon size="35">mdi-plus</v-icon></v-btn>
+                  <v-col cols="2">
+                    <v-btn text color="primary" @click="addRound" icon fab><v-icon size="35">mdi-plus</v-icon></v-btn>
                   </v-col>
                 </v-row>
               </v-container>
@@ -289,6 +290,6 @@
 
 <style scoped>
   .lowered {
-    margin-top: 0.55rem;
+    margin-top: 0.3rem;
   }
 </style>

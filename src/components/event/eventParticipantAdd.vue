@@ -5,74 +5,77 @@
     </template>
     <v-card>
       <v-card-title>{{ action }} to "{{ event.name }}"</v-card-title>
-      <v-form v-model="valid">
-        <eventParticipantDetails :participant="participant" :catering="event.catering"/>
-        <v-container v-if="action !== 'Add Me'">
-          <v-row>
-            <v-autocomplete
-              v-model="archer"
-              :search-input.sync="query"
-              :items="qresponse_items"
-              item-value="id"
-              label="Existing Archers"
-              placeholder="Start typing to query"
-              prepend-icon="mdi-database-search"
-              return-object
-              hide-no-data
-              no-filter
-              clearable
-            >
-          </v-autocomplete>
-          </v-row>
-          <template v-if="archer ? false : true">
+      <v-card-text>
+        <v-form v-model="valid">
+          <eventParticipantDetails :participant="participant" :catering="event.catering"/>
+          <v-container v-if="action !== 'Add Me'">
             <v-row>
-              <v-col cols="4">
-                <v-text-field
-                  v-model="participant.archer.full_name"
-                  label="Your full name*"
-                  :rules="[v => !!v || 'This field is required']"
-                >
-                </v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-select
-                  v-model="participant.archer.gender"
-                  :items="[{'text': 'Male', 'value': 'M'}, {'text': 'Female', 'value': 'F'}]"
-                  label="Gender*"
-                  :rules="[v => !!v || 'Choice must be made :)']"
-                ></v-select>
-              </v-col>
-              <v-col cols="4">
-                <v-select
-                  v-model="participant.archer.club"
-                  :items="clubs ? clubs : []"
-                  label="Choose Club*"
-                  :rules="[v => !!v || 'Choose ..no club.. if other options are not suitable']"
-                  item-text="name"
-                  item-value="id"
-                ></v-select>
-              </v-col>
+              <v-autocomplete
+                v-model="archer"
+                :search-input.sync="query"
+                :items="qresponse_items"
+                item-value="id"
+                label="Existing Archers"
+                placeholder="Start typing to query"
+                prepend-icon="mdi-database-search"
+                return-object
+                hide-no-data
+                no-filter
+                clearable
+              >
+            </v-autocomplete>
             </v-row>
-            <v-row>
-              <v-col cols="6">
-                <v-text-field
-                  v-model="participant.archer.email"
-                  label="Contact email address*"
-                  :rules="[v => !!v || 'This field is required']"
-                >
-                </v-text-field>
-              </v-col>
-              <v-col cols="6">
-                <v-text-field
-                  v-model="participant.archer.phone"
-                  label="Contact phone number"
-                >
-                </v-text-field>
-              </v-col>
-            </v-row>
-          </template>
-        </v-container>
-      </v-form>
+            <template v-if="archer ? false : true">
+              <v-row>
+                <v-col cols="4">
+                  <v-text-field
+                    v-model="participant.archer.full_name"
+                    label="Your full name*"
+                    :rules="[v => !!v || 'This field is required']"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="4">
+                  <v-select
+                    v-model="participant.archer.gender"
+                    :items="[{'text': 'Male', 'value': 'M'}, {'text': 'Female', 'value': 'F'}]"
+                    label="Gender*"
+                    :rules="[v => !!v || 'Choice must be made :)']"
+                  ></v-select>
+                </v-col>
+                <v-col cols="4">
+                  <v-select
+                    v-model="participant.archer.club"
+                    :items="clubs ? clubs : []"
+                    label="Choose Club*"
+                    :rules="[v => !!v || 'Choose ..no club.. if other options are not suitable']"
+                    item-text="name"
+                    item-value="id"
+                  ></v-select>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="participant.archer.email"
+                    label="Contact email address*"
+                    :rules="[v => !!v || 'This field is required']"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="participant.archer.phone"
+                    label="Contact phone number"
+                  >
+                  </v-text-field>
+                </v-col>
+              </v-row>
+            </template>
+          </v-container>
+        </v-form>
+        <small><p>fields marked with '*' are mandatory</p></small>
+      </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn text @click="dialog = false">Close</v-btn>

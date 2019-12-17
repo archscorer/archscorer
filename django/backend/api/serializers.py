@@ -24,6 +24,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
 class RoundSerializer(serializers.ModelSerializer):
     course_name = serializers.SerializerMethodField()
+    scorecards = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Round
         fields = '__all__'

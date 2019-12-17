@@ -39,6 +39,7 @@ class myArcherAdmin(admin.ModelAdmin):
         else:
             return ''
     club_name.short_description = 'Club'
+    club_name.admin_order_field = 'club'
 
 @admin.register(Course)
 class myCourseAdmin(admin.ModelAdmin):
@@ -61,6 +62,7 @@ class myEndAdmin(admin.ModelAdmin):
         else:
             return ''
     course_name.short_description = 'Course'
+    course_name.admin_order_field = 'course'
 
 @admin.register(Participant)
 class myParticipantAdmin(admin.ModelAdmin):
@@ -91,10 +93,11 @@ class myRoundAdmin(admin.ModelAdmin):
 
     def event_name(self, obj):
         if isinstance(obj.event, Event):
-            return str(obj.id) + ': ' + obj.event.name
+            return str(obj.ord) + ': ' + obj.event.name
         else:
             return ''
     event_name.short_description = 'Event'
+    event_name.admin_order_field = 'event'
 
     def course_name(self, obj):
         if isinstance(obj.course, Course):
@@ -102,3 +105,4 @@ class myRoundAdmin(admin.ModelAdmin):
         else:
             return ''
     course_name.short_description = 'Course'
+    course_name.admin_order_field = 'course'

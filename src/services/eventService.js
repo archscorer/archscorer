@@ -11,7 +11,7 @@ export default {
     return api.post(`events/`, payload)
               .then(response => response.data)
   },
-  deleteEvent(eId) {
+  delEvent(eId) {
     return api.delete(`events/${eId}/`)
               .then(response => response.data)
   },
@@ -24,12 +24,12 @@ export default {
     return api.post(`events/rounds/add/`, payload)
               .then(response => response.data)
   },
-  deleteRound(rId) {
+  delRound(rId) {
     return api.delete(`events/rounds/${rId}/`)
               .then(response => response.data)
   },
   putRound(rId, payload) {
-    return api.delete(`events/rounds/${rId}/`, payload)
+    return api.put(`events/rounds/${rId}/`, payload)
               .then(response => response.data)
   },
 

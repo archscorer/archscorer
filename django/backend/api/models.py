@@ -160,7 +160,7 @@ class Participant(models.Model):
 
 class ScoreCard(models.Model):
     participant = models.ForeignKey(Participant, related_name='scorecards', on_delete=models.CASCADE)
-    round = models.ForeignKey(Round, related_name='rounds', on_delete=models.CASCADE)
+    round = models.ForeignKey(Round, related_name='scorecards', on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ['participant', 'round']
