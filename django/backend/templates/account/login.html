@@ -22,7 +22,7 @@ for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
   {% for provider in socialaccount_providers %}
     <div>
       <a title="{{provider.name}}"
-        href="{% provider_login_url provider.id process='login' scope=scope auth_params=auth_params %}">
+        href="{% provider_login_url provider.id process='login' %}">
         <div class="{{ provider.id }}"></div>
       </a>
     </div>

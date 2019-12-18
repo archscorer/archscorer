@@ -92,7 +92,7 @@
               row[r.ord] = sum( getScore(r, p) )
               return row[r.ord]
             })
-            row['sum'] = sum( sums )
+            row['sum'] = sums.length ? sum( sums ) : 0
 
             return row
           }, this.event)

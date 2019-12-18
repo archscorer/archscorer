@@ -6,13 +6,3 @@
 
 
 * add some kind of contact admin page?
-
-
-* add competition overview page (what rounds)
-* to competition owner can edit participants / rounds
-
- * whether it is possible to register is options by owner. Owner can always add
- participants.
-
-* Two archers with same name and no email creates internal server error. When updateing
-archer details in profile view check and merge / delete identical archer profiles?
