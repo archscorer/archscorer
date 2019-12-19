@@ -15,6 +15,7 @@
       ></v-text-field>
     </v-card-title>
     <v-data-table
+      :mobile-breakpoint="300"
       dense
       :headers="r_table_header"
       :items="r_table"

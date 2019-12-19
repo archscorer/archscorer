@@ -14,10 +14,11 @@
           <template v-else>
             on {{ event.date_start }}
           </template>
+          / {{ event.participants }} participant(s)
         </v-list-item-subtitle>
       </v-list-item-content>
       <v-list-item-action>
-        <v-chip v-text="event.type" :color="chip_color(event.type)"></v-chip>
+        <v-chip v-if="event.type !== 'private'" v-text="event.type" :color="chip_color(event.type)"></v-chip>
       </v-list-item-action>
     </v-list-item>
   </v-list>

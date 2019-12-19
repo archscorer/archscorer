@@ -24,6 +24,12 @@
           @focus="currentFocus = [sc.id, a.id]; arrow_inc = si * sc.arrows.filter(obj => obj.end == end.id).length + ai">
         </v-select>
       </v-col>
+      <v-col cols="1" class="text-cum">
+        {{ get_end_score(sc) }}
+      </v-col>
+      <v-col cols="1" class="text-cum">
+        {{ get_cum_score(sc) }}
+      </v-col>
     </v-row>
     <v-row dense>
       <v-col cols="2">
@@ -32,6 +38,7 @@
       <v-col cols="8">
         <template v-for="score in sc_eval(end.scoring, end.x)">
           <v-btn :key="'score' + end.id + '_' + score.text"
+          class="sc-btn"
           @click.prevent="enter_score(score)">{{ score.text }}</v-btn>
         </template>
       </v-col>
@@ -47,6 +54,17 @@
 </template>
 
 <script>
+
+  function sum(arr) {
+    return arr.reduce((sum, x) => sum + x);
+  }
+
+  function getScore(sc, e) {
+    if (e) {
+      return sc.arrows.filter(obj => obj.end === e.id).map(a => {return a.score ? a.score : 0})
+    }
+    return sc.arrows.map(a => {return a.score ? a.score : 0})
+  }
 
   export default {
 
@@ -120,6 +138,12 @@
           })
         }
       },
+      get_end_score(sc) {
+        return sum(getScore(sc, this.end))
+      },
+      get_cum_score(sc) {
+        return sum(getScore(sc))
+      },
       focus_first_empty() {
         // for this code to actually work it needs to be double $nextTick
         for (let a in this.$refs.arrow) {
@@ -156,9 +180,12 @@
     margin-top: 0.2rem;
     min-width: 80px;
   }
+  .text-cum {
+    margin-top: 0.2rem;
+  }
   .score {
-    max-width: 45px;
-    min-width: 45px;
+    max-width: 37px;
+    min-width: 37px;
     max-height: 30px;
   }
   .oflow {
@@ -168,8 +195,10 @@
   .v-sheet {
     text-align: center;
   }
-  .v-btn {
+  .sc-btn {
     margin-bottom: 3px;
     margin-right: 3px;
+    min-width: 67px!important;
+    min-height: 58px;
   }
 </style>

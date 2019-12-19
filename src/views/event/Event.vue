@@ -54,6 +54,13 @@
       tab: null,
       tabs: ['Overview', 'Results', 'Scoring']
     }),
+    watch: {
+      tab: {
+        handler () {
+          if (this.tab === 1) this.$store.dispatch('events/updateEvent', parseInt(this.$route.params.id))
+        }
+      }
+    },
     computed: {
       ...mapState({
         user: state => state.user.user,

@@ -219,7 +219,9 @@
       },
       deleteP(pId) {
         let p = this.event.participants.find(obj => obj.id === pId)
-        confirm(p.archer.full_name + ' will be removed from participant list') && this.delParticipant({pId: p.id, eId: p.event})
+        confirm(p.archer.full_name + ' will be removed from participant list' +
+        ' (and their scorecards will be lost)') &&
+        this.delParticipant({pId: p.id, eId: p.event})
       }
     },
   }

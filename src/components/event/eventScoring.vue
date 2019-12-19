@@ -13,7 +13,6 @@
       <v-card-title>
         Round <v-spacer/>
         <v-select
-          max-width="250px"
           label="Select round for scoring."
           v-model="round"
           :items="event_rounds"
@@ -152,7 +151,7 @@
     transform: scale(0.75);
   }
   .v-select {
-    max-width: 250px;
-    margin: 0 25px;
+    max-width: 200px;
+    margin: 0 20px;
   }
 </style>
