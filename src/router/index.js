@@ -25,6 +25,11 @@ const routes = [
     props: (route) => ({ action: route.query.a })
   },
   {
+    path: '/series',
+    name: 'series',
+    component: () => import('@/views/Series.vue')
+  },
+  {
     path: '/statistics',
     name: 'statistics',
     component: () => import('@/views/Statistics.vue')
