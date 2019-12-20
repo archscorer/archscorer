@@ -158,8 +158,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="error" @click="deleteR()" >Remove last round</v-btn>
-          <v-btn color="primary" @click="newRound">Add new round</v-btn>
+          <v-btn color="error" @click="deleteR()" >Remove last</v-btn>
+          <v-btn color="primary" @click="newRound">Add new</v-btn>
         </v-card-actions>
       </v-card>
     </v-card>

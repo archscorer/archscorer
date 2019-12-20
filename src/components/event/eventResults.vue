@@ -23,11 +23,33 @@
       group-by="class"
       multi-sort
       :items-per-page="50"
-    ></v-data-table>
+    >
+      <template v-slot:group="props">
+        <tr class="v-row-group__header">
+          <td :colspan="props.headers.length">{{ props.group }}</td>
+        </tr>
+        <tr v-for="row in props.items" :key="row.class + ':' + row.name">
+          <td v-for="col in props.headers" :key="col.text">
+            {{ row[col.value] }}
+            <template v-if="'pr'+col.value in row">
+              <v-progress-circular
+                v-model="row['pr'+col.value]"
+                :color="row['pr'+col.value] === 100 ? 'green' : 'error'"
+                width="1"
+                size="12">
+              </v-progress-circular>
+            </template>
+          </td>
+        </tr>
+      </template>
+    </v-data-table>
   </v-card>
 </template>
 
 <script>
+
+  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
+
   import { mapState} from 'vuex'
 
   function sum(arr) {
@@ -36,7 +58,7 @@
 
   function getScore(r, p) {
     let r_sc = p.scorecards.find(obj => obj.round === r.id)
-    return r_sc ?  r_sc.arrows.map(a => a.score) : [0]
+    return r_sc ?  r_sc.arrows.map(a => a.score) : [null]
   }
 
   function cSumSc( a, b ) {
@@ -95,6 +117,10 @@
             })
             row['sum'] = sums.length ? sum( sums ) : 0
 
+            this.rounds.map(function (r) {
+              let r_sc = getScore(r, p)
+              row['pr' + r.ord] = (r_sc.filter(obj => obj !== null).length / r_sc.length) * 100
+            })
             return row
           }, this.event)
           return r_table.sort( cSumSc )
