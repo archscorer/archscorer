@@ -28,8 +28,13 @@
         <tr class="v-row-group__header">
           <td :colspan="props.headers.length">{{ props.group }}</td>
         </tr>
-        <tr v-for="row in props.items" :key="row.class + ':' + row.name">
+        <tr v-for="row in props.items" :key="row.id">
           <td v-for="col in props.headers" :key="col.text">
+            <template v-if="col.value === 'name'">
+              <v-btn icon @click="participant_sc(row.id)" small>
+                <v-icon size="16">mdi-book-open-outline</v-icon>
+              </v-btn>
+            </template>
             {{ row[col.value] }}
             <template v-if="'pr'+col.value in row">
               <v-progress-circular
@@ -43,12 +48,24 @@
         </tr>
       </template>
     </v-data-table>
+    <v-dialog v-model="sc_dialog" max-width="600px">
+      <v-card v-if="participant !== null">
+        <v-card-title>{{ participant.archer.full_name }} {{ participant.class}} {{ participant.archer.club }}</v-card-title>
+        <v-card-subtitle>{{ event.name }}</v-card-subtitle>
+        <v-card-text>
+          <eventParticipantScorecards :participant="participant" :rounds="event.rounds" />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer/>
+          <v-btn text @click="sc_dialog = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
 <script>
-
-  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
+  import eventParticipantScorecards from '@/components/event/eventParticipantScorecards.vue'
 
   import { mapState} from 'vuex'
 
@@ -73,8 +90,13 @@
 
   export default {
 
+    components: {
+      eventParticipantScorecards,
+    },
     data: () => ({
       r_search: '',
+      sc_dialog: false,
+      participant: null,
     }),
     computed: {
       ...mapState({
@@ -108,6 +130,7 @@
         if (Array.isArray(this.event.participants)) {
           let r_table = this.event.participants.map(function(p) {
             let row = {
+              id: p.id,
               name: p.archer.full_name,
               class: p.age_group + p.archer.gender + p.style,
             }
@@ -132,6 +155,11 @@
     methods: {
       update_r_table() {
         this.$store.dispatch('events/updateEvent', this.event.id)
+      },
+      participant_sc(pId) {
+        this.participant = this.event.participants.find(obj => obj.id === pId)
+        this.participant['class'] = this.participant.age_group + this.participant.archer.gender + this.participant.style
+        this.sc_dialog = true
       }
     }
   }

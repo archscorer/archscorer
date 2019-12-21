@@ -83,7 +83,7 @@
         deep: true,
         handler () {
           let r = this.event.rounds.find(obj => obj.id === this.round.id)
-          if (r && r.is_open === false) {
+          if (!r || r.is_open === false) {
             this.round = {id: null}
           }
         }
@@ -99,6 +99,7 @@
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
       },
       event_rounds() {
+        // populate items for round selector
         return this.event.rounds.map(r => {
           let text = r.ord + '. ' + r.label + ' (' + r.course_name + ')'
           let disabled = !r.is_open
@@ -116,6 +117,7 @@
     },
     methods: {
       get_course(cId) {
+        // course layout determines the order of ends and scoring
         this.$store.dispatch('courses/getCourses', cId)
         .then(() => {
           this.course = this.courses.find(obj => obj.id === cId)
@@ -127,6 +129,8 @@
         this.end_view = this.p_user.start_group - 1
         this.currentRound = rId
         this.scorecards_loading = true
+        // ask for scorecards. Creating new ones will take time, therefore catch
+        // timeout and let user know of it
         this.$store.dispatch('events/getUserGroupScoreCards', {eId: eId, rId: rId})
         .then(() => {
           this.scorecards_loading = false
