@@ -72,9 +72,10 @@ class Course(models.Model):
     creator = models.ForeignKey('User', related_name='courses_created', null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
 
-    name = models.CharField('Round name', max_length=150, default='Unnamed round', blank=False)
+    name = models.CharField('Course name', max_length=150, default='Unnamed course', blank=False)
     description = models.TextField(blank=True)  # If creating custom non-standard course, describe its purpose
     location = models.CharField(max_length=150, blank=True)
+    halves = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-created']

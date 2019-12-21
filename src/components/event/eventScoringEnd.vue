@@ -17,7 +17,8 @@
           v-model="a.score"
           :items="sc_eval(end.scoring)"
           append-icon=""
-          :color="a.color"
+          :loading="a.loading"
+          :error="a.error"
           :background-color="a.x ? '#FFC300' : a.score === 0 ? '#9E9E9E': ''"
           ref="arrow"
           readonly outlined dense
@@ -117,7 +118,7 @@
 
           arrow.x = sc.text === 'X' ? true : false
           arrow.score = sc.value
-          arrow.color = 'warning'
+          arrow.loading = 'warning'
           this.$store.dispatch('events/putArrow', {scId: scId, arrow: arrow})
           this.$refs.arrow[this.arrow_inc].blur()
         } else {

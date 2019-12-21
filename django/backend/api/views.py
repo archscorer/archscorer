@@ -241,4 +241,6 @@ class ArrowViewSet(mixins.UpdateModelMixin,
     queryset = Arrow.objects.all()
 
     def perform_update(self, serializer):
+        # import time
+        # time.sleep(4) # use if needed to simulate slow net or smth
         serializer.save(updated_by=self.request.user.email)

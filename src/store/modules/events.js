@@ -42,6 +42,8 @@ const actions = {
         eventService.postRound(round)
         .then(() => {
           // here we could also return round and append it to event rounds
+          // TODO if different server calls time differently -- the last call
+          // might not return correct (latest) event instance?
           eventService.fetchEvents(event.id)
           .then(event => {
             commit('updateEvent', event)
@@ -142,10 +144,17 @@ const actions = {
     commit('setScoreCards', [])
   },
   putArrow({ commit }, attr) {
+    // commit to be submitted arrow to local store
+    commit('updateArrow', {scId: attr.scId, arrow: attr.arrow})
     eventService.putArrow(attr.arrow.id, attr.arrow)
     .then(arrow => {
       commit('updateArrow', {scId: attr.scId, arrow: arrow})
     }).catch(error => {
+      // server returned error, store error state to store
+      let arrow = attr.arrow
+      arrow.error = true
+      arrow.loading = false
+      commit('updateArrow', {scId: attr.scId, arrow: arrow})
       console.log(error.response.data)
     })
   }
