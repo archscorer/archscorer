@@ -60,6 +60,7 @@
                             v-model="event.date_start"
                             label="Start date"
                             prepend-icon="mdi-calendar"
+                            readonly
                             :rules="[v => !!v || 'Start date is required']"
                             v-on="on"
                           ></v-text-field>
@@ -84,6 +85,7 @@
                             v-model="event.date_end"
                             label="End date"
                             prepend-icon="mdi-calendar"
+                            readonly
                             v-on="on"
                           ></v-text-field>
                         </template>

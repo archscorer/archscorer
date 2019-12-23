@@ -20,7 +20,7 @@ class CourseSerializer(serializers.ModelSerializer):
     ends = EndSerializer(many=True)
     class Meta:
         model = Course
-        fields = ['id', 'creator', 'name', 'description', 'location', 'ends']
+        fields = ['id', 'creator', 'name', 'description', 'location', 'ends', 'halves']
 
 class RoundSerializer(serializers.ModelSerializer):
     course_name = serializers.SerializerMethodField()

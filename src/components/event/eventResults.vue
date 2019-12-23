@@ -164,3 +164,9 @@
     }
   }
 </script>
+
+<style scoped>
+  .v-data-table >>> * {
+    white-space: nowrap;
+  }
+</style>

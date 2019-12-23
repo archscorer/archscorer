@@ -1,7 +1,8 @@
 <template>
-    <v-row>
-      <v-col v-for="round in get_rounds()" :key="round.id">
-        <p>{{ round.ord }}. {{ round.label }}</p>
+  <v-container>
+    <v-row v-for="round in get_rounds()" :key="round.id">
+      <h3>{{ round.ord }}. {{ round.label }}</h3>
+      <v-col v-for="(half, hi) in round.halves" :key="hi">
         <table>
           <thead>
             <tr>
@@ -12,7 +13,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="end in round.ends" :key="end.id">
+            <tr v-for="end in half" :key="end.id">
               <td class="end-ord">
                 {{ end.ord }}
               </td>
@@ -33,9 +34,12 @@
         </table>
       </v-col>
     </v-row>
+  </v-container>
 </template>
 
 <script>
+  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
+
   import { mapState} from 'vuex'
 
   // TODO should create util.js file to collect most used utility functions
@@ -63,10 +67,20 @@
         // round object for scorecard, return list of modified round objects
         let rounds = [...this.rounds]
         return rounds.map(r => {
-          let ends = this.courses.find(obj => obj.id === r.course).ends
+          let course = this.courses.find(obj => obj.id === r.course)
+
+          let ends = []
+          // in some cases course is not loaded, probably related to dev hotreload
+          // but nevertheless, if couse is not loaded -- request it from backend
+          if (course) {
+            ends = course.ends
+          } else {
+            this.$store.dispatch('courses/getCourses', r.course)
+          }
           // max number of arrows for round ends
           let aNr = 0
           let cum = 0
+          let halves = []
           let sc_ends = []
           for (let e of ends) {
             // end arrows
@@ -78,12 +92,15 @@
 
             // update max number
             aNr = e.nr_of_arrows > aNr ? e.nr_of_arrows : aNr
-
             cum += eSum
-
             sc_ends.push(Object.assign({}, e, {arrows: eAr, sum: eSum, cum: cum}))
+            if (course.halves === true && e.ord === course.ends.length / 2) {
+              halves.push([...sc_ends])
+              sc_ends = []
+            }
           }
-          return Object.assign({}, r, {nr_of_arrows: aNr, ends: sc_ends})
+          halves.push(sc_ends)
+          return Object.assign({}, r, {nr_of_arrows: aNr, halves: halves})
         })
       },
       get_end_arrows(rId, eId) {

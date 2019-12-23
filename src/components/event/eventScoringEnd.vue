@@ -183,6 +183,7 @@
   }
   .text-cum {
     margin-top: 0.2rem;
+    white-space: nowrap;
   }
   .score {
     max-width: 37px;
