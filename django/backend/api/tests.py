@@ -40,15 +40,23 @@ def build_base_data():
 
     clubs = [Club.objects.create(creator=None, name='..no club..')]
 
-    course_1 = Course.objects.create(creator=None, name='28 ends / 1 arrow / 20,18,16,14,12,10')
+    course_1 = Course.objects.create(creator=None, halves=True, name='28 ends / 1 arrow / 20,18,16,14,12,10')
     for i in range(28):
-        End.objects.create(course=course_1, ord=i+1, nr_of_arrows=1, scoring=[20,18,16,14,12,10])
+        End.objects.create(course=course_1, ord=i+1, nr_of_arrows=1, x=False, scoring=[20,18,16,14,12,10])
 
     course_1 = Course.objects.create(creator=None, name='14 ends / 1 arrow / 20,18,16,14,12,10')
     for i in range(14):
-        End.objects.create(course=course_1, ord=i+1, nr_of_arrows=1, scoring=[20,18,16,14,12,10])
+        End.objects.create(course=course_1, ord=i+1, nr_of_arrows=1, x=False, scoring=[20,18,16,14,12,10])
 
-    course_2 = Course.objects.create(creator=None, name='28 ends / 2 arrows / 10,8,5')
+    course_1 = Course.objects.create(creator=None, halves=True, name='28 ends / 1 arrow / 20,16,10')
+    for i in range(28):
+        End.objects.create(course=course_1, ord=i+1, nr_of_arrows=1, scoring=[20,16,10])
+
+    course_1 = Course.objects.create(creator=None, name='14 ends / 1 arrow / 20,16,10')
+    for i in range(14):
+        End.objects.create(course=course_1, ord=i+1, nr_of_arrows=1, scoring=[20,16,10])
+
+    course_2 = Course.objects.create(creator=None, halves=True, name='28 ends / 2 arrows / 10,8,5')
     for i in range(28):
         End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, scoring=[10,8,5])
 
@@ -56,19 +64,19 @@ def build_base_data():
     for i in range(14):
         End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, scoring=[10,8,5])
 
-    course_2 = Course.objects.create(creator=None, name='24 ends / 2 arrows / 11,10,8,5')
+    course_2 = Course.objects.create(creator=None, halves=True, name='24 ends / 2 arrows / 11,10,8,5')
     for i in range(24):
-        End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, scoring=[11,10,8,5])
+        End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, x=False, scoring=[11,10,8,5])
 
     course_2 = Course.objects.create(creator=None, name='12 ends / 2 arrows / 11,10,8,5')
     for i in range(12):
-        End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, scoring=[11,10,8,5])
+        End.objects.create(course=course_2, ord=i+1, nr_of_arrows=2, x=False, scoring=[11,10,8,5])
 
     course_3 = Course.objects.create(creator=None, name='10 ends / 3 arrows / 10,9,8,7,6,5,4,3,2,1')
     for i in range(10):
         End.objects.create(course=course_3, ord=i+1, nr_of_arrows=3, scoring=[10,9,8,7,6,5,4,3,2,1])
 
-    course_4 = Course.objects.create(creator=None, name='28 ends / 4 arrows / 5,4,3')
+    course_4 = Course.objects.create(creator=None, halves=True, name='28 ends / 4 arrows / 5,4,3')
     for i in range(28):
         End.objects.create(course=course_4, ord=i+1, nr_of_arrows=4, scoring=[5,4,3])
 
