@@ -83,7 +83,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, '..', '..', 'dist'),
+        'DIRS': [os.path.join(BASE_DIR, '..', 'frontend'),
                  os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -181,7 +181,7 @@ MIDDLEWARE_CLASSES = (
 
 STATIC_URL = '/static/'
 # Place static in the same location as webpack build files
-STATIC_ROOT = os.path.join(BASE_DIR, '..', '..', 'dist', 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, '..', 'frontend', 'static')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 ##########

@@ -1,6 +1,5 @@
 django
 djangorestframework
 whitenoise
-gunicorn
 django-allauth
 django-widget-tweaks
