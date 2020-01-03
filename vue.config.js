@@ -2,7 +2,7 @@ module.exports = {
   "transpileDependencies": [
     "vuetify"
   ],
-  outputDir: 'dist',
+  outputDir: 'django/frontend',
   assetsDir: 'static',
   devServer: {
     proxy: {
