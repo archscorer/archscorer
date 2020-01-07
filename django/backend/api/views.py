@@ -132,7 +132,7 @@ class ArcherViewSet(mixins.UpdateModelMixin,
         """
         Search archer profiles by name
         """
-        archers = Archer.objects.filter(full_name__contains=request.data['query'])
+        archers = Archer.objects.filter(full_name__icontains=request.data['query'])
         if len(archers) == 0:
             return Response([{ 'header': 'no matching archer profiles' }],
                             status=status.HTTP_200_OK)

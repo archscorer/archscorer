@@ -127,7 +127,7 @@
     }),
     watch: {
       query: function(val) {
-        if (val && val.length >= 3) {
+        if (val && val.length >= 2) {
           this.searchArcher(val)
         } else {
           this.clearSearch([{ header: 'be more specific' }])
