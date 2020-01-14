@@ -24,7 +24,7 @@ const actions = {
     })
   },
   updateEvent({ commit }, eId) {
-    eventService.fetchEvents(eId)
+    return eventService.fetchEvents(eId)
     .then(event => {
       commit('updateEvent', event)
     })

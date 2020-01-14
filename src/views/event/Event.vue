@@ -84,7 +84,9 @@
     },
     created() {
       //do something after creating vue instance
-      this.$store.dispatch('events/updateEvent', parseInt(this.$route.params.id))
+      this.$store.dispatch('events/updateEvent', parseInt(this.$route.params.id)).catch(() => {
+        this.$router.push('/events')
+      })
       if (this.action === 'register') this.tab = 0
     }
   }

@@ -84,23 +84,28 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if isinstance(user, AnonymousUser):
-            # not logged in users can see and discover only 'open' type of events
-            return Event.objects.filter(Q(type = 'open'))
         if self.action == 'list':
-            # to list events show only those that should be listed
-            return Event.objects.filter(Q(creator__pk = user.id) |
-                                       (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
-                                        Q(participants__in = user.archer.events.all()) |
-                                        Q(type = 'open')).distinct()
+            if isinstance(user, AnonymousUser):
+                # not logged in users can see only 'open' type of events
+                return Event.objects.filter(Q(type = 'open'))
+            else:
+                # to list events that are associated with the user / archer
+                return Event.objects.filter(Q(creator__pk = user.id) |
+                                           (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
+                                            Q(participants__in = user.archer.events.all()) |
+                                            Q(type = 'open')).distinct()
         else:
-            # In addition to 'my' events allow to discover events that are open
-            # for registration
-            return Event.objects.filter(Q(creator__pk = user.id) |
-                                       (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
-                                        Q(participants__in = user.archer.events.all()) |
-                                        Q(type = 'open') |
-                                        Q(is_open = True)).distinct()
+            if isinstance(user, AnonymousUser):
+                # not logged in users can discover 'open' and open for registration type of events
+                return Event.objects.filter(Q(type = 'open') | Q(is_open = True)).distinct()
+            else:
+                # In addition to 'my' events allow to discover events that are open
+                # for registration
+                return Event.objects.filter(Q(creator__pk = user.id) |
+                                           (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
+                                            Q(participants__in = user.archer.events.all()) |
+                                            Q(type = 'open') |
+                                            Q(is_open = True)).distinct()
 
     def get_serializer_class(self):
         if self.action == 'list':
