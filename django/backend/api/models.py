@@ -58,12 +58,12 @@ class Archer(models.Model):
     gender = models.CharField('gender', max_length=1, default='U', choices=[('M', 'Male'),
                                                                             ('F', 'Female'),
                                                                             ('U', 'Unisex')])
-    club = models.ForeignKey('Club', related_name='members', null=True, on_delete=models.CASCADE)
+    club = models.ForeignKey('Club', related_name='members', null=True, blank=True, on_delete=models.CASCADE)
     email = models.EmailField('email address', blank=True)
     phone = models.CharField('phone number', max_length=20, blank=True)
     nat_id = models.CharField('National Archer ID', max_length=30, blank=True)
 
-    user = models.OneToOneField('User', related_name='archer', null=True, on_delete=models.SET_NULL)
+    user = models.OneToOneField('User', related_name='archer', null=True, blank=True, on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ['full_name']
@@ -78,7 +78,7 @@ class Course(models.Model):
     halves = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['-created']
+        ordering = ['name']
 
 class End(models.Model):
     course = models.ForeignKey('Course', related_name='ends', on_delete=models.CASCADE)
@@ -146,14 +146,22 @@ class Participant(models.Model):
         ('LB', 'Longbow'),
         ('TR', 'Traditional Recurve')
     ]
+    ROLE_CHOICES = [
+        (0, ''),
+        (1, 'Scorer'),
+        (2, 'Captain')
+    ]
     created = models.DateTimeField(auto_now_add=True)
     archer = models.ForeignKey(Archer, related_name='events', on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name='participants', on_delete=models.CASCADE)
     age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
-    eats = models.BooleanField(default=False)
+    food = models.BooleanField(default=False)
     comments = models.CharField(max_length=255, blank=True)
-    start_group = models.IntegerField(default=1)
+    group = models.IntegerField(default=None, null=True)
+    group_target = models.IntegerField(default=1)
+    group_role = models.IntegerField('Archer role', default=0, choices=ROLE_CHOICES)
+
 
     class Meta:
         ordering = ['created']

@@ -120,7 +120,7 @@
         'style': '',
         'age_group': '',
         'comments': '',
-        'eats': false
+        'food': false
       },
       // TODO write validators for form fields: style, age, gender, full_name, email
       // TODO quicklink to register me (skip archer fields or autofill them)

@@ -126,7 +126,7 @@
       get_scorecards(eId, rId) {
         // before getting new set, the current set should be destroyed
         this.$store.dispatch('events/resetUserGroupScoreCards')
-        this.end_view = this.p_user.start_group - 1
+        this.end_view = this.p_user.group_target - 1
         this.currentRound = rId
         this.scorecards_loading = true
         // ask for scorecards. Creating new ones will take time, therefore catch
@@ -134,6 +134,9 @@
         this.$store.dispatch('events/getUserGroupScoreCards', {eId: eId, rId: rId})
         .then(() => {
           this.scorecards_loading = false
+          this.$nextTick(() => {
+            this.$refs.end[this.end_view].isActive = true
+          })
         }).catch(err => {
           this.scorecards_loading = false
           if (err.code === 'ECONNABORTED') {

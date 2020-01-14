@@ -68,22 +68,60 @@
         :search="p_search"
         group-by="class"
         :items-per-page="50"
+        multi-sort
       >
-        <template v-slot:item.start_group="props" v-if="user.email === event.creator && event.archive === false">
+        <template v-slot:item.group="props" v-if="user.email === event.creator && event.archive === false">
           <v-edit-dialog
-            :return-value="props.item.start_group"
+            :return-value="props.item.group"
             :key="props.item.id"
-            @save="save(props.item.id, {start_group: props.item.start_group})"
+            @save="save(props.item.id, {group: props.item.group})"
             @cancel="cancel"
-          > {{ props.item.start_group }}
+          > {{ props.item.group }}
             <template v-slot:input>
               <v-text-field
-                v-model="props.item.start_group"
-                :rules="start_group_rules"
+                v-model="props.item.group"
+                type="number"
+                single-line
+                autofocus
+                persistent
+              ></v-text-field>
+            </template>
+          </v-edit-dialog>
+        </template>
+        <template v-slot:item.target="props" v-if="user.email === event.creator && event.archive === false">
+          <v-edit-dialog
+            :return-value="props.item.target"
+            :key="props.item.id"
+            @save="save(props.item.id, {group_target: props.item.target})"
+            @cancel="cancel"
+            persistent
+          > {{ props.item.target }}
+            <template v-slot:input>
+              <v-text-field
+                v-model="props.item.target"
+                :rules="target_rules"
                 type="number"
                 single-line
                 autofocus
               ></v-text-field>
+            </template>
+          </v-edit-dialog>
+        </template>
+        <template v-slot:item.role="props">
+          <v-edit-dialog v-if="user.email === event.creator && event.archive === false"
+            :return-value="props.item.role"
+            :key="props.item.id"
+            @save="save(props.item.id, {group_role: props.item.role})"
+            @cancel="cancel"
+            persistent
+          > {{ props.item.role === 2 ? 'Capt' : props.item.role === 1 ? 'scor' : '' }}
+            <template v-slot:input>
+              <v-select
+                v-model="props.item.role"
+                :items="[{'text': 'Captain', 'value': 2}, {'text': 'Scorer', 'value': 1}, {'text': 'member', 'value': 0}]"
+                single-line
+                autofocus
+              ></v-select>
             </template>
           </v-edit-dialog>
         </template>
@@ -143,18 +181,10 @@
       p_edit: {
         age_group: '',
         style: '',
-        eats: '',
+        food: '',
         comments: '',
       },
-      p_table_header: [
-        { text: 'Name', value: 'name' },
-        { text: 'Class', value: 'class' },
-        { text: 'Club', value: 'club' },
-        { text: 'Eats', value: 'eats', width: "80px" },
-        { text: 'Group', value: 'start_group', width: "90px" },
-        { text: 'Actions', value: 'action', sortable: false, width: "1%" },
-      ],
-      start_group_rules: [
+      target_rules: [
         v => !!v || 'required',
       ],
       dialog: false,
@@ -170,6 +200,22 @@
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
       },
+      p_table_header() {
+        let header = [
+          { text: 'Name', value: 'name' },
+          { text: 'Class', value: 'class' },
+          { text: 'Club', value: 'club' },
+          { text: 'Group', value: 'group', width: "90px" },
+          { text: 'Target', value: 'target', width: "90px" },
+          { text: 'Role', value: 'role', width: "80px" },
+          { text: 'Actions', value: 'action', sortable: false, width: "1%" },
+        ]
+        if (this.user.email === this.event.creator) {
+          header.push(...[{ text: 'Food', value: 'food', width: "80px" },
+                          { text: 'Comments', value: 'comments'}])
+        }
+        return header
+      },
       p_table() {
         if (Array.isArray(this.event.participants)) {
           return this.event.participants.map(function(p) {
@@ -179,8 +225,11 @@
               name: p.archer.full_name,
               class: p.age_group + p.archer.gender + p.style,
               club: p.archer.club,
-              eats: (p.eats ? "Yes" : "No"),
-              start_group: p.start_group,
+              group: p.group,
+              target: p.group_target,
+              role: p.group_role,
+              food: (p.food ? "Yes" : "No"),
+              comments: p.comments,
             }
           })
         } else {
@@ -212,7 +261,7 @@
         this.p_edit = {
           age_group: p.age_group,
           style: p.style,
-          eats: p.eats,
+          food: p.food,
           comments: p.comments,
         }
         this.dialog = true

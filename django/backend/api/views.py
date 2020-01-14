@@ -29,16 +29,24 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         if isinstance(user, AnonymousUser):
             # for AnonymousUser swap to User model and add archer
             user = User()
-            _ = Archer(user=user)
+            _ = Archer(user = user)
             return [user]
 
         if not hasattr(user, 'archer'):
             # in case logged in user does not yet have archer model or it has
             # been deleted ?
-            archer = Archer.objects.create(full_name=user.get_full_name(),
-                                           email=user.email,
-                                           user=user,
-                                           club=Club.objects.get(pk=1))
+
+            # this if there should return at least one response, here user.email
+            # can not be empty
+            archer = Archer.objects.filter(email = user.email, user = None).first()
+            if archer:
+                Archer.objects.filter(pk = archer.id).update(user = user)
+                user.refresh_from_db()
+            else:
+                Archer.objects.create(full_name = user.get_full_name(),
+                                      email = user.email,
+                                      user = user,
+                                      club = Club.objects.get(pk=1))
         setattr(user, 'csrftoken', get_token(self.request))
         return [user]
 
@@ -151,7 +159,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
         """
         Retrieve user group scorecards for specified round
         """
-        # get user start_group first
+        # get user group first
         event = Event.objects.get(pk=request.data['eId'])
         round = Round.objects.get(pk=request.data['rId'])
 
@@ -159,7 +167,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
 
         # get or create scorecards for given round in start group
         for participant in event.participants.all():
-            if participant.start_group == user_participant.start_group:
+            if participant.group == user_participant.group:
                 sc, created = ScoreCard.objects.get_or_create(participant=participant, round=round)
                 if created:
                     # fill in arrows, so we would have valid model always
@@ -169,7 +177,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
 
         scorecards = ScoreCard.objects.filter(
                                             participant__event__pk=event.id).filter(
-                                            participant__start_group=user_participant.start_group).filter(
+                                            participant__group=user_participant.group).filter(
                                             round=round)
 
         # return scorecards

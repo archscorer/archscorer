@@ -119,19 +119,19 @@ def test_registration():
                Archer.objects.create(full_name='Volli Mets', gender='M', club=clubs[2])]
 
 
-    Participant.objects.create(archer=Archer.objects.get(pk=1), event=comp, age_group='A', style='LB', start_group=choice(range(1,6)))
+    Participant.objects.create(archer=Archer.objects.get(pk=1), event=comp, age_group='A', style='LB', group=choice(range(1,6)))
 
     comp = Event.objects.get(pk=1)
 
     for a in Archer.objects.all():
-        Participant.objects.create(archer=a, event=comp, age_group='A', style='LB', start_group=choice(range(1,6)))
+        Participant.objects.create(archer=a, event=comp, age_group='A', style='LB', group=choice(range(1,6)))
         if a.full_name == 'Ann Mets':
             # test if archer can participate in multiple styles
-            Participant.objects.create(archer=a, event=comp, age_group='A', style='BU', start_group=choice(range(1,6)))
+            Participant.objects.create(archer=a, event=comp, age_group='A', style='BU', group=choice(range(1,6)))
 
     for _ in range(20):
         Participant.objects.create(archer=Archer.objects.create(full_name=choice(first_names) + ' ' + choice(last_names), gender='M'),
-                                   event=comp, age_group='A', style='LB', start_group=choice(range(1,6)))
+                                   event=comp, age_group='A', style='LB', group=choice(range(1,6)))
 
 
 def test_scoring():

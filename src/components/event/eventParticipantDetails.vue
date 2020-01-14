@@ -24,8 +24,8 @@
       <v-col cols="4">
         <v-switch
           v-if="catering"
-          v-model="participant.eats"
-          :label="participant.eats ? 'I will eat' : 'I will not eat'"
+          v-model="participant.food"
+          :label="participant.food ? 'I will eat' : 'I will not eat'"
           color="primary"
         ></v-switch>
       </v-col>

@@ -31,6 +31,7 @@ class myClubAdmin(admin.ModelAdmin):
 
 @admin.register(Archer)
 class myArcherAdmin(admin.ModelAdmin):
+    raw_id_fields = ('club', 'user')
     list_display = ('full_name', 'gender', 'email', 'club_name', 'user')
 
     def club_name(self, obj):
