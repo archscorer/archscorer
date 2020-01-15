@@ -63,6 +63,7 @@
     </v-card-title>
       <v-data-table
         dense
+        :mobile-breakpoint="300"
         :headers="p_table_header"
         :items="p_table"
         :search="p_search"
