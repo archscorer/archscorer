@@ -71,12 +71,15 @@
         :items-per-page="50"
         multi-sort
       >
-        <template v-slot:item.group="props" v-if="user.email === event.creator && event.archive === false">
+        <template v-slot:item.group="props">
           <v-edit-dialog
+            v-if="user.email === event.creator && event.archive === false"
             :return-value="props.item.group"
             :key="props.item.id"
             @save="save(props.item.id, {group: props.item.group})"
             @cancel="cancel"
+            large
+            persistent
           > {{ props.item.group }}
             <template v-slot:input>
               <v-text-field
@@ -84,17 +87,18 @@
                 type="number"
                 single-line
                 autofocus
-                persistent
               ></v-text-field>
             </template>
           </v-edit-dialog>
         </template>
-        <template v-slot:item.target="props" v-if="user.email === event.creator && event.archive === false">
+        <template v-slot:item.target="props">
           <v-edit-dialog
+             v-if="user.email === event.creator && event.archive === false"
             :return-value="props.item.target"
             :key="props.item.id"
             @save="save(props.item.id, {group_target: props.item.target})"
             @cancel="cancel"
+            large
             persistent
           > {{ props.item.target }}
             <template v-slot:input>
@@ -114,6 +118,7 @@
             :key="props.item.id"
             @save="save(props.item.id, {group_role: props.item.role})"
             @cancel="cancel"
+            large
             persistent
           > {{ props.item.role === 2 ? 'Capt' : props.item.role === 1 ? 'scor' : '' }}
             <template v-slot:input>
