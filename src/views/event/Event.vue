@@ -5,7 +5,7 @@
         {{ label }}
       </v-tab>
     </v-tabs>
-    <v-tabs-items v-model="tab">
+    <v-tabs-items v-model="tab" touchless>
       <v-tab-item>
         <v-sheet class="py-5">
           <h1 v-text="event.name"></h1>

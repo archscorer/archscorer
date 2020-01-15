@@ -27,7 +27,8 @@
           :total-visible="14"
           circle></v-pagination>
         <v-window v-model="end_view"
-          :show-arrows="false">
+          :show-arrows="false"
+          touchless>
           <v-window-item
             v-for="(end, ei) in course.ends"
             :key="'e' + currentRound + ':' + end.id"
