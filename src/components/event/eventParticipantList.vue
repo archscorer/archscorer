@@ -1,8 +1,10 @@
 <template>
   <v-sheet>
     <v-toolbar dense flat>
-      <eventParticipantAdd action="Register" v-if="event.is_open"/>
-      <eventParticipantAdd action="Add Me" v-if="user.id !== null && p_user === null"/>
+      <template v-if="event.is_open">
+        <eventParticipantAdd action="Register"/>
+        <eventParticipantAdd action="Add Me" v-if="user.id !== null && p_user === null"/>
+      </template>
       <v-spacer />
       <template v-if="user.email === event.creator">
         <template v-if="$vuetify.breakpoint.smAndUp">

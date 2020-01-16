@@ -188,6 +188,11 @@
         handler() {
           this.e_edit()
         }
+      },
+      'event.archive': function(val) {
+        if (val) {
+          this.event.is_open = false
+        }
       }
     },
     computed: {

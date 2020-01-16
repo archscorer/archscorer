@@ -26,6 +26,7 @@
             </v-autocomplete>
             </v-row>
             <template v-if="archer ? false : true">
+              <span class="archer-warn">Use form below only if archer could not be found from database!</span>
               <v-row>
                 <v-col cols="4">
                   <v-text-field
@@ -55,7 +56,7 @@
                 </v-col>
               </v-row>
               <v-row>
-                <v-col cols="6">
+                <v-col cols="4">
                   <v-text-field
                     v-model="participant.archer.email"
                     label="Contact email address*"
@@ -63,10 +64,18 @@
                   >
                   </v-text-field>
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="4">
                   <v-text-field
                     v-model="participant.archer.phone"
                     label="Contact phone number"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    v-model="participant.archer.nat_id"
+                    label="Archer national ID"
+                    hint="FAAE ID in Estonia - first 7 digits from your national ID code."
                   >
                   </v-text-field>
                 </v-col>
@@ -190,3 +199,7 @@
     }
   }
 </script>
+
+<style scoped>
+
+</style>

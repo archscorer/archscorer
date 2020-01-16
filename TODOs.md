@@ -14,3 +14,8 @@ Iga vibu harjutuse per class top tulemused aasta lõikes
 
 Catering will allow to enter descriptive "food options" to the event and these
 descriptors will be displayed in registration for as selection.
+
+When registering some classes have age restriction. Form rules need to be created !
+
+archiving event should set some backend limitations as well.. some more tests and
+limitations on frontend on combined with registration switch.
