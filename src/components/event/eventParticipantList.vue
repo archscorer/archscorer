@@ -53,97 +53,103 @@
     </v-toolbar>
     <v-card>
       <v-card-title>
-      <small>Registered Archers</small>
-      <v-spacer />
-      <v-text-field
-        v-model="p_search"
-        append-icon="mdi-magnify"
-        label="Search"
-        single-line
-        hide-details
-      ></v-text-field>
-    </v-card-title>
-      <v-data-table
-        dense
-        :mobile-breakpoint="300"
-        :headers="p_table_header"
-        :items="p_table"
-        :search="p_search"
-        group-by="class"
-        :items-per-page="50"
-        multi-sort
-      >
-        <template v-slot:item.group="props">
-          <v-edit-dialog
-            v-if="user.email === event.creator && event.archive === false"
-            :return-value="props.item.group"
-            :key="props.item.id"
-            @save="save(props.item.id, {group: props.item.group})"
-            @cancel="cancel"
-            large
-            persistent
-          > {{ props.item.group }}
-            <template v-slot:input>
-              <v-text-field
-                v-model="props.item.group"
-                type="number"
-                single-line
-                autofocus
-              ></v-text-field>
-            </template>
-          </v-edit-dialog>
-        </template>
-        <template v-slot:item.target="props">
-          <v-edit-dialog
-             v-if="user.email === event.creator && event.archive === false"
-            :return-value="props.item.target"
-            :key="props.item.id"
-            @save="save(props.item.id, {group_target: props.item.target})"
-            @cancel="cancel"
-            large
-            persistent
-          > {{ props.item.target }}
-            <template v-slot:input>
-              <v-text-field
-                v-model="props.item.target"
-                :rules="target_rules"
-                type="number"
-                single-line
-                autofocus
-              ></v-text-field>
-            </template>
-          </v-edit-dialog>
-        </template>
-        <template v-slot:item.role="props">
-          <v-edit-dialog v-if="user.email === event.creator && event.archive === false"
-            :return-value="props.item.role"
-            :key="props.item.id"
-            @save="save(props.item.id, {group_role: props.item.role})"
-            @cancel="cancel"
-            large
-            persistent
-          > {{ props.item.role === 2 ? 'Capt' : props.item.role === 1 ? 'scor' : '' }}
-            <template v-slot:input>
-              <v-select
-                v-model="props.item.role"
-                :items="[{'text': 'Captain', 'value': 2}, {'text': 'Scorer', 'value': 1}, {'text': 'member', 'value': 0}]"
-                single-line
-                autofocus
-              ></v-select>
-            </template>
-          </v-edit-dialog>
-        </template>
-        <template v-slot:item.action="{ item }" v-if="event.archive === false">
-          <template v-if="(user.archer.id === item.aId && event.is_open) || user.email === event.creator">
-            <v-icon small class="mr-2" @click="editP(item.id)">
-              mdi-pencil
-            </v-icon>
-            <v-icon small @click="deleteP(item.id)">
-              mdi-delete
-            </v-icon>
+        <small>Registered Archers</small>
+        <v-spacer />
+        <v-text-field
+          v-model="p_search"
+          append-icon="mdi-magnify"
+          label="Search"
+          single-line
+          hide-details
+        ></v-text-field>
+      </v-card-title>
+      <v-card-text>
+        <v-data-table
+          dense
+          :mobile-breakpoint="300"
+          :headers="p_table_header"
+          :items="p_table"
+          :search="p_search"
+          group-by="class"
+          :items-per-page="50"
+          multi-sort
+        >
+          <template v-slot:item.group="props"
+            v-if="user.email === event.creator && event.archive === false">
+            <v-edit-dialog
+              :return-value="props.item.group"
+              :key="props.item.id"
+              @save="save(props.item.id, {group: props.item.group})"
+              @cancel="cancel"
+              large
+              persistent
+            > {{ props.item.group }}
+              <template v-slot:input>
+                <v-text-field
+                  v-model="props.item.group"
+                  type="number"
+                  single-line
+                  autofocus
+                ></v-text-field>
+              </template>
+            </v-edit-dialog>
           </template>
-        </template>
-      </v-data-table>
+          <template v-slot:item.target="props"
+            v-if="user.email === event.creator && event.archive === false">
+            <v-edit-dialog
+              :return-value="props.item.target"
+              :key="props.item.id"
+              @save="save(props.item.id, {group_target: props.item.target})"
+              @cancel="cancel"
+              large
+              persistent
+            > {{ props.item.target }}
+              <template v-slot:input>
+                <v-text-field
+                  v-model="props.item.target"
+                  :rules="target_rules"
+                  type="number"
+                  single-line
+                  autofocus
+                ></v-text-field>
+              </template>
+            </v-edit-dialog>
+          </template>
+          <template v-slot:item.role="props">
+            <v-edit-dialog v-if="user.email === event.creator && event.archive === false"
+              :return-value="props.item.role"
+              :key="props.item.id"
+              @save="save(props.item.id, {group_role: props.item.role})"
+              @cancel="cancel"
+              large
+              persistent
+            > {{ props.item.role === 2 ? 'Capt' : props.item.role === 1 ? 'scor' : '' }} {{ props.item.has_account ? '*' : '' }}
+              <template v-slot:input>
+                <v-select
+                  v-model="props.item.role"
+                  :items="[{'text': 'Captain', 'value': 2}, {'text': 'Scorer', 'value': 1}, {'text': 'member', 'value': 0}]"
+                  single-line
+                  autofocus
+                ></v-select>
+              </template>
+            </v-edit-dialog>
+            <template v-else>
+              {{ props.item.role === 2 ? 'Capt' : props.item.role === 1 ? 'scor' : '' }}
+            </template>
+          </template>
+          <template v-slot:item.action="props">
+            <template v-if="(user.archer.id === props.item.aId && event.is_open) || user.email === event.creator">
+              <v-icon small class="mr-2" @click="editP(props.item.id)">
+                mdi-pencil
+              </v-icon>
+              <v-icon small @click="deleteP(props.item.id)">
+                mdi-delete
+              </v-icon>
+            </template>
+          </template>
+        </v-data-table>
+        <p><small>'Role *' - indicates that archer has user account and could be digital scorer.</small></p>
+      </v-card-text>
     </v-card>
     <v-dialog v-model="dialog" max-width="500px">
       <v-card>
@@ -216,8 +222,10 @@
           { text: 'Group', value: 'group', width: "90px" },
           { text: 'Target', value: 'target', width: "90px" },
           { text: 'Role', value: 'role', width: "80px" },
-          { text: 'Actions', value: 'action', sortable: false, width: "1%" },
         ]
+        if (this.event.archive === false) {
+          header.push({ text: 'Actions', value: 'action', sortable: false, width: "1%" })
+        }
         if (this.user.email === this.event.creator) {
           header.push(...[{ text: 'Food', value: 'food', width: "80px" },
                           { text: 'Comments', value: 'comments'}])
@@ -236,6 +244,7 @@
               group: p.group,
               target: p.group_target,
               role: p.group_role,
+              has_account: p.archer.user,
               food: (p.food ? "Yes" : "No"),
               comments: p.comments,
             }

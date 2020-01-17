@@ -34,8 +34,15 @@
         <p>
           First it might be good idea to create user account by either logging in
           with your Google account or create local account. Then try the site out
-          on a training session. Then please give feedback -- there is no feedback
-          page yet, but most of you should know how to reach me :)
+          on a training session. Then please give feedback -- 'info @ archscorer .
+          faae . ee'
+        </p>
+
+        <p>
+          As mentioned site is work in progress. From some things I have very
+          solid idea how it should be, some other features I have vague ideas or
+          haven't tought about it at all. <b>Your feedback is important</b> and
+          helps the site to get better :)
         </p>
       </v-flex>
 
@@ -46,9 +53,8 @@
         <h2 class="headline font-weight-bold mb-3">Important</h2>
 
         <p colour="alert">
-          As we are in the testing phase, I wont guarantee that your events and
-          scores can be safely propagated to the future instances, but I'll give
-          my best not to lose them either.
+          After creating user account or by logging in with Google - check your
+          profile (menu selection if clicked on your email address).
         </p>
       </v-flex>
 

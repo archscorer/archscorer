@@ -110,6 +110,9 @@ class Event(models.Model):
     catering = models.BooleanField(default=False)
     type = models.CharField('event type', max_length=10, default='private', choices=TYPE_CHOICES)
     tags = models.CharField('event tags', max_length=255, blank=True)
+    # list of account emails, that have more access to manage event settings, users and scores
+    admins = models.CharField('event admins', max_length=255, blank=True, default='')
+    records = models.CharField('record category (nat/EM/MM)', max_length=50, blank=True, default='')
 
     class Meta:
         ordering = ['-date_start']
@@ -170,8 +173,10 @@ class Participant(models.Model):
 class ScoreCard(models.Model):
     participant = models.ForeignKey(Participant, related_name='scorecards', on_delete=models.CASCADE)
     round = models.ForeignKey(Round, related_name='scorecards', on_delete=models.CASCADE)
+    score = models.IntegerField('Final score', default=None, null=True)
 
     class Meta:
+        ordering = ['-participant__group_role']
         unique_together = ['participant', 'round']
 
 class Arrow(models.Model):

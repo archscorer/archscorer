@@ -32,7 +32,6 @@ class RoundSerializer(serializers.ModelSerializer):
     def get_course_name(self, obj):
         return obj.course.name
 
-
 class ArrowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Arrow

@@ -19,3 +19,9 @@ When registering some classes have age restriction. Form rules need to be create
 
 archiving event should set some backend limitations as well.. some more tests and
 limitations on frontend on combined with registration switch.
+
+Standard units are 6 ends, 7 ends and 14 ends.
+This would be cool to only have those options available for selection, but if
+shooting outdoors the start target can be > 14. Currently 28 end rounds have
+attribute 'halves' that can be used to determine that they need to appear once
+per event, compared to 6 end or 7 end counterparts.
