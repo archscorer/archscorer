@@ -151,11 +151,6 @@ class Participant(models.Model):
         ('LB', 'Longbow'),
         ('TR', 'Traditional Recurve')
     ]
-    ROLE_CHOICES = [
-        (0, ''),
-        (1, 'Scorer'),
-        (2, 'Captain')
-    ]
     created = models.DateTimeField(auto_now_add=True)
     archer = models.ForeignKey(Archer, related_name='events', on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name='participants', on_delete=models.CASCADE)
@@ -165,7 +160,7 @@ class Participant(models.Model):
     comments = models.CharField(max_length=255, blank=True)
     group = models.IntegerField(default=None, null=True)
     group_target = models.IntegerField(default=1)
-    group_role = models.IntegerField('Archer role', default=0, choices=ROLE_CHOICES)
+    group_pos = models.CharField('Archer position', max_length=1, default='')
 
 
     class Meta:
@@ -178,7 +173,7 @@ class ScoreCard(models.Model):
     score = models.IntegerField('Final score', default=None, null=True)
 
     class Meta:
-        ordering = ['-participant__group_role']
+        ordering = ['participant__group_pos']
         unique_together = ['participant', 'round']
 
 class Arrow(models.Model):

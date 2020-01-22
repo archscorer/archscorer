@@ -36,7 +36,7 @@
               </v-btn>
             </template>
             {{ row[col.value] }}
-            <template v-if="'pr'+col.value in row">
+            <template v-if="'pr'+col.value in row && event.archive === false">
               <v-progress-circular
                 v-model="row['pr'+col.value]"
                 :color="row['pr'+col.value] === 100 ? 'green' : 'error'"
@@ -96,10 +96,10 @@
     if ( a.sum < b.sum ){
       return 1;
     }
-    if (a.xCum > b.xCum) {
+    if (a.x > b.x) {
       return -1;
     }
-    if (a.xCum < b.xCum) {
+    if (a.x < b.x) {
       return 1;
     }
     return 0;

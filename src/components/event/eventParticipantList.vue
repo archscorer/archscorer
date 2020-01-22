@@ -115,26 +115,27 @@
               </template>
             </v-edit-dialog>
           </template>
-          <template v-slot:item.role="props">
+          <template v-slot:item.pos="props">
             <v-edit-dialog v-if="user.email === event.creator && event.archive === false"
-              :return-value="props.item.role"
+              :return-value="props.item.pos"
               :key="props.item.id"
-              @save="save(props.item.id, {group_role: props.item.role})"
+              @save="save(props.item.id, {group_pos: props.item.pos})"
               @cancel="cancel"
               large
               persistent
-            > {{ props.item.role === 2 ? 'Capt' : props.item.role === 1 ? 'scor' : '' }} {{ props.item.has_account ? '*' : '' }}
+            > {{ props.item.pos }} {{ props.item.has_account ? '*' : '' }}
               <template v-slot:input>
-                <v-select
-                  v-model="props.item.role"
-                  :items="[{'text': 'Captain', 'value': 2}, {'text': 'Scorer', 'value': 1}, {'text': 'member', 'value': 0}]"
+                <v-text-field
+                  v-model="props.item.pos"
+                  :rules="position_rules"
+                  counter="1"
                   single-line
                   autofocus
-                ></v-select>
+                ></v-text-field>
               </template>
             </v-edit-dialog>
             <template v-else>
-              {{ props.item.role === 2 ? 'Capt' : props.item.role === 1 ? 'scor' : '' }}
+              {{ props.item.pos }}
             </template>
           </template>
           <template v-slot:item.action="props">
@@ -149,7 +150,7 @@
           </template>
         </v-data-table>
         <p v-if="user.email === event.creator && event.archive === false">
-          <small>'Role *' - indicates that archer has user account and could be digital scorer.</small>
+          <small>'Position *' - indicates that archer has user account and could be digital scorer.</small>
         </p>
       </v-card-text>
     </v-card>
@@ -203,6 +204,9 @@
       target_rules: [
         v => !!v || 'required',
       ],
+      position_rules: [
+        v => !!v && v.length <= 1 || 'Position is marked with single capital letter',
+      ],
       dialog: false,
       creator_menu: false,
       snack: false,
@@ -222,8 +226,8 @@
           { text: 'Class', value: 'class' },
           { text: 'Club', value: 'club' },
           { text: 'Group', value: 'group', width: "90px" },
-          { text: 'Target', value: 'target', width: "90px" },
-          { text: 'Role', value: 'role', width: "80px" },
+          { text: 'Position', value: 'pos', width: "80px" },
+          { text: 'Start From', value: 'target', width: "90px" },
         ]
         if (this.event.archive === false) {
           header.push({ text: 'Actions', value: 'action', sortable: false, width: "1%" })
@@ -244,9 +248,9 @@
               class: p.age_group + p.archer.gender + p.style,
               club: p.archer.club,
               group: p.group,
-              target: p.group_target,
-              role: p.group_role,
+              pos: p.group_pos,
               has_account: p.archer.user,
+              target: p.group_target,
               food: (p.food ? "Yes" : "No"),
               comments: p.comments,
             }

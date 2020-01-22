@@ -1,0 +1,46 @@
+from backend.api import models
+from collections import namedtuple
+
+def import_archers(club=None, file=None):
+
+    club, created = models.Club.objects.get_or_create(name = club)
+
+    with open(file) as fh:
+        header = fh.readline().rstrip().split('\t')
+        A = namedtuple('Archer', header, defaults=[None, None])
+        for line in fh.readlines():
+            a = A(*line.rstrip().split('\t'))
+            gender = 'M' if str(a.nat_id[0]) in ['3', '5'] else 'F'
+            models.Archer.objects.get_or_create(full_name=a.full_name,
+                                                club=club,
+                                                nat_id=a.nat_id,
+                                                gender=gender,
+                                                email=a.email if a.email else '',
+                                                phone=a.phone if a.phone else '')
+
+
+def import_and_register(file=None, event_pk=None):
+    event = models.Event.objects.get(pk = event_pk)
+    with open(file) as fh:
+        header = fh.readline().rstrip().split(',')
+        A = namedtuple('Archer', header)
+        for line in fh.readlines():
+            a = A(*line.rstrip().split(','))
+            archer, created = models.Archer.objects.get_or_create(full_name=a.full_name)
+            if created:
+                club, created = models.Club.objects.get_or_create(name = a.club)
+                models.Archer.objects.filter(pk = archer.id).update(club=club,
+                                                                    nat_id=a.nat_id,
+                                                                    gender=a.gender,
+                                                                    email=a.email,
+                                                                    phone=a.phone)
+            models.Participant.objects.get_or_create(archer=archer,
+                                                     event=event,
+                                                     style=a.style,
+                                                     age_group=a.age_group)
+
+
+def read_clubs():
+    # import_archers(club='Kagu Vibuklubi', file='kagu_vibuklubi.tsv')
+    # import_archers(club='Tartu Vibuklubi', file='tartu_vibuklubi.tsv')
+    pass
