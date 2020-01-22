@@ -25,3 +25,5 @@ This would be cool to only have those options available for selection, but if
 shooting outdoors the start target can be > 14. Currently 28 end rounds have
 attribute 'halves' that can be used to determine that they need to appear once
 per event, compared to 6 end or 7 end counterparts.
+
+on the scorecard as well

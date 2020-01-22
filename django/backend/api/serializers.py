@@ -44,7 +44,7 @@ class ParticipantScoreCardSerializer(serializers.ModelSerializer):
         fields = ['id', 'participant', 'round', 'arrows']
 
 class ParticipantArcherSerializer(serializers.ModelSerializer):
-    club = serializers.ReadOnlyField(source='club.name')
+    club = serializers.ReadOnlyField(source='club.name_short')
     user = serializers.ReadOnlyField(source='user.is_active')
     class Meta:
         model = Archer

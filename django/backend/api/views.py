@@ -168,7 +168,9 @@ class ParticipantViewSet(viewsets.ModelViewSet):
         event = Event.objects.get(pk=request.data['eId'])
         round = Round.objects.get(pk=request.data['rId'])
 
-        user_participant = event.participants.get(archer__id=request.user.archer.id)
+        user_participant = event.participants.filter(
+           archer__id=request.user.archer.id).get(
+           pk=request.data['pId'])
 
         # get or create scorecards for given round in start group
         for participant in event.participants.all():

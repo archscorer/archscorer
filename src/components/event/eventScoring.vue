@@ -7,11 +7,18 @@
       <small>You need to register to the event first!</small>
     </v-card-title>
     <v-card-title v-else-if="event.archive === true">
-      <small>This event in archived and can not be edited!</small>
+      <small>This event is archived and can not be edited any more!</small>
     </v-card-title>
     <template v-else>
       <v-card-title>
         Round <v-spacer/>
+        <v-select
+          v-if="p_user.length > 1"
+          label="Select your group to score."
+          v-model="user_group"
+          :items="p_user"
+          item-text="group"
+          return-object></v-select>
         <v-select
           label="Select round for scoring."
           v-model="round"
@@ -65,9 +72,10 @@
       eventScoringEnd
     },
     props: {
-      p_user: Object,
+      p_user: Array,
     },
     data: () => ({
+      user_group: {id: null},
       end_view: 0,
       arrow_inc: 0,
       currentRound: null,
@@ -125,14 +133,19 @@
         })
       },
       get_scorecards(eId, rId) {
+        if (this.user_group.id === null) {
+          this.user_group = this.p_user[0]
+        }
         // before getting new set, the current set should be destroyed
         this.$store.dispatch('events/resetUserGroupScoreCards')
-        this.end_view = this.p_user.group_target - 1
+        this.end_view = this.user_group.group_target - 1
         this.currentRound = rId
         this.scorecards_loading = true
         // ask for scorecards. Creating new ones will take time, therefore catch
         // timeout and let user know of it
-        this.$store.dispatch('events/getUserGroupScoreCards', {eId: eId, rId: rId})
+        this.$store.dispatch('events/getUserGroupScoreCards', {eId: eId,
+                                                               rId: rId,
+                                                               pId: this.user_group.id })
         .then(() => {
           this.scorecards_loading = false
           this.$nextTick(() => {

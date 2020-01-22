@@ -78,11 +78,28 @@
     return r_sc ?  r_sc.arrows.map(a => a.score) : [null]
   }
 
+  function getX(r, p) {
+    let r_sc = p.scorecards.find(obj => obj.round === r.id)
+    return r_sc ?  r_sc.arrows.map(a => a.x ? 1 : 0) : [null]
+  }
+
   function cSumSc( a, b ) {
+    if ( a.class > b.class) {
+      return -1;
+    }
+    if ( a.class < b.class) {
+      return 1;
+    }
     if ( a.sum > b.sum ){
       return -1;
     }
     if ( a.sum < b.sum ){
+      return 1;
+    }
+    if (a.xCum > b.xCum) {
+      return -1;
+    }
+    if (a.xCum < b.xCum) {
       return 1;
     }
     return 0;
@@ -108,14 +125,17 @@
       r_table_header() {
         if (this.event) {
           let header = [
+            { text: 'Place', value: 'place', width: '1%' },
             { text: 'Name', value: 'name' },
+            { text: 'Club', value: 'club' },
             { text: 'Class', value: 'class' },
           ]
           header.push(...this.event.rounds.map(function(r) {
             return { text: r.ord.toString() + '. ' + r.label,
                     value: r.ord.toString() }
           }))
-          header.push({ text: 'Sum', value: 'sum'})
+          header.push({ text: 'x', value: 'x', width: '1%' })
+          header.push({ text: 'Sum', value: 'sum', width: '1%' })
 
           return header
         } else {
@@ -133,20 +153,43 @@
               id: p.id,
               name: p.archer.full_name,
               class: p.age_group + p.archer.gender + p.style,
+              club: p.archer.club
             }
             let sums = this.rounds.map(function(r) {
               row[r.ord] = sum( getScore(r, p) )
               return row[r.ord]
             })
             row['sum'] = sums.length ? sum( sums ) : 0
-
+            let x = this.rounds.map(function(r) {
+              return sum( getX(r, p) )
+            })
+            row['x'] = x.length ? sum( x ) : 0
             this.rounds.map(function (r) {
               let r_sc = getScore(r, p)
               row['pr' + r.ord] = (r_sc.filter(obj => obj !== null).length / r_sc.length) * 100
             })
             return row
           }, this.event)
-          return r_table.sort( cSumSc )
+          let place = {class: null, ord: 1, sum: null, x: null}
+          for (let p of r_table.sort( cSumSc )) {
+            if (p.class !== place.class) {
+              place.class = p.class
+              place.ord = 1
+              place.place = 1
+              place.sum = p.sum
+              place.x = p.x
+            }
+            if (p.sum < place.sum) {
+              place.place = place.ord
+            } else if (p.x < place.x) {
+              place.place = place.ord
+            }
+            p['place'] = place.place
+            place.x = p.x
+            place.sum = p.sum
+            place.ord += 1
+          }
+          return r_table
         } else {
           return []
         }

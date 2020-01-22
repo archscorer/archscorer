@@ -47,6 +47,8 @@ class User(AbstractUser):
 class Club(models.Model):
     creator = models.ForeignKey('User', related_name='clubs_created', null=True, on_delete=models.SET_NULL)
     name = models.CharField('Club name', max_length=150, blank=False, default='Unnamed archery club')
+    name_short = models.CharField('Club name short', max_length=5, blank=True, default='***')
+    association = models.CharField('Association name (FAAE - in estonia)', max_length=255, blank=True, default='***')
     contact = models.TextField('Contact Information')
     description = models.TextField()
 
@@ -168,7 +170,7 @@ class Participant(models.Model):
 
     class Meta:
         ordering = ['created']
-        unique_together = ['archer', 'event', 'style']
+        unique_together = ['archer', 'event', 'style', 'age_group']
 
 class ScoreCard(models.Model):
     participant = models.ForeignKey(Participant, related_name='scorecards', on_delete=models.CASCADE)

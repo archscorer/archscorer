@@ -148,7 +148,9 @@
             </template>
           </template>
         </v-data-table>
-        <p><small>'Role *' - indicates that archer has user account and could be digital scorer.</small></p>
+        <p v-if="user.email === event.creator && event.archive === false">
+          <small>'Role *' - indicates that archer has user account and could be digital scorer.</small>
+        </p>
       </v-card-text>
     </v-card>
     <v-dialog v-model="dialog" max-width="500px">
@@ -184,7 +186,7 @@
       eventParticipantAdd,
     },
     props: {
-      p_user: Object,
+      p_user: Array,
     },
     data: () => ({
       p_search: '',

@@ -72,7 +72,7 @@
       p_user() {
         let p_user = null
         if (Array.isArray(this.event.participants)) {
-          p_user = this.event.participants.find(obj => obj.archer.id === this.user.archer.id)
+          p_user = this.event.participants.filter(obj => obj.archer.id === this.user.archer.id)
         }
         return p_user ? p_user : null
       },
