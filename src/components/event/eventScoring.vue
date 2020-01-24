@@ -3,7 +3,7 @@
     <v-card-title v-if="user.id === null">
       <p>You need to be logged in for scoring</p>
     </v-card-title>
-    <v-card-title v-else-if="p_user === null">
+    <v-card-title v-else-if="!Array.isArray(p_user) || !p_user.length">
       <small>You need to register to the event first!</small>
     </v-card-title>
     <v-card-title v-else-if="event.archive === true">

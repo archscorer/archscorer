@@ -184,12 +184,38 @@
               <v-col cols="6">
                 <v-switch
                   v-model="event.is_open"
-                  :label="event.is_open ? 'Others can register*' : 'Event is private'"
+                  :label="event.is_open ? 'Registration is open*' : 'Registration is closed'"
                 ></v-switch>
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="6"></v-col>
+              <v-col cols="6">
+                <v-alert v-if="event.type === 'open'"
+                  border="bottom"
+                  type="warning"
+                  colored-border
+                  elevation="2">
+                  <small>
+                    <p>
+                      'Open' type of event is reserved for official / public archery events
+                      only. This type of event can be seen by everybody in the events page.
+                    </p>
+                  </small>
+                </v-alert>
+                <v-alert v-if="event.type === 'club'"
+                  border="bottom"
+                  type="info"
+                  colored-border
+                  elevation="2">
+                  <small>
+                    <p>
+                      'Club' type of event should be used for club level events. Club members
+                      can see this type of events on events page. Archers outside the club
+                      can still register by event link.
+                    </p>
+                  </small>
+                </v-alert>
+              </v-col>
               <v-col cols="6">
                 <v-switch
                   v-model="event.catering"
@@ -198,9 +224,10 @@
               </v-col>
             </v-row>
             <small>
-              <p>* If event visibility is 'Private' and 'Others can register', they can do
+              <p>* If event visibility is 'Private' and 'Registration is open', they can do
                 so by event URL. Click 'Finish' first and then you can navigate to the event
-                and copy the URL. The 'Open' events are discoverable by anyone in event listing.
+                and copy the URL. The 'Open' events are discoverable by anyone on the
+                <router-link :to="'events'">Events page</router-link>.
                 The 'Club' events are discoverable by the club memebers only.</p>
               <p>** If catering is provided, the details (menu) should be added to the description of
                 the event.</p>

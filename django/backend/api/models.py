@@ -31,6 +31,9 @@ class LocalUserManager(BaseUserManager):
         return self._create_user(email, password, True, True,
                                  **extra_fields)
 
+TYPE_CHOICES = [('private', 'Private'),
+                ('club', 'Club'),
+                ('open', 'Open')]
 
 class User(AbstractUser):
     username = models.CharField('username', max_length=30, blank=True)
@@ -47,7 +50,7 @@ class User(AbstractUser):
 class Club(models.Model):
     creator = models.ForeignKey('User', related_name='clubs_created', null=True, on_delete=models.SET_NULL)
     name = models.CharField('Club name', max_length=150, blank=False, default='Unnamed archery club')
-    name_short = models.CharField('Club name short', max_length=5, blank=True, default='***')
+    name_short = models.CharField('Club name short', max_length=10, blank=True, default='***')
     association = models.CharField('Association name (FAAE - in estonia)', max_length=255, blank=True, default='***')
     contact = models.TextField('Contact Information')
     description = models.TextField()
@@ -93,10 +96,26 @@ class End(models.Model):
     class Meta:
         ordering = ['ord']
 
+class Series(models.Model):
+    creator = models.ForeignKey('User', related_name='series_created', null=True, on_delete=models.SET_NULL)
+    created = models.DateTimeField(auto_now_add=True)
+
+    date_start = models.DateField(default=timezone.localdate)
+    date_end = models.DateField(default=timezone.localdate)
+
+    name = models.CharField(max_length=150, default='Unnamed Series', blank=False)
+    description = models.TextField(blank=True)
+    type = models.CharField('event type', max_length=10, default='private', choices=TYPE_CHOICES)
+
+    # use None or 'any' for no restriction. Otherwise club__association should be used as limitation (i.e FAAE)
+    participant_restriction = models.CharField('i.e. club__association', max_length=10, blank=True, null=True, default=None)
+    participant_min = models.IntegerField('Minimum nr of events for final ranking', default=1)
+    participant_max = models.IntegerField('Maximum nr of envets used for final ranking', default=None, null=True)
+    # Aimed to accommodate club cup and comparing clubs
+    club_ranking = models.BooleanField(default=False)
+    club_ranking_max = models.IntegerField('Max nr of club members to contribute points to club per class', default=3)
+
 class Event(models.Model):
-    TYPE_CHOICES = [('private', 'Private'),
-                    ('club', 'Club'),
-                    ('open', 'Open')]
     creator = models.ForeignKey('User', related_name='events_created', null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -157,10 +176,10 @@ class Participant(models.Model):
     age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     food = models.BooleanField(default=False)
-    comments = models.CharField(max_length=255, blank=True)
-    group = models.IntegerField(default=None, null=True)
-    group_target = models.IntegerField(default=1)
-    group_pos = models.CharField('Archer position', max_length=1, default='')
+    comments = models.CharField('Comments to organiser', max_length=255, blank=True)
+    group = models.IntegerField('Group/Target nr', default=None, null=True)
+    group_target = models.IntegerField('Starting end nr', default=1)
+    group_pos = models.CharField('Archer position', max_length=1, blank=True, default='')
 
 
     class Meta:

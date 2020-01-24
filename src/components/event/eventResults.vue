@@ -181,7 +181,7 @@
             }
             if (p.sum < place.sum) {
               place.place = place.ord
-            } else if (p.x < place.x) {
+            } else if (p.x < place.x && place.ord > 3) {
               place.place = place.ord
             }
             p['place'] = place.place

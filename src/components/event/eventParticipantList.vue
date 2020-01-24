@@ -268,10 +268,11 @@
       ]),
       save(pId, attr) {
         let p = Object.assign({}, this.event.participants.find(obj => obj.id === pId), attr)
-        this.putParticipant({pId: p.id, participant: p})
-        this.snack = true
-        this.snackColor = 'success'
-        this.snackText = 'Changes have been saved'
+        this.putParticipant({pId: p.id, participant: p}).then(() => {
+          this.snack = true
+          this.snackColor = 'success'
+          this.snackText = 'Changes have been saved'
+        })
       },
       cancel() {
         this.snack = true

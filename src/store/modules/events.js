@@ -123,7 +123,7 @@ const actions = {
     })
   },
   putParticipant({ commit }, attr) {
-    eventService.putParticipant(attr.pId, attr.participant)
+    return eventService.putParticipant(attr.pId, attr.participant)
     .then(participant => {
       eventService.fetchEvents(participant.event)
       .then(event => {
