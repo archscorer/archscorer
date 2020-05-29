@@ -3,7 +3,7 @@
     <v-toolbar dense flat>
       <template v-if="event.is_open">
         <eventParticipantAdd action="Register"/>
-        <eventParticipantAdd action="Add Me" v-if="user.id !== null && p_user === null"/>
+        <eventParticipantAdd action="Add Me" v-if="user.id !== null && (!Array.isArray(p_user) || !p_user.length)"/>
       </template>
       <v-spacer />
       <template v-if="user.email === event.creator">

@@ -3,6 +3,7 @@ from .models import (User,
                      Archer,
                      Course,
                      End,
+                     Series,
                      Event,
                      Round,
                      Participant,
@@ -101,3 +102,10 @@ class EventSerializerList(serializers.ModelSerializer):
 
     def get_participants(self, obj):
         return len(obj.participants.all())
+
+class SeriesSerializer(serializers.ModelSerializer):
+    creator = serializers.ReadOnlyField(source='creator.email')
+    stages = EventSerializer(many=True, read_only=True)
+    class Meta:
+        model = Series
+        fields = '__all__'

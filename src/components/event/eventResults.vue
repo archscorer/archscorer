@@ -66,12 +66,10 @@
 
 <script>
   import eventParticipantScorecards from '@/components/event/eventParticipantScorecards.vue'
+  import rankingService from '@/services/rankingService'
+  import {mapState} from 'vuex'
 
-  import { mapState} from 'vuex'
 
-  function sum(arr) {
-    return arr.reduce((sum, x) => sum + x);
-  }
 
   function getScore(r, p) {
     let r_sc = p.scorecards.find(obj => obj.round === r.id)
@@ -81,28 +79,6 @@
   function getX(r, p) {
     let r_sc = p.scorecards.find(obj => obj.round === r.id)
     return r_sc ?  r_sc.arrows.map(a => a.x ? 1 : 0) : [null]
-  }
-
-  function cSumSc( a, b ) {
-    if ( a.class > b.class) {
-      return -1;
-    }
-    if ( a.class < b.class) {
-      return 1;
-    }
-    if ( a.sum > b.sum ){
-      return -1;
-    }
-    if ( a.sum < b.sum ){
-      return 1;
-    }
-    if (a.x > b.x) {
-      return -1;
-    }
-    if (a.x < b.x) {
-      return 1;
-    }
-    return 0;
   }
 
   export default {
@@ -156,39 +132,30 @@
               club: p.archer.club
             }
             let sums = this.rounds.map(function(r) {
-              row[r.ord] = sum( getScore(r, p) )
+              row[r.ord] = rankingService.sum( getScore(r, p) )
+              if (r.course_name.search('shootoff') !== -1) {
+                if (row[r.ord] > 0) {
+                  row.shootoff = row[r.ord]
+                }
+                return 0
+              }
               return row[r.ord]
             })
-            row['sum'] = sums.length ? sum( sums ) : 0
+            row['sum'] = sums.length ? rankingService.sum( sums ) : 0
             let x = this.rounds.map(function(r) {
-              return sum( getX(r, p) )
+              if (r.course_name.search('shootoff') !== -1) {
+                return 0
+              }
+              return rankingService.sum( getX(r, p) )
             })
-            row['x'] = x.length ? sum( x ) : 0
+            row['x'] = x.length ? rankingService.sum( x ) : 0
             this.rounds.map(function (r) {
               let r_sc = getScore(r, p)
               row['pr' + r.ord] = (r_sc.filter(obj => obj !== null).length / r_sc.length) * 100
             })
             return row
           }, this.event)
-          let place = {class: null, ord: 1, sum: null, x: null}
-          for (let p of r_table.sort( cSumSc )) {
-            if (p.class !== place.class) {
-              place.class = p.class
-              place.ord = 1
-              place.place = 1
-              place.sum = p.sum
-              place.x = p.x
-            }
-            if (p.sum < place.sum) {
-              place.place = place.ord
-            } else if (p.x < place.x && place.ord > 3) {
-              place.place = place.ord
-            }
-            p['place'] = place.place
-            place.x = p.x
-            place.sum = p.sum
-            place.ord += 1
-          }
+          rankingService.participantRank(r_table)
           return r_table
         } else {
           return []

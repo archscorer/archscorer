@@ -26,6 +26,8 @@
             </v-autocomplete>
             </v-row>
             <template v-if="archer ? false : true">
+              <!-- this should not be visible by default. should make user make a extra click to open this in case
+                   archer was not found by search -->
               <span class="archer-warn">Use form below only if archer could not be found from database!</span>
               <v-row>
                 <v-col cols="4">

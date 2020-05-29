@@ -35,6 +35,26 @@ TYPE_CHOICES = [('private', 'Private'),
                 ('club', 'Club'),
                 ('open', 'Open')]
 
+AGEGROUP_CHOICES = [('C', 'Cub'),
+                    ('J', 'Junior'),
+                    ('A', 'Adult'),
+                    ('V', 'Veteran'),
+                    ('S', 'Senior')]
+
+STYLE_CHOICES = [
+    ('BB-C', 'Barebow Compound'),
+    ('BB-R', 'Barebow Recurve'),
+    ('BH-C', 'Bowhunter Compound'),
+    ('BH-R', 'Bowhunter Recurve'),
+    ('BL', 'Bowhunter Limited'),
+    ('BU', 'Bowhunter Unlimited'),
+    ('FS-C', 'Freestyle Limited Compound'),
+    ('FS-R', 'Freestyle Limited Recurve'),
+    ('FU', 'Freestyle Unlimited'),
+    ('HB', 'Historic Longbow'),
+    ('LB', 'Longbow'),
+    ('TR', 'Traditional Recurve')]
+
 class User(AbstractUser):
     username = models.CharField('username', max_length=30, blank=True)
     email = models.EmailField('email address', unique=True)
@@ -96,6 +116,18 @@ class End(models.Model):
     class Meta:
         ordering = ['ord']
 
+class Record(models.Model):
+    archer = models.CharField('Archer name', max_length=255, blank=False)
+    date = models.DateField('Date of achievement', blank=True, null=True)
+    age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
+    style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
+    score = models.IntegerField('Record score', blank=False)
+    scope = models.CharField('record scope (FAAE/EM/MM)', max_length=50, blank=True, default='FAAE')
+
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.EmailField(blank=True, null=True)
+
+
 class Series(models.Model):
     creator = models.ForeignKey('User', related_name='series_created', null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
@@ -106,6 +138,8 @@ class Series(models.Model):
     name = models.CharField(max_length=150, default='Unnamed Series', blank=False)
     description = models.TextField(blank=True)
     type = models.CharField('event type', max_length=10, default='private', choices=TYPE_CHOICES)
+
+    points_max = models.IntegerField('Maximum point score for the first place', default=10)
 
     # use None or 'any' for no restriction. Otherwise club__association should be used as limitation (i.e FAAE)
     participant_restriction = models.CharField('i.e. club__association', max_length=10, blank=True, null=True, default=None)
@@ -135,6 +169,8 @@ class Event(models.Model):
     admins = models.CharField('event admins', max_length=255, blank=True, default='')
     records = models.CharField('record category (nat/EM/MM)', max_length=50, blank=True, default='')
 
+    series = models.ForeignKey('Series', related_name='stages', null=True, on_delete=models.SET_NULL)
+
     class Meta:
         ordering = ['-date_start']
 
@@ -151,25 +187,6 @@ class Round(models.Model):
         unique_together = ['ord', 'course', 'event']
 
 class Participant(models.Model):
-    AGEGROUP_CHOICES = [('C', 'Cub'),
-                        ('J', 'Junior'),
-                        ('A', 'Adult'),
-                        ('V', 'Veteran'),
-                        ('S', 'Senior')]
-    STYLE_CHOICES = [
-        ('BB-C', 'Barebow Compound'),
-        ('BB-R', 'Barebow Recurve'),
-        ('BH-C', 'Bowhunter Compound'),
-        ('BH-R', 'Bowhunter Recurve'),
-        ('BL', 'Bowhunter Limited'),
-        ('BU', 'Bowhunter Unlimited'),
-        ('FS-C', 'Freestyle Limited Compound'),
-        ('FS-R', 'Freestyle Limited Recurve'),
-        ('FU', 'Freestyle Unlimited'),
-        ('HB', 'Historic Longbow'),
-        ('LB', 'Longbow'),
-        ('TR', 'Traditional Recurve')
-    ]
     created = models.DateTimeField(auto_now_add=True)
     archer = models.ForeignKey(Archer, related_name='events', on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name='participants', on_delete=models.CASCADE)

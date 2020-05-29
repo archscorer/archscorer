@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import (User, Club, Archer, Course, End, Participant, Event, Round)
+from .models import (User, Club, Archer, Course, End,
+                     Participant, Series, Event, Round,
+                     Record, Arrow, ScoreCard)
 
 # Register your models here.
 @admin.register(User)
@@ -29,10 +31,15 @@ class myUserAdmin(UserAdmin):
 class myClubAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
+class myParticipantInline(admin.TabularInline):
+    model = Participant
+
 @admin.register(Archer)
 class myArcherAdmin(admin.ModelAdmin):
     raw_id_fields = ('club', 'user')
     list_display = ('full_name', 'gender', 'email', 'club_name', 'user')
+    search_fields = ('full_name', 'club__name')
+    inlines = (myParticipantInline,)
 
     def club_name(self, obj):
         if isinstance(obj.club, Club):
@@ -68,6 +75,7 @@ class myEndAdmin(admin.ModelAdmin):
 @admin.register(Participant)
 class myParticipantAdmin(admin.ModelAdmin):
     list_display = ('archer_name', 'event_name', 'style', 'age_group')
+    search_fields = ('archer__full_name', 'event__name')
 
     def archer_name(self, obj):
         return obj.archer.full_name
@@ -80,6 +88,14 @@ class myParticipantAdmin(admin.ModelAdmin):
 @admin.register(Event)
 class myEventAdmin(admin.ModelAdmin):
     list_display = ('name', 'creator')
+
+@admin.register(Series)
+class mySeriesAdmin(admin.ModelAdmin):
+    list_display = ('name', 'creator')
+
+@admin.register(Record)
+class myRecordAdmin(admin.ModelAdmin):
+    list_display = ('scope', 'style', 'age_group', 'score', 'archer', 'updated_by', 'updated_at')
 
 @admin.register(Round)
 class myRoundAdmin(admin.ModelAdmin):
@@ -107,3 +123,36 @@ class myRoundAdmin(admin.ModelAdmin):
             return ''
     course_name.short_description = 'Course'
     course_name.admin_order_field = 'course'
+
+class myArrowInline(admin.TabularInline):
+    model = Arrow
+
+@admin.register(ScoreCard)
+class myScoreCardAdmin(admin.ModelAdmin):
+    list_display = ('participant_name', 'event_name', 'course_name')
+    search_fields = ('participant__archer__full_name', 'participant__event__name')
+    inlines = (myArrowInline,)
+
+    def participant_name(self, obj):
+        if isinstance(obj.participant, Participant):
+            return obj.participant.archer.full_name
+        else:
+            return ''
+    participant_name.short_description = 'Archer'
+    participant_name.admin_order_field = 'participant__archer'
+
+    def event_name(self, obj):
+        if isinstance(obj.round.event, Event):
+            return obj.round.event.name
+        else:
+            return ''
+    event_name.short_description = 'Event'
+    event_name.admin_order_field = 'round__event'
+
+    def course_name(self, obj):
+        if isinstance(obj.round.course, Course):
+            return obj.round.course.name
+        else:
+            return ''
+    course_name.short_description = 'Course'
+    course_name.admin_order_field = 'round__course'

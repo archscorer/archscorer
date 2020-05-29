@@ -14,7 +14,7 @@
           <template v-else>
             on {{ event.date_start }}
           </template>
-          / {{ event.participants }} participant(s)
+          / {{ Array.isArray(event.participants) ? event.participants.length : event.participants }} participant(s)
         </v-list-item-subtitle>
       </v-list-item-content>
       <v-list-item-action>

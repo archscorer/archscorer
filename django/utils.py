@@ -40,6 +40,26 @@ def import_and_register(file=None, event_pk=None):
                                                      age_group=a.age_group)
 
 
+def register(file=None, event_pk=None):
+    # participant fields
+    # archer, event, age_group, style, food, comments, group, group_target, group_pos
+    event = models.Event.objects.get(pk = event_pk)
+    with open(file) as fh:
+        header = fh.readline().rstrip().split('\t')
+        A = namedtuple('Archer', header)
+        for line in fh.readlines():
+            a = A(*line.rstrip().split('\t'))
+            try:
+                archer = models.Archer.objects.get(full_name=a.full_name)
+                models.Participant.objects.get_or_create(archer=archer,
+                                                         event=event,
+                                                         style=a.style,
+                                                         age_group=a.age_group,
+                                                         food=True if a.food == 'TRUE' else False)
+            except:
+                print(a)
+
+
 def read_clubs():
     # import_archers(club='Kagu Vibuklubi', file='kagu_vibuklubi.tsv')
     # import_archers(club='Tartu Vibuklubi', file='tartu_vibuklubi.tsv')

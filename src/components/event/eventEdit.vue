@@ -85,7 +85,7 @@
             <v-col cols="6">
               <v-switch
                 v-model="event.is_open"
-                :label="event.is_open ? 'Others can register' : 'Event is private'"
+                :label="event.is_open ? 'Registration is open' : 'Registration is closed'"
               ></v-switch>
               <v-switch
                 v-model="event.catering"
@@ -94,7 +94,7 @@
               <v-switch
                 v-model="event.archive"
                 color="error"
-                :label="event.archive ? 'Event is read-only' : 'Event can be edited'"
+                :label="event.archive ? 'Event is read-only (archived)' : 'Active event'"
               ></v-switch>
             </v-col>
           </v-row>

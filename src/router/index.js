@@ -26,8 +26,13 @@ const routes = [
   },
   {
     path: '/series',
-    name: 'series',
+    name: 'series_list',
     component: () => import('@/views/Series.vue')
+  },
+  {
+    path: '/series/:id',
+    name: 'series',
+    component: () => import('@/views/series/Series.vue')
   },
   {
     path: '/statistics',
@@ -44,6 +49,10 @@ const routes = [
     name: 'profile',
     component: () => import('@/views/user/ArcherProfile.vue')
   },
+  {
+    path: '*',
+    component: Home
+  }
 ]
 
 const router = new VueRouter({

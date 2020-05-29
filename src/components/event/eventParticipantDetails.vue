@@ -7,9 +7,12 @@
           :items="pModel.style.choices"
           label="Style*"
           :rules="[v => !!v || 'Bow style is required']"
-          item-text="display_name"
           dense
-        ></v-select>
+        >
+          <template v-slot:item="data">
+            {{ data.item.value }} -- {{ data.item.display_name }}
+          </template>
+        </v-select>
       </v-col>
       <v-col cols="4">
         <v-select

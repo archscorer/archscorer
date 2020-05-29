@@ -1,13 +1,13 @@
 <template>
   <v-card v-if="event">
-    <v-card-title v-if="user.id === null">
+    <v-card-title v-if="event.archive === true">
+      <small>This event is archived and can not be edited any more!</small>
+    </v-card-title>
+    <v-card-title v-else-if="user.id === null">
       <p>You need to be logged in for scoring</p>
     </v-card-title>
     <v-card-title v-else-if="!Array.isArray(p_user) || !p_user.length">
       <small>You need to register to the event first!</small>
-    </v-card-title>
-    <v-card-title v-else-if="event.archive === true">
-      <small>This event is archived and can not be edited any more!</small>
     </v-card-title>
     <template v-else>
       <v-card-title>

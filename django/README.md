@@ -16,18 +16,17 @@ python3 manage.py makemigrations
 python3 manage.py migrate
 ```
 
-## add users from command line
+## add users from command line [needed only once, upon creation of the database]
 ```
 python3 manage.py createsuperuser
 ```
 
-## run dev server
+## run dev server [this is the main operation needed for development]
 ```
 python3 manage.py runserver 0:8008
 ```
 
 # Setting up new instance
-
 ```
 python3 manage.py loaddata initdata
 ```

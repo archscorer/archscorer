@@ -5,7 +5,7 @@
         -- Round: {{ round.ord }} {{ round.label ? '(' + round.label + ')': ''}} --
       </small>
     </h4>
-    <v-row class="oflow flex-nowrap" dense
+    <v-row :class="{'oflow': $vuetify.breakpoint.xsOnly}" class="flex-nowrap" dense
       v-for="(sc, si) in scorecards"
       :key="'sc' + sc.id">
       <v-col cols="2" class="text text-truncate">{{ get_participant(sc.participant).archer.full_name }}</v-col>

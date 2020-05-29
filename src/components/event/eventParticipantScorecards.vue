@@ -17,12 +17,17 @@
               <td class="end-ord">
                 {{ end.ord }}
               </td>
-              <td class="end-arrow" v-for="a in round.nr_of_arrows" :key="a">
+              <td class="end-arrow" v-for="a in end.nr_of_arrows" :key="'a' + a">
                 <template v-if="end.arrows !== null">
-                  <!-- for very wierd reasona 'a' is starts from 1, not 0 like within <script> -->
+                  <!-- for very wierd reason 'a' is starting from 1, not 0 like within <script> -->
                   {{ end.arrows[a-1].x ? 'X' : end.arrows[a-1].score === 0 ? 'M' : end.arrows[a-1].score }}
                 </template>
               </td>
+              <!-- some ends might have less arrows, handle the alignment here -->
+              <template v-if="end.nr_of_arrows < round.nr_of_arrows">
+                <td v-for="a in round.nr_of_arrows - end.nr_of_arrows" :key="'empty' + a">
+                </td>
+              </template>
               <td class="end-sums text-right">
                 {{ end.sum }}
               </td>
@@ -34,6 +39,12 @@
         </table>
       </v-col>
     </v-row>
+    <v-dialog
+      v-model="sc_edit"
+      fullscreen>
+      <!-- this dialog has not been implemented yet. This should allow to edit
+      scorecard of an archer -->
+    </v-dialog>
   </v-container>
 </template>
 
@@ -55,7 +66,7 @@
       rounds: Array,
     },
     data: () => ({
-      //
+      sc_edit: false
     }),
     computed: {
       ...mapState({

@@ -8,9 +8,9 @@ from django.middleware.csrf import get_token
 from django.db.models import Q
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
-from .models import (User, Club, Course, Archer, Event, Round, Participant, ScoreCard, Arrow)
+from .models import (User, Club, Course, Archer, Series, Event, Round, Participant, ScoreCard, Arrow)
 from .serializers import (UserSerializer, ClubSerializer, CourseSerializer,
-                          ArcherSerializer, EventSerializer, EventSerializerList,
+                          ArcherSerializer, SeriesSerializer, EventSerializer, EventSerializerList,
                           RoundSerializer, ParticipantArcherSerializer,ParticipantSerializer,
                           ParticipantScoreCardSerializer, ArrowSerializer)
 
@@ -61,7 +61,7 @@ class ClubViewSet(viewsets.ModelViewSet):
     queryset = Club.objects.all()
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        serializer.save(creator=self.request.user)
 
 class CourseViewSet(viewsets.ModelViewSet):
     """
@@ -73,7 +73,19 @@ class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        serializer.save(creator=self.request.user)
+
+class SeriesViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows courses to be viewed or edited.
+    Edit / create is privileged to registered users only.
+    """
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = SeriesSerializer
+    queryset = Series.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
 
 class EventViewSet(viewsets.ModelViewSet):
     """
@@ -174,7 +186,8 @@ class ParticipantViewSet(viewsets.ModelViewSet):
 
         # get or create scorecards for given round in start group
         for participant in event.participants.all():
-            if participant.group == user_participant.group:
+            if (participant.group == user_participant.group and
+                participant.group_target == user_participant.group_target):
                 sc, created = ScoreCard.objects.get_or_create(participant=participant, round=round)
                 if created:
                     # fill in arrows, so we would have valid model always
@@ -185,6 +198,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
         scorecards = ScoreCard.objects.filter(
                                             participant__event__pk=event.id).filter(
                                             participant__group=user_participant.group).filter(
+                                            participant__group_target=user_participant.group_target).filter(
                                             round=round)
 
         # return scorecards
