@@ -68,7 +68,6 @@
   }
 
   export default {
-
     props: {
       event: Object,
       round: Object,

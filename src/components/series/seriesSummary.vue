@@ -53,10 +53,10 @@
             { text: 'Points', value: 'points'},
             { text: 'Sum', value: 'sum' },
           ]
-          header.push(...this.s.stages.map(function(stage, i) {
-            return { text: (i + 1).toString() + '. ' + stage.name,
+          header.push(...this.s.stages.map(function(stage) {
+            return { text: stage.name,
                     value: 'stage' + stage.id.toString() }
-          }))
+          }).reverse())
           return header
         }
         return []
@@ -86,32 +86,50 @@
             rankingService.participantRank(p_table)
             // Map solution to count classes in participant array
             let class_counts = p_table.reduce((acc, e) => acc.set(e.class, (acc.get(e.class) || 0) + 1), new Map())
+            // populate series table
             let points = {class: null, points: null}
-            for (let p of p_table) {
+            for (let p of p_table.filter(obj => obj.sum > 0)) {
               if (p.class !== points.class) {
                 points.class = p.class
                 points.points = Math.min(this.s.points_max, class_counts.get(p.class))
               }
-              p.points = points.points - p.place + 1
-              let index = s_table.findIndex(obj => obj.id === p.id)
-              if (index === -1) {
-                s_table.push({
-                  id: p.id,
-                  class: p.class,
-                  name: p.name,
-                  club: p.club,
-                  sum: p.sum,
-                  points: p.points
-                })
-                s_table[s_table.length - 1]['stage' + stage.id.toString()] = [p.sum, p.points]
-              } else {
-                s_table[index].sum += p.sum
-                s_table[index].points += p.points
-                s_table[index]['stage' + stage.id.toString()] = [p.sum, p.points]
+              p.points = points.points >= p.place && p.sum > 0 ? points.points - p.place + 1 : null
+              if (p.points) {
+                let index = s_table.findIndex(obj => obj.id === p.id)
+                if (index === -1) {
+                  s_table.push({
+                    id: p.id,
+                    class: p.class,
+                    name: p.name,
+                    club: p.club,
+                    sum: p.sum,
+                    points: p.points
+                  })
+                  // [p.sum, p.points]
+                  s_table[s_table.length - 1]['stage' + stage.id.toString()] = p.points.toString() + ' (' + p.sum.toString() + ')'
+                } else {
+                  s_table[index].sum += p.sum
+                  s_table[index].points += p.points
+                  s_table[index]['stage' + stage.id.toString()] = p.points.toString() + ' (' + p.sum.toString() + ')'
+                }
               }
             }
           }
-          return s_table
+          return s_table.sort(function(a, b) {
+            if (a.points < b.points) {
+              return 1
+            }
+            if (a.points > b.points) {
+              return -1
+            }
+            if (a.sum < b.sum) {
+              return 1
+            }
+            if (a.sum > b.sum) {
+              return -1
+            }
+            return 0
+          })
         }
         return []
       }

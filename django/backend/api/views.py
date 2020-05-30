@@ -11,7 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import (User, Club, Course, Archer, Series, Event, Round, Participant, ScoreCard, Arrow)
 from .serializers import (UserSerializer, ClubSerializer, CourseSerializer,
                           ArcherSerializer, SeriesSerializer, EventSerializer, EventSerializerList,
-                          RoundSerializer, ParticipantArcherSerializer,ParticipantSerializer,
+                          RoundSerializer, ParticipantArcherSerializer, ParticipantSerializer,
                           ParticipantScoreCardSerializer, ArrowSerializer)
 
 # Serve Vue Application

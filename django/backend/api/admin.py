@@ -27,17 +27,14 @@ class myUserAdmin(UserAdmin):
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
 
-@admin.register(Club)
-class myClubAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-
 class myParticipantInline(admin.TabularInline):
+    raw_id_fields = ('archer', 'event')
     model = Participant
 
 @admin.register(Archer)
 class myArcherAdmin(admin.ModelAdmin):
     raw_id_fields = ('club', 'user')
-    list_display = ('full_name', 'gender', 'email', 'club_name', 'user')
+    list_display = ('full_name', 'id', 'gender', 'email', 'club_name', 'user')
     search_fields = ('full_name', 'club__name')
     inlines = (myParticipantInline,)
 
@@ -48,6 +45,15 @@ class myArcherAdmin(admin.ModelAdmin):
             return ''
     club_name.short_description = 'Club'
     club_name.admin_order_field = 'club'
+
+class myArcherInline(admin.TabularInline):
+    raw_id_fields = ('club',)
+    model = Archer
+
+@admin.register(Club)
+class myClubAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    inlines = (myArcherInline,)
 
 @admin.register(Course)
 class myCourseAdmin(admin.ModelAdmin):
@@ -74,6 +80,7 @@ class myEndAdmin(admin.ModelAdmin):
 
 @admin.register(Participant)
 class myParticipantAdmin(admin.ModelAdmin):
+    raw_id_fields = ('archer', 'event')
     list_display = ('archer_name', 'event_name', 'style', 'age_group')
     search_fields = ('archer__full_name', 'event__name')
 
@@ -129,7 +136,8 @@ class myArrowInline(admin.TabularInline):
 
 @admin.register(ScoreCard)
 class myScoreCardAdmin(admin.ModelAdmin):
-    list_display = ('participant_name', 'event_name', 'course_name')
+    raw_id_fields = ('participant', 'round')
+    list_display = ('participant_name', 'event_name', 'course_name', 'sum')
     search_fields = ('participant__archer__full_name', 'participant__event__name')
     inlines = (myArrowInline,)
 
@@ -143,7 +151,7 @@ class myScoreCardAdmin(admin.ModelAdmin):
 
     def event_name(self, obj):
         if isinstance(obj.round.event, Event):
-            return obj.round.event.name
+            return obj.round.event.name + (' (Archived)' if obj.round.event.archive else '')
         else:
             return ''
     event_name.short_description = 'Event'
@@ -156,3 +164,10 @@ class myScoreCardAdmin(admin.ModelAdmin):
             return ''
     course_name.short_description = 'Course'
     course_name.admin_order_field = 'round__course'
+
+    def sum(self, obj):
+        scores = [a.score for a in obj.arrows.all() if a.score is not None]
+        if scores:
+            return sum(scores)
+        return '-'
+    sum.short_description = 'Score'

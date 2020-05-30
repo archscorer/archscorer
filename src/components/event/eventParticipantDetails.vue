@@ -12,6 +12,9 @@
           <template v-slot:item="data">
             {{ data.item.value }} -- {{ data.item.display_name }}
           </template>
+          <template v-slot:selection="data">
+            {{ data.item.value }} -- {{ data.item.display_name }}
+          </template>
         </v-select>
       </v-col>
       <v-col cols="4">

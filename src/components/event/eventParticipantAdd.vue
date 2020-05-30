@@ -14,8 +14,7 @@
                 v-model="archer"
                 :search-input.sync="query"
                 :items="qresponse_items"
-                item-value="id"
-                label="Existing Archers"
+                label="Search for existing Archers"
                 placeholder="Start typing to query"
                 prepend-icon="mdi-database-search"
                 return-object
@@ -26,9 +25,16 @@
             </v-autocomplete>
             </v-row>
             <template v-if="archer ? false : true">
-              <!-- this should not be visible by default. should make user make a extra click to open this in case
-                   archer was not found by search -->
-              <span class="archer-warn">Use form below only if archer could not be found from database!</span>
+              <!-- this should be somehow clear that by using this form form a
+                   *new* archer profile is created -->
+              <v-alert
+                outlined
+                border="left"
+                prominent
+                type="warning">
+                  <b>Form below</b> creates new archer profile database entry.
+                  Use it only if archer is not yet in the database!
+              </v-alert>
               <v-row>
                 <v-col cols="4">
                   <v-text-field
@@ -62,7 +68,8 @@
                   <v-text-field
                     v-model="participant.archer.email"
                     label="Contact email address*"
-                    :rules="[v => !!v || 'This field is required']"
+                    :rules="[v => !!v || 'This field is required',
+                             v => /.+@.+\..+/.test(v) || 'E-mail must be valid']"
                   >
                   </v-text-field>
                 </v-col>
@@ -194,6 +201,8 @@
         }
         this.addParticipant(this.participant);
         this.dialog = false
+        this.archer = null
+        this.query = ''
       },
     },
     created() {
