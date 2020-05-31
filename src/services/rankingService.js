@@ -1,6 +1,6 @@
 export default {
   sum(arr) {
-    return arr ? arr.reduce((sum, x) => sum + x) : null;
+    return Array.isArray(arr) && arr.length ? arr.reduce((sum, x) => sum + x) : null;
   },
   participantOrder( a, b ) {
     if ( a.class < b.class) {

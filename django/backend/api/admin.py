@@ -85,8 +85,9 @@ class myParticipantAdmin(admin.ModelAdmin):
     search_fields = ('archer__full_name', 'event__name')
 
     def archer_name(self, obj):
-        return obj.archer.full_name
+        return obj.archer.full_name + '[' + str(obj.archer.id) + ']'
     archer_name.short_description = 'Archer'
+    archer_name.admin_order_field = 'archer__full_name'
 
     def event_name(self, obj):
         return obj.event.name

@@ -75,6 +75,6 @@ cp ../frontend/index.html .
 cd static/
 rm -r js/ css/
 cp -r ../../frontend/static/js ../../frontend/static/css .
-cd ..
+cd ../..
 touch tmp/restart.txt
 ```
