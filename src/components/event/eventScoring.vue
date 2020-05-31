@@ -137,13 +137,13 @@
           this.user_group = this.p_user[0]
         }
         // before getting new set, the current set should be destroyed
-        this.$store.dispatch('events/resetUserGroupScoreCards')
+        this.$store.dispatch('events/resetScoreCardsUserGroup')
         this.end_view = this.user_group.group_target - 1
         this.currentRound = rId
         this.scorecards_loading = true
         // ask for scorecards. Creating new ones will take time, therefore catch
         // timeout and let user know of it
-        this.$store.dispatch('events/getUserGroupScoreCards', {eId: eId,
+        this.$store.dispatch('events/getScoreCardsUserGroup', {eId: eId,
                                                                rId: rId,
                                                                pId: this.user_group.id })
         .then(() => {

@@ -50,7 +50,7 @@ export default {
               .then(response => response.data)
   },
 
-  fetchUserGroupScoreCards(payload) {
+  fetchScoreCards(payload) {
     return api.post(`events/participants/scorecards/`, payload)
               .then(response => response.data)
   },

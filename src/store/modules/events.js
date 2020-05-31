@@ -134,15 +134,23 @@ const actions = {
     })
   },
 
-  getUserGroupScoreCards({ commit }, attr) {
-    return eventService.fetchUserGroupScoreCards(attr)
+  getScoreCardsUserGroup({ commit }, attr) {
+    return eventService.fetchScoreCards(attr)
     .then(scorecards => {
       commit('setScoreCards', scorecards)
     })
   },
-  resetUserGroupScoreCards({ commit }) {
+  resetScoreCardsUserGroup({ commit }) {
     commit('setScoreCards', [])
   },
+  getScoreCardsAdmin({ commit }, attr) {
+    // this could become useful for third party scoring i.e. official scorer or admin in case of shootoff for example
+    return eventService.fetchScoreCards(attr)
+    .then(scorecards => {
+      commit('setScoreCards', scorecards)
+    })
+  },
+
   putArrow({ commit }, attr) {
     // commit to be submitted arrow to local store
     commit('updateArrow', {scId: attr.scId, arrow: attr.arrow})
@@ -155,6 +163,21 @@ const actions = {
       arrow.error = true
       arrow.loading = false
       commit('updateArrow', {scId: attr.scId, arrow: arrow})
+      console.log(error.response.data)
+    })
+  },
+  putArrowEdit({ commit }, attr) {
+    // commit to be submitted arrow to local store
+    commit('updateArrowEdit', {eId: attr.eId, pId: attr.pId, scId: attr.scId, arrow: attr.arrow})
+    eventService.putArrow(attr.arrow.id, attr.arrow)
+    .then(arrow => {
+      commit('updateArrowEdit', {eId: attr.eId, pId: attr.pId, scId: attr.scId, arrow: arrow})
+    }).catch(error => {
+      // server returned error, store error state to store
+      let arrow = attr.arrow
+      arrow.error = true
+      arrow.loading = false
+      commit('updateArrowEdit', {eId: attr.eId, pId: attr.pId, scId: attr.scId, arrow: arrow})
       console.log(error.response.data)
     })
   }
@@ -216,6 +239,21 @@ const mutations = {
       }
     }
   },
+  updateArrowEdit(state, attr) {
+    const ei = state.events.findIndex(obj => obj.id === attr.eId)
+    if (ei !== -1) {
+      const pi = state.events[ei].participants.findIndex(obj => obj.id === attr.pId)
+      if (pi !== -1) {
+        const sci = state.events[ei].participants[pi].scorecards.findIndex(obj => obj.id === attr.scId)
+        if (sci !== -1) {
+          const ai = state.events[ei].participants[pi].scorecards[sci].arrows.findIndex(obj => obj.id === attr.arrow.id)
+          if (ai !== -1) {
+            state.events[ei].participants[pi].scorecards[sci].arrows.splice(ai, 1, attr.arrow)
+          }
+        }
+      }
+    }
+  }
 }
 
 export default {

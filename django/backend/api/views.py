@@ -180,14 +180,23 @@ class ParticipantViewSet(viewsets.ModelViewSet):
         event = Event.objects.get(pk=request.data['eId'])
         round = Round.objects.get(pk=request.data['rId'])
 
-        user_participant = event.participants.filter(
-           archer__id=request.user.archer.id).get(
-           pk=request.data['pId'])
+        if (request.user == event.creator and
+            'group' in request.data and
+            'group_target' in request.data):
+            group = request.data['group']
+            group_target = request.data['group_target']
+        else:
+            user_participant = event.participants.filter(
+               archer__id=request.user.archer.id).get(
+               pk=request.data['pId'])
+
+            group = user_participant.group
+            group_target = user_participant.group_target
 
         # get or create scorecards for given round in start group
         for participant in event.participants.all():
-            if (participant.group == user_participant.group and
-                participant.group_target == user_participant.group_target):
+            if (participant.group == group and
+                participant.group_target == group_target):
                 sc, created = ScoreCard.objects.get_or_create(participant=participant, round=round)
                 if created:
                     # fill in arrows, so we would have valid model always
@@ -197,8 +206,8 @@ class ParticipantViewSet(viewsets.ModelViewSet):
 
         scorecards = ScoreCard.objects.filter(
                                             participant__event__pk=event.id).filter(
-                                            participant__group=user_participant.group).filter(
-                                            participant__group_target=user_participant.group_target).filter(
+                                            participant__group=group).filter(
+                                            participant__group_target=group_target).filter(
                                             round=round)
 
         # return scorecards

@@ -48,12 +48,12 @@
         </tr>
       </template>
     </v-data-table>
-    <v-dialog v-model="sc_dialog" max-width="600px">
+    <v-dialog v-model="sc_dialog" max-width="650px">
       <v-card v-if="participant !== null">
         <v-card-title>{{ participant.archer.full_name }} {{ participant.class}} {{ participant.archer.club }}</v-card-title>
         <v-card-subtitle>{{ event.name }}</v-card-subtitle>
         <v-card-text>
-          <eventParticipantScorecards :participant="participant" :rounds="event.rounds" />
+          <eventParticipantScorecards :participant="participant" :rounds="event.rounds" :edit="sc_edit()"/>
         </v-card-text>
         <v-card-actions>
           <v-spacer/>
@@ -170,6 +170,9 @@
         this.participant = this.event.participants.find(obj => obj.id === pId)
         this.participant['class'] = this.participant.age_group + this.participant.archer.gender + this.participant.style
         this.sc_dialog = true
+      },
+      sc_edit() {
+        return this.user.email === this.event.creator
       }
     }
   }
