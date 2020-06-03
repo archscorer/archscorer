@@ -55,6 +55,11 @@ STYLE_CHOICES = [
     ('LB', 'Longbow'),
     ('TR', 'Traditional Recurve')]
 
+LEVEL_CHOICES = [('A', 'A'),
+                 ('B', 'B'),
+                 ('C', 'C'),
+                 ('*', '*')]
+
 class User(AbstractUser):
     username = models.CharField('username', max_length=30, blank=True)
     email = models.EmailField('email address', unique=True)
@@ -68,7 +73,7 @@ class User(AbstractUser):
         ordering = ['-date_joined']
 
 class Club(models.Model):
-    creator = models.ForeignKey('User', related_name='clubs_created', null=True, on_delete=models.SET_NULL)
+    creator = models.ForeignKey(User, related_name='clubs_created', null=True, on_delete=models.SET_NULL)
     name = models.CharField('Club name', max_length=150, blank=False, default='Unnamed archery club')
     name_short = models.CharField('Club name short', max_length=10, blank=True, default='***')
     association = models.CharField('Association name (FAAE - in estonia)', max_length=255, blank=True, default='***')
@@ -83,7 +88,7 @@ class Archer(models.Model):
     gender = models.CharField('gender', max_length=1, default='U', choices=[('M', 'Male'),
                                                                             ('F', 'Female'),
                                                                             ('U', 'Unisex')])
-    club = models.ForeignKey('Club', related_name='members', null=True, blank=True, on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, related_name='members', null=True, blank=True, on_delete=models.CASCADE)
     email = models.EmailField('email address', blank=True)
     phone = models.CharField('phone number', max_length=20, blank=True)
     nat_id = models.CharField('National Archer ID', max_length=30, blank=True)
@@ -93,8 +98,23 @@ class Archer(models.Model):
     class Meta:
         ordering = ['full_name']
 
+class LevelClass(models.Model):
+    # this is intended for level classes for archers (A, B, C, *)
+    archer = models.ForeignKey(Archer, related_name='level_classes', on_delete=models.CASCADE)
+    level = models.CharField('Level', max_length=1, blank=False, choices=LEVEL_CHOICES)
+    age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
+    style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
+    date = models.DateField('Date of achievement', blank=True, null=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.EmailField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['style', 'age_group']
+        unique_together = ['style', 'age_group', 'archer']
+
 class Course(models.Model):
-    creator = models.ForeignKey('User', related_name='courses_created', null=True, on_delete=models.SET_NULL)
+    creator = models.ForeignKey(User, related_name='courses_created', null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
 
     name = models.CharField('Course name', max_length=150, default='Unnamed course', blank=False)
@@ -106,7 +126,7 @@ class Course(models.Model):
         ordering = ['name']
 
 class End(models.Model):
-    course = models.ForeignKey('Course', related_name='ends', on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, related_name='ends', on_delete=models.CASCADE)
     ord = models.IntegerField('End order', blank=False)
     label = models.CharField(max_length=30, blank=True)  # i.e 70 yards walk-up
     nr_of_arrows = models.PositiveSmallIntegerField(blank=False)  # number of max arrows that can be shot
@@ -121,15 +141,19 @@ class Record(models.Model):
     date = models.DateField('Date of achievement', blank=True, null=True)
     age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
+    round = models.CharField('Round', max_length=255, blank=False)
     score = models.IntegerField('Record score', blank=False)
-    scope = models.CharField('record scope (FAAE/EM/MM)', max_length=50, blank=True, default='FAAE')
+    scope = models.CharField('record scope (personal/FAAE/EM/MM)', max_length=50, blank=True, default='FAAE')
 
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.EmailField(blank=True, null=True)
 
+    class Meta:
+        ordering = ['style', 'age_group']
+        unique_together = ['style', 'age_group', 'scope']
 
 class Series(models.Model):
-    creator = models.ForeignKey('User', related_name='series_created', null=True, on_delete=models.SET_NULL)
+    creator = models.ForeignKey(User, related_name='series_created', null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
 
     date_start = models.DateField(default=timezone.localdate)
@@ -150,7 +174,7 @@ class Series(models.Model):
     club_ranking_max = models.IntegerField('Max nr of club members to contribute points to club per class', default=3)
 
 class Event(models.Model):
-    creator = models.ForeignKey('User', related_name='events_created', null=True, on_delete=models.SET_NULL)
+    creator = models.ForeignKey(User, related_name='events_created', null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
 
     date_start = models.DateField(default=timezone.localdate)
@@ -166,10 +190,10 @@ class Event(models.Model):
     type = models.CharField('event type', max_length=10, default='private', choices=TYPE_CHOICES)
     tags = models.CharField('event tags', max_length=255, blank=True)
     # list of account emails, that have more access to manage event settings, users and scores
-    admins = models.CharField('event admins', max_length=255, blank=True, default='')
+    admins = models.ForeignKey(User, related_name='events_admins', null=True, on_delete=models.SET_NULL)
     records = models.CharField('record category (nat/EM/MM)', max_length=50, blank=True, default='')
 
-    series = models.ForeignKey('Series', related_name='stages', null=True, on_delete=models.SET_NULL)
+    series = models.ForeignKey(Series, related_name='stages', null=True, on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ['-date_start']
@@ -177,8 +201,8 @@ class Event(models.Model):
 class Round(models.Model):
     ord = models.IntegerField('Round order', blank=False)
     label = models.CharField('Label for round', max_length=150, blank=True)
-    course = models.ForeignKey('Course', related_name='events', on_delete=models.CASCADE)
-    event = models.ForeignKey('Event', related_name='rounds', on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, related_name='events', on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, related_name='rounds', on_delete=models.CASCADE)
     is_open = models.BooleanField('is round open', default=False)
     start = models.DateTimeField('Round start time', blank=True, null=True)
 
@@ -194,9 +218,10 @@ class Participant(models.Model):
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     food = models.BooleanField(default=False)
     comments = models.CharField('Comments to organiser', max_length=255, blank=True)
-    group = models.IntegerField('Group/Target nr', default=None, null=True)
-    group_target = models.IntegerField('Starting end nr', default=1)
+    group = models.IntegerField('Group', default=None, blank=True, null=True)
+    group_target = models.IntegerField('End nr', default=1)
     group_pos = models.CharField('Archer position', max_length=1, blank=True, default='')
+    level_class = models.CharField('Level class', max_length=1, blank=True, default='')
 
 
     class Meta:

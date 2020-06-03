@@ -167,19 +167,31 @@ const actions = {
     })
   },
   putArrowEdit({ commit }, attr) {
-    // commit to be submitted arrow to local store
-    commit('updateArrowEdit', {eId: attr.eId, pId: attr.pId, scId: attr.scId, arrow: attr.arrow})
-    eventService.putArrow(attr.arrow.id, attr.arrow)
-    .then(arrow => {
-      commit('updateArrowEdit', {eId: attr.eId, pId: attr.pId, scId: attr.scId, arrow: arrow})
-    }).catch(error => {
-      // server returned error, store error state to store
-      let arrow = attr.arrow
-      arrow.error = true
-      arrow.loading = false
-      commit('updateArrowEdit', {eId: attr.eId, pId: attr.pId, scId: attr.scId, arrow: arrow})
-      console.log(error.response.data)
-    })
+    const ei = state.events.findIndex(obj => obj.id === attr.eId)
+    if (ei !== -1) {
+      const pi = state.events[ei].participants.findIndex(obj => obj.id === attr.pId)
+      if (pi !== -1) {
+        const sci = state.events[ei].participants[pi].scorecards.findIndex(obj => obj.id === attr.scId)
+        if (sci !== -1) {
+          const ai = state.events[ei].participants[pi].scorecards[sci].arrows.findIndex(obj => obj.id === attr.arrow.id)
+          if (ai !== -1) {
+            // commit to be submitted arrow to local store
+            commit('updateArrowEdit', {ei: ei, pi: pi, sci: sci, ai: ai, arrow: attr.arrow})
+            eventService.putArrow(attr.arrow.id, attr.arrow)
+            .then(arrow => {
+              commit('updateArrowEdit', {ei: ei, pi: pi, sci: sci, ai: ai, arrow: arrow})
+            }).catch(error => {
+              // server returned error, store error state to store
+              let arrow = attr.arrow
+              arrow.error = true
+              arrow.loading = false
+              commit('updateArrowEdit', {ei: ei, pi: pi, sci: sci, ai: ai, arrow: arrow})
+              console.log(error.response.data)
+            })
+          }
+        }
+      }
+    }
   }
 }
 
@@ -240,19 +252,7 @@ const mutations = {
     }
   },
   updateArrowEdit(state, attr) {
-    const ei = state.events.findIndex(obj => obj.id === attr.eId)
-    if (ei !== -1) {
-      const pi = state.events[ei].participants.findIndex(obj => obj.id === attr.pId)
-      if (pi !== -1) {
-        const sci = state.events[ei].participants[pi].scorecards.findIndex(obj => obj.id === attr.scId)
-        if (sci !== -1) {
-          const ai = state.events[ei].participants[pi].scorecards[sci].arrows.findIndex(obj => obj.id === attr.arrow.id)
-          if (ai !== -1) {
-            state.events[ei].participants[pi].scorecards[sci].arrows.splice(ai, 1, attr.arrow)
-          }
-        }
-      }
-    }
+    state.events[attr.ei].participants[attr.pi].scorecards[attr.sci].arrows.splice(attr.ai, 1, attr.arrow)
   }
 }
 

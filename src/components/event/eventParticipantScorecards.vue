@@ -223,5 +223,9 @@
     font-weight: 300;
     text-align: center;
     min-width: 24px;
+    height: 28px;
+  }
+  th {
+    padding: 0 5px;
   }
 </style>

@@ -67,6 +67,9 @@
           for (let stage of this.s.stages) {
             // here before map should be filter to exclude participants who should not be in
             // cup ranking (i.e for club cup, they dont have club that belongs to faae)
+            if (!Array.isArray(stage.participants)) {
+              continue
+            }
             let p_table = stage.participants.map(p => {
               // handle shootoff
               let so = stage.rounds.find(obj => obj.course_name.search('shootoff') !== -1)

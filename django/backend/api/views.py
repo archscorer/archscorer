@@ -12,7 +12,7 @@ from .models import (User, Club, Course, Archer, Series, Event, Round, Participa
 from .serializers import (UserSerializer, ClubSerializer, CourseSerializer,
                           ArcherSerializer, SeriesSerializer, EventSerializer, EventSerializerList,
                           RoundSerializer, ParticipantArcherSerializer, ParticipantSerializer,
-                          ParticipantScoreCardSerializer, ArrowSerializer)
+                          ParticipantScoreCardSerializer, ArrowSerializer, SeriesSerializerList)
 
 # Serve Vue Application
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
@@ -83,6 +83,23 @@ class SeriesViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = SeriesSerializer
     queryset = Series.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user
+        if isinstance(user, AnonymousUser):
+            # not logged in users can see only 'open' type of events
+            return Series.objects.filter(Q(type = 'open'))
+        else:
+            # to list events that are associated with the user / archer
+            return Series.objects.filter(Q(creator__pk = user.id) |
+                                       (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
+                                        Q(stages__participants__in = user.archer.events.all()) |
+                                        Q(type = 'open')).distinct()
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return SeriesSerializerList
+        return SeriesSerializer
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)

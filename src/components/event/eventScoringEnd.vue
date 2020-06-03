@@ -23,6 +23,9 @@
           ref="arrow"
           readonly outlined dense
           @focus="currentFocus = [sc.id, a.id]; arrow_inc = si * sc.arrows.filter(obj => obj.end == end.id).length + ai">
+          <template v-slot:selection>
+            <div class='v-select__selection v-select__selection--comma'>{{ a ? a.x ? 'X' : a.score === 0 ? 'M' : a.score : '' }}</div>
+          </template>
         </v-select>
       </v-col>
       <v-col cols="1" class="text-cum">
@@ -165,7 +168,10 @@
 </script>
 
 <style scoped>
-  .v-text-field--outlined.v-input--dense.v-text-field--outlined >>> .v-input__control > .v-input__slot {
+  .v-input >>> .v-text-field__details {
+    display: none;
+  }
+  .v-text-field--outlined.v-input--dense >>> .v-input__control .v-input__slot {
     min-height: 30px;
     max-height: 30px;
     padding: 0 5px;

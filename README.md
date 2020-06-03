@@ -64,6 +64,12 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
 #### Update sequence in server (could be script?)
+
+First backup sql database
+```
+mysqldump --databases {db} > {db.sql}
+```
+
 ```
 # in repo folder
 git pull

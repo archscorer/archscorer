@@ -109,3 +109,10 @@ class SeriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Series
         fields = '__all__'
+
+class SeriesSerializerList(serializers.ModelSerializer):
+    creator = serializers.ReadOnlyField(source='creator.email')
+    stages = EventSerializerList(many=True, read_only=True)
+    class Meta:
+        model = Series
+        fields = '__all__'
