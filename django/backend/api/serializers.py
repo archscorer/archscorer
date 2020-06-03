@@ -103,9 +103,31 @@ class EventSerializerList(serializers.ModelSerializer):
     def get_participants(self, obj):
         return len(obj.participants.all())
 
+class StageSerializer(serializers.ModelSerializer):
+    creator = serializers.ReadOnlyField(source='creator.email')
+    rounds = RoundSerializer(many=True, read_only=True)
+    participants = serializers.SerializerMethodField()
+    class Meta:
+        model = Event
+        fields = '__all__'
+
+    def get_participants(self, obj):
+        participants = obj.participants.all()
+        # root.instance contains series object
+        if self.root.instance.participant_restriction:
+            try:
+                p, v = self.root.instance.participant_restriction.split(':')
+                kwargs = {p: v}
+                participants = obj.participants.filter(**kwargs)
+            except:
+                print('parsing "' + self.root.instance.participant_restriction + '" failed')
+
+        return ParticipantSerializer(instance=participants, many=True).data
+
+
 class SeriesSerializer(serializers.ModelSerializer):
     creator = serializers.ReadOnlyField(source='creator.email')
-    stages = EventSerializer(many=True, read_only=True)
+    stages = StageSerializer(many=True, read_only=True)
     class Meta:
         model = Series
         fields = '__all__'

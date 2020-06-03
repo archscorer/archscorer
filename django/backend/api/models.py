@@ -142,6 +142,7 @@ class Record(models.Model):
     age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     round = models.CharField('Round', max_length=255, blank=False)
+    event = models.CharField('Event', max_length=255, blank=True)
     score = models.IntegerField('Record score', blank=False)
     scope = models.CharField('record scope (personal/FAAE/EM/MM)', max_length=50, blank=True, default='FAAE')
 
@@ -165,8 +166,8 @@ class Series(models.Model):
 
     points_max = models.IntegerField('Maximum point score for the first place', default=10)
 
-    # use None or 'any' for no restriction. Otherwise club__association should be used as limitation (i.e FAAE)
-    participant_restriction = models.CharField('i.e. club__association', max_length=10, blank=True, null=True, default=None)
+    # use None for no restriction. Otherwise archer__club__association should be used as limitation (i.e FAAE)
+    participant_restriction = models.CharField('i.e. "archer__club__association:FAAE"', max_length=255, blank=True, null=True, default=None)
     participant_min = models.IntegerField('Minimum nr of events for final ranking', default=1)
     participant_max = models.IntegerField('Maximum nr of envets used for final ranking', default=None, null=True)
     # Aimed to accommodate club cup and comparing clubs
