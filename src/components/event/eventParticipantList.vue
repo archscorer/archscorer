@@ -6,7 +6,7 @@
         <eventParticipantAdd action="Add Me" v-if="user.id !== null && (!Array.isArray(p_user) || !p_user.length)"/>
       </template>
       <v-spacer />
-      <template v-if="user.email === event.creator">
+      <template v-if="[event.creator, ...event.admins].includes(user.email)">
         <template v-if="$vuetify.breakpoint.smAndUp">
           <eventParticipantAdd action="Add Archer"/>
           <eventEdit/>
@@ -75,7 +75,7 @@
           multi-sort
         >
           <template v-slot:item.group="props"
-            v-if="user.email === event.creator && event.archive === false">
+            v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive">
             <v-edit-dialog
               :return-value="props.item.group"
               :key="props.item.id"
@@ -95,7 +95,7 @@
             </v-edit-dialog>
           </template>
           <template v-slot:item.target="props"
-            v-if="user.email === event.creator && event.archive === false">
+            v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive">
             <v-edit-dialog
               :return-value="props.item.target"
               :key="props.item.id"
@@ -116,7 +116,7 @@
             </v-edit-dialog>
           </template>
           <template v-slot:item.pos="props">
-            <v-edit-dialog v-if="user.email === event.creator && event.archive === false"
+            <v-edit-dialog v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive"
               :return-value="props.item.pos"
               :key="props.item.id"
               @save="save(props.item.id, {group_pos: props.item.pos})"
@@ -139,7 +139,7 @@
             </template>
           </template>
           <template v-slot:item.action="props">
-            <template v-if="(user.archer.id === props.item.aId && event.is_open) || user.email === event.creator">
+            <template v-if="(user.archer.id === props.item.aId && event.is_open) || [event.creator, ...event.admins].includes(user.email) && !event.archive">
               <v-icon small class="mr-2" @click="editP(props.item.id)">
                 mdi-pencil
               </v-icon>
@@ -149,7 +149,7 @@
             </template>
           </template>
         </v-data-table>
-        <p v-if="user.email === event.creator && event.archive === false">
+        <p v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive">
           <small>'Position *' - indicates that archer has user account and could be digital scorer.</small>
         </p>
       </v-card-text>
@@ -229,13 +229,13 @@
           { text: 'Position', value: 'pos', width: "80px" },
           { text: 'Start From', value: 'target', width: "90px" },
         ]
-        if (this.event.archive === false) {
+        if (!this.event.archive && this.user.id) {
           header.push({ text: 'Actions', value: 'action', sortable: false, width: "1%" })
-        }
-        if (this.user.email === this.event.creator) {
-          header.push(...[{ text: 'Food', value: 'food', width: "80px" },
-                          { text: 'Contact', value: 'contact'},
-                          { text: 'Comments', value: 'comments'}])
+          if (this.user.email === this.event.creator) {
+            header.push(...[{ text: 'Food', value: 'food', width: "80px" },
+                            { text: 'Contact', value: 'contact'},
+                            { text: 'Comments', value: 'comments'}])
+          }
         }
         return header
       },

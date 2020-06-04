@@ -83,6 +83,8 @@ class Club(models.Model):
     class Meta:
         ordering = ['name']
 
+# sql to find duplicate archers from db
+# SELECT full_name, count(full_name) FROM `api_archer` group by full_name having count(full_name) > 1
 class Archer(models.Model):
     full_name = models.CharField('Full Name', max_length=150, blank=False, default='Unnamed archer')  # full name <first_name last_name>
     gender = models.CharField('gender', max_length=1, default='U', choices=[('M', 'Male'),
@@ -181,8 +183,7 @@ class Event(models.Model):
     date_start = models.DateField(default=timezone.localdate)
     date_end = models.DateField(default=timezone.localdate)
     is_open = models.BooleanField(default=True)
-    # archive is implemented on client level, api currenlty is unaware of it
-    # this is TODO
+    # TODO: archive is implemented on client level, api currenlty is unaware of it
     archive = models.BooleanField(default=False)
 
     name = models.CharField(max_length=150, default='Unnamed event', blank=False)
@@ -191,7 +192,7 @@ class Event(models.Model):
     type = models.CharField('event type', max_length=10, default='private', choices=TYPE_CHOICES)
     tags = models.CharField('event tags', max_length=255, blank=True)
     # list of account emails, that have more access to manage event settings, users and scores
-    admins = models.ForeignKey(User, related_name='events_admins', null=True, on_delete=models.SET_NULL)
+    admins = models.ManyToManyField(User, related_name='events_admins', blank=True)
     records = models.CharField('record category (nat/EM/MM)', max_length=50, blank=True, default='')
 
     series = models.ForeignKey(Series, related_name='stages', null=True, on_delete=models.SET_NULL)
@@ -219,8 +220,10 @@ class Participant(models.Model):
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     food = models.BooleanField(default=False)
     comments = models.CharField('Comments to organiser', max_length=255, blank=True)
+    # TODO do these have to be integers? could/should I let them free?
     group = models.IntegerField('Group', default=None, blank=True, null=True)
     group_target = models.IntegerField('End nr', default=1)
+    
     group_pos = models.CharField('Archer position', max_length=1, blank=True, default='')
     level_class = models.CharField('Level class', max_length=1, blank=True, default='')
 

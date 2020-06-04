@@ -197,7 +197,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
         event = Event.objects.get(pk=request.data['eId'])
         round = Round.objects.get(pk=request.data['rId'])
 
-        if (request.user == event.creator and
+        if (request.user in [event.creator, *event.admins.all()] and
             'group' in request.data and
             'group_target' in request.data):
             group = request.data['group']

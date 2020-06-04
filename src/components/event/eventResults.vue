@@ -172,7 +172,7 @@
         this.sc_dialog = true
       },
       sc_edit() {
-        return this.user.email === this.event.creator
+        return [this.event.creator, ...this.event.admins].includes(this.user.email) && !this.event.archive
       }
     }
   }

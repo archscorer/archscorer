@@ -24,7 +24,7 @@
       <v-tab-item>
         <eventResults/>
       </v-tab-item>
-      <v-tab-item>
+      <v-tab-item v-if="!event.archive">
         <eventScoring :p_user="p_user"/>
       </v-tab-item>
     </v-tabs-items>
@@ -52,7 +52,6 @@
     },
     data: () => ({
       tab: null,
-      tabs: ['Overview', 'Results', 'Scoring']
     }),
     watch: {
       tab: {
@@ -68,6 +67,12 @@
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
+      },
+      tabs() {
+        if (this.event && this.event.archive) {
+          return ['Overview', 'Results']
+        }
+        return ['Overview', 'Results', 'Scoring']
       },
       p_user() {
         let p_user = null

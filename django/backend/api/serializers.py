@@ -53,7 +53,9 @@ class ParticipantArcherSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name', 'gender', 'club', 'user', 'contact']
 
     def get_contact(self, obj):
-        if self.context['request'].user.email == self.root.instance.creator.email:
+        if (isinstance(self.root.instance, Event) and
+            isinstance(self.context['request'].user, User) and
+            self.context['request'].user.email == self.root.instance.creator.email):
             return obj.email + ', ' + obj.phone
         else:
             return None
@@ -91,8 +93,16 @@ class ClubSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'contact', 'members']
         depth = 1
 
+class EventAdminSerializer(serializers.RelatedField):
+    class Meta:
+        model = User
+
+    def to_representation(self, obj):
+        return obj.email
+
 class EventSerializer(serializers.ModelSerializer):
     creator = serializers.ReadOnlyField(source='creator.email')
+    admins = EventAdminSerializer(many=True, read_only=True)
     participants = ParticipantSerializer(many=True, read_only=True)
     rounds = RoundSerializer(many=True, read_only=True)
     class Meta:
