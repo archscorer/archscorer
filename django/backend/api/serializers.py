@@ -47,9 +47,16 @@ class ParticipantScoreCardSerializer(serializers.ModelSerializer):
 class ParticipantArcherSerializer(serializers.ModelSerializer):
     club = serializers.ReadOnlyField(source='club.name_short')
     user = serializers.ReadOnlyField(source='user.is_active')
+    contact = serializers.SerializerMethodField()
     class Meta:
         model = Archer
-        fields = ['id', 'full_name', 'gender', 'club', 'user']
+        fields = ['id', 'full_name', 'gender', 'club', 'user', 'contact']
+
+    def get_contact(self, obj):
+        if self.context['request'].user.email == self.root.instance.creator.email:
+            return obj.email + ', ' + obj.phone
+        else:
+            return None
 
 class ParticipantSerializer(serializers.ModelSerializer):
     archer = ParticipantArcherSerializer(read_only=True)

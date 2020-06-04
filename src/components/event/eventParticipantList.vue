@@ -234,6 +234,7 @@
         }
         if (this.user.email === this.event.creator) {
           header.push(...[{ text: 'Food', value: 'food', width: "80px" },
+                          { text: 'Contact', value: 'contact'},
                           { text: 'Comments', value: 'comments'}])
         }
         return header
@@ -252,6 +253,7 @@
               has_account: p.archer.user,
               target: p.group_target,
               food: (p.food ? "Yes" : "No"),
+              contact: (p.archer.contact || ''),
               comments: p.comments,
             }
           })
