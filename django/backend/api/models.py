@@ -195,7 +195,7 @@ class Event(models.Model):
     admins = models.ManyToManyField(User, related_name='events_admins', blank=True)
     records = models.CharField('record category (nat/EM/MM)', max_length=50, blank=True, default='')
 
-    series = models.ForeignKey(Series, related_name='stages', null=True, on_delete=models.SET_NULL)
+    series = models.ForeignKey(Series, related_name='stages', null=True, blank=True, on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ['-date_start']
@@ -223,7 +223,6 @@ class Participant(models.Model):
     # TODO do these have to be integers? could/should I let them free?
     group = models.IntegerField('Group', default=None, blank=True, null=True)
     group_target = models.IntegerField('End nr', default=1)
-    
     group_pos = models.CharField('Archer position', max_length=1, blank=True, default='')
     level_class = models.CharField('Level class', max_length=1, blank=True, default='')
 
