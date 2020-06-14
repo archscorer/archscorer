@@ -18,6 +18,10 @@ export default {
     return api.put(`archer/${aId}/`, payload)
               .then(response => response.data)
   },
+  delArcher(aId) {
+    return api.delete(`archer/${aId}`)
+              .then(response => response.data)
+  },
   searchArcher(payload) {
     return api.post(`archer/search/`, payload)
               .then(response => response.data)

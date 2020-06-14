@@ -98,4 +98,7 @@
 </script>
 
 <style>
+  th {
+    white-space: nowrap;
+  }
 </style>

@@ -28,17 +28,10 @@ const actions = {
     }).catch(() => {})
   },
   putArcher({ commit }, archer) {
-    if (archer.id !== null) {
-      userService.putArcher(archer.id, archer)
-      .then(archer => {
-        commit('updateArcher', archer)
-      })
-    } else {
-      userService.postArcher(archer)
-      .then(archer => {
-        commit('updateArcher', archer)
-      })
-    }
+    userService.putArcher(archer.id, archer)
+    .then(archer => {
+      commit('updateArcher', archer)
+    })
   },
   searchArcher({ commit }, query) {
     userService.searchArcher({query: query})

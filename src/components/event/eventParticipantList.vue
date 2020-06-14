@@ -222,19 +222,21 @@
       },
       p_table_header() {
         let header = [
-          { text: 'Name', value: 'name' },
+          { text: 'Name', value: 'name', width: '140px' },
           { text: 'Class', value: 'class' },
           { text: 'Club', value: 'club' },
-          { text: 'Group', value: 'group', width: "90px" },
-          { text: 'Position', value: 'pos', width: "80px" },
-          { text: 'Start From', value: 'target', width: "90px" },
+          { text: 'Group', value: 'group' },
+          { text: 'Position', value: 'pos' },
+          { text: 'Start From', value: 'target' },
         ]
         if (!this.event.archive && this.user.id) {
           header.push({ text: 'Actions', value: 'action', sortable: false, width: "1%" })
           if (this.user.email === this.event.creator) {
-            header.push(...[{ text: 'Food', value: 'food', width: "80px" },
-                            { text: 'Contact', value: 'contact'},
-                            { text: 'Comments', value: 'comments'}])
+            if (this.event.catering) {
+              header.push({ text: 'Food', value: 'food' })
+            }
+            header.push(...[{ text: 'Contact', value: 'contact' },
+                            { text: 'Comments', value: 'comments' }])
           }
         }
         return header
@@ -252,7 +254,7 @@
               pos: p.group_pos,
               has_account: p.archer.user,
               target: p.group_target,
-              food: (p.food ? "Yes" : "No"),
+              food: (p.food ? p.food_choices.split('|').join('; ') : 'No'),
               contact: (p.archer.contact || ''),
               comments: p.comments,
             }

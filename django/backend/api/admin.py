@@ -23,7 +23,7 @@ class myUserAdmin(UserAdmin):
             'fields': ('email', 'password1', 'password2'),
         }),
     )
-    list_display = ('email', 'first_name', 'last_name', 'is_staff')
+    list_display = ('email', 'id', 'first_name', 'last_name', 'is_staff')
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
 
@@ -55,28 +55,13 @@ class myClubAdmin(admin.ModelAdmin):
     list_display = ('name',)
     inlines = (myArcherInline,)
 
+class myEndInline(admin.TabularInline):
+    model = End
+
 @admin.register(Course)
 class myCourseAdmin(admin.ModelAdmin):
     list_display = ('name', 'creator')
-
-@admin.register(End)
-class myEndAdmin(admin.ModelAdmin):
-    list_display = ('has_label', 'course_name')
-
-    def has_label(self, obj):
-        if obj.label:
-            return obj.label
-        else:
-            return '..no label..'
-    has_label.short_description = 'Label for End'
-
-    def course_name(self, obj):
-        if isinstance(obj.course, Course):
-            return obj.course.name
-        else:
-            return ''
-    course_name.short_description = 'Course'
-    course_name.admin_order_field = 'course'
+    inlines = (myEndInline,)
 
 @admin.register(Participant)
 class myParticipantAdmin(admin.ModelAdmin):
@@ -95,6 +80,7 @@ class myParticipantAdmin(admin.ModelAdmin):
 
 @admin.register(Event)
 class myEventAdmin(admin.ModelAdmin):
+    raw_id_fields = ('series',)
     list_display = ('name', 'creator')
 
 @admin.register(Series)

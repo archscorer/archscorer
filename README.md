@@ -61,26 +61,3 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 * shootoff is currently set up so, that from rounds we look courses, that name
  contains word 'shootoff'. If such appears, it is not used to compute sum, but
  its score is used for ordering if it is real value (not 0, null, undefined).
-
-
-#### Update sequence in server (could be script?)
-
-First backup sql database
-```
-mysqldump --databases {db} > {db.sql}
-```
-
-```
-# in repo folder
-git pull
-cd django/
-./manage.py migrate
-cd public/
-rm index.html
-cp ../frontend/index.html .
-cd static/
-rm -r js/ css/
-cp -r ../../frontend/static/js ../../frontend/static/css .
-cd ../..
-touch tmp/restart.txt
-```

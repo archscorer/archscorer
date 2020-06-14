@@ -9,7 +9,7 @@ from django.db.models import Q
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from .models import (User, Club, Course, Archer, Series, Event, Round, Participant, ScoreCard, Arrow)
-from .serializers import (UserSerializer, ClubSerializer, CourseSerializer,
+from .serializers import (UserSerializer, ClubSerializer, ClubsSerializerList, CourseSerializer,
                           ArcherSerializer, SeriesSerializer, EventSerializer, EventSerializerList,
                           RoundSerializer, ParticipantArcherSerializer, ParticipantSerializer,
                           ParticipantScoreCardSerializer, ArrowSerializer, SeriesSerializerList)
@@ -59,6 +59,11 @@ class ClubViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = ClubSerializer
     queryset = Club.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ClubsSerializerList
+        return ClubSerializer
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
@@ -122,6 +127,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 return Event.objects.filter(Q(creator__pk = user.id) |
                                            (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
                                             Q(participants__in = user.archer.events.all()) |
+                                            Q(admins__pk = user.id) |
                                             Q(type = 'open')).distinct()
         else:
             if isinstance(user, AnonymousUser):
@@ -134,6 +140,7 @@ class EventViewSet(viewsets.ModelViewSet):
                                            (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
                                             Q(participants__in = user.archer.events.all()) |
                                             Q(type = 'open') |
+                                            Q(admins__pk = user.id) |
                                             Q(is_open = True)).distinct()
 
     def get_serializer_class(self):
@@ -157,17 +164,13 @@ class RoundViewSet(viewsets.ModelViewSet):
     def add(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
-class ArcherViewSet(mixins.UpdateModelMixin,
-                    viewsets.GenericViewSet):
+class ArcherViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows archer to be viewed or edited.
     """
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ArcherSerializer
     queryset = Archer.objects.all()
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
     @action(detail=False, methods=['POST'], permission_classes=[permissions.AllowAny])
     def search(self, request):
@@ -264,7 +267,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
                         del req_archer['club']
                 archer = Archer.objects.create(**req_archer)
             else:
-                return Response(archer_serialized.errors,
+                return Response(archer_serialized.is_valid().errors,
                                 status=status.HTTP_400_BAD_REQUEST)
 
         req_participant = request.data
@@ -283,7 +286,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
                                 status=status.HTTP_409_CONFLICT)
             return Response(ParticipantSerializer(participant).data)
         else:
-            return Response(participant_serialized.errors,
+            return Response(participant_serialized.is_valid().errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
 class ArrowViewSet(mixins.UpdateModelMixin,

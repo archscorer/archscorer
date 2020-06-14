@@ -15,12 +15,13 @@
             be then locked for user (until kicked from club and/or lifted by managers).</p>
         </v-card-text>
       </v-card>
-      <v-card v-for="club in clubs" :key="club.id" class="ma-5">
+      <v-card v-for="club in clubs" :key="club.id" class="ma-5"
+        :to="{ name: 'club', params: { 'id': club.id}}">
         <v-card-title>
           {{ club.name }}
         </v-card-title>
         <v-card-text>
-          <p>There are {{ club.members.length }} members</p>
+          <p>There are {{ Array.isArray(club.members) ? club.members.length : club.members }} members</p>
         </v-card-text>
       </v-card>
     </v-layout>

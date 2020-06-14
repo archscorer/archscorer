@@ -88,14 +88,19 @@
                 :label="event.is_open ? 'Registration is open' : 'Registration is closed'"
               ></v-switch>
               <v-switch
-                v-model="event.catering"
-                :label="event.catering ? 'Offer catering' : 'No catering'"
-              ></v-switch>
-              <v-switch
                 v-model="event.archive"
                 color="error"
                 :label="event.archive ? 'Event is read-only (archived)' : 'Active event'"
               ></v-switch>
+              <v-switch
+                v-model="event.catering"
+                :label="event.catering ? 'Offer catering' : 'No catering'"
+              ></v-switch>
+              <v-text-field v-if="event.catering"
+                v-model="event.catering_choices"
+                label="Meals"
+                hint='format of "meal1|meal2|meal3"'>
+              </v-text-field>
             </v-col>
           </v-row>
         </v-card-text>
@@ -255,6 +260,7 @@
         this.event.rounds = [...this.event.rounds]
       },
       e_update() {
+        // TODO there is possible async clash with e_edit. It is possible that e_edit is finished first
         // trigger event update before you start editing, so you would edit the right model
         this.$store.dispatch('events/updateEvent', parseInt(this.$route.params.id))
       }

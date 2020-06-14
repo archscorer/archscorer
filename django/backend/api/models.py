@@ -79,6 +79,7 @@ class Club(models.Model):
     association = models.CharField('Association name (FAAE - in estonia)', max_length=255, blank=True, default='***')
     contact = models.TextField('Contact Information')
     description = models.TextField()
+    admins = models.ManyToManyField(User, related_name='admin_clubs', blank=True)
 
     class Meta:
         ordering = ['name']
@@ -189,10 +190,10 @@ class Event(models.Model):
     name = models.CharField(max_length=150, default='Unnamed event', blank=False)
     description = models.TextField(blank=True)
     catering = models.BooleanField(default=False)
+    catering_choices = models.CharField(max_length=255, blank=True)
     type = models.CharField('event type', max_length=10, default='private', choices=TYPE_CHOICES)
     tags = models.CharField('event tags', max_length=255, blank=True)
-    # list of account emails, that have more access to manage event settings, users and scores
-    admins = models.ManyToManyField(User, related_name='events_admins', blank=True)
+    admins = models.ManyToManyField(User, related_name='admin_events', blank=True)
     records = models.CharField('record category (nat/EM/MM)', max_length=50, blank=True, default='')
 
     series = models.ForeignKey(Series, related_name='stages', null=True, blank=True, on_delete=models.SET_NULL)
@@ -219,6 +220,7 @@ class Participant(models.Model):
     age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     food = models.BooleanField(default=False)
+    food_choices = models.CharField(max_length=255, blank=True)
     comments = models.CharField('Comments to organiser', max_length=255, blank=True)
     # TODO do these have to be integers? could/should I let them free?
     group = models.IntegerField('Group', default=None, blank=True, null=True)

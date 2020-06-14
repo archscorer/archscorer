@@ -55,7 +55,7 @@
       <template v-else>
         <v-alert type="info" prominent v-if="edit">
           <v-row align="center">
-            <v-col class="grow">For {{participant.archer.full_name}}({{ participant.class }}) there is no scorecard for {{ round.ord }}. {{ round.label }} round!</v-col>
+            <v-col class="grow">{{participant.archer.full_name}}({{ participant.class }}) has no scorecard for {{ round.ord }}. {{ round.label }} round!</v-col>
             <v-col class="shrink" ><v-btn @click="get_scorecards(round.id)">Add</v-btn></v-col>
           </v-row>
         </v-alert>

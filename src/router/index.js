@@ -45,6 +45,11 @@ const routes = [
     component: () => import('@/views/Clubs.vue')
   },
   {
+    path: '/club/:id',
+    name: 'club',
+    component: () => import('@/views/club/Club.vue')
+  },
+  {
     path: '/accounts/profile',
     name: 'profile',
     component: () => import('@/views/user/ArcherProfile.vue')

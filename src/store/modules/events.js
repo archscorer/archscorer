@@ -55,6 +55,8 @@ const actions = {
     })
   },
   putEvent({ commit }, attr) {
+    // TODO attr here is wierd style, event alone should be enough as it always
+    // should have .id
     eventService.putEvent(attr.eId, attr.event)
     .then(event => {
       commit('updateEvent', event)

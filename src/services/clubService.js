@@ -10,6 +10,10 @@ export default {
     return api.post(`clubs/`, payload)
               .then(response => response.data)
   },
+  putClub(cId, payload) {
+    return api.put(`clubs/${cId}/`, payload)
+              .then(response => response.data)
+  },
   deleteClub(cId) {
     return api.delete(`clubs/${cId}/`)
               .then(response => response.data)

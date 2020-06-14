@@ -7,88 +7,36 @@
       <v-card-title>{{ action }} to "{{ event.name }}"</v-card-title>
       <v-card-text>
         <v-form v-model="valid">
-          <eventParticipantDetails :participant="participant" :catering="event.catering"/>
+          <eventParticipantDetails :participant="participant"
+            :catering="event.catering"
+            :catering_choices="event.catering_choices.split('|')"/>
           <v-container v-if="action !== 'Add Me'">
             <v-row>
               <v-autocomplete
                 v-model="archer"
                 :search-input.sync="query"
                 :items="qresponse_items"
-                label="Search for existing Archers"
-                placeholder="Start typing to query"
+                label="Find archer from database"
+                hint="Search is executed from 3 characters"
+                placeholder="Start typing .."
                 prepend-icon="mdi-database-search"
                 return-object
                 hide-no-data
                 no-filter
                 clearable
               >
-            </v-autocomplete>
+              </v-autocomplete>
             </v-row>
             <template v-if="archer ? false : true">
               <!-- this should be somehow clear that by using this form form a
                    *new* archer profile is created -->
               <v-alert
-                outlined
-                border="left"
-                prominent
-                type="warning">
-                  <b>Form below</b> creates new archer profile database entry.
-                  Use it only if archer is not yet in the database!
+                type="info">
+                  Use query above to find archer from our database. If query does not find the archer you
+                  were looking for you can click <v-btn x-small @click="new_archer = (new_archer ? false : true)">here</v-btn> to add new archer profile
+                  to the database!
               </v-alert>
-              <v-row>
-                <v-col cols="4">
-                  <v-text-field
-                    v-model="participant.archer.full_name"
-                    label="Your full name*"
-                    :rules="[v => !!v || 'This field is required']"
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-col cols="4">
-                  <v-select
-                    v-model="participant.archer.gender"
-                    :items="[{'text': 'Male', 'value': 'M'}, {'text': 'Female', 'value': 'F'}]"
-                    label="Gender*"
-                    :rules="[v => !!v || 'Choice must be made :)']"
-                  ></v-select>
-                </v-col>
-                <v-col cols="4">
-                  <v-select
-                    v-model="participant.archer.club"
-                    :items="clubs ? clubs : []"
-                    label="Choose Club*"
-                    :rules="[v => !!v || 'Choose ..no club.. if other options are not suitable']"
-                    item-text="name"
-                    item-value="id"
-                  ></v-select>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="4">
-                  <v-text-field
-                    v-model="participant.archer.email"
-                    label="Contact email address*"
-                    :rules="[v => !!v || 'This field is required',
-                             v => /.+@.+\..+/.test(v) || 'E-mail must be valid']"
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field
-                    v-model="participant.archer.phone"
-                    label="Contact phone number"
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field
-                    v-model="participant.archer.nat_id"
-                    label="Archer national ID"
-                    hint="FAAE ID in Estonia - first 7 digits from your national ID code."
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
+              <archerDetails v-model="participant.archer" :clubs="clubs" v-if="new_archer" />
             </template>
           </v-container>
         </v-form>
@@ -96,7 +44,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text @click="dialog = false">Close</v-btn>
+        <v-btn text @click="dialog = false; new_archer = false; archer = null">Close</v-btn>
         <v-btn color="primary"
           @click="addParticipantProxy()"
           :disabled="!valid">{{ action }}</v-btn>
@@ -111,11 +59,13 @@
   import { mapState, mapActions } from 'vuex'
 
   import eventParticipantDetails from '@/components/event/eventParticipantDetails.vue'
+  import archerDetails from '@/components/archer/archerDetails.vue'
 
   export default {
     // name: "listCompetitonRegister",
     components: {
       eventParticipantDetails,
+      archerDetails,
     },
     props: {
       action: String,
@@ -125,20 +75,22 @@
       valid: false,
       archer: null,
       query: '',
+      new_archer: false,
 
       participant: {
-        'event': null,
-        'archer': {
-          'full_name': '',
-          'gender': '',
-          'club': '',
-          'email': '',
-          'phone': '',
+        event: null,
+        archer: {
+          full_name: '',
+          gender: '',
+          club: '',
+          email: '',
+          phone: '',
         },
-        'style': '',
-        'age_group': '',
-        'comments': '',
-        'food': false
+        style: '',
+        age_group: '',
+        comments: '',
+        food: false,
+        food_choices: [],
       },
       // TODO write validators for form fields: style, age, gender, full_name, email
       // TODO quicklink to register me (skip archer fields or autofill them)
@@ -148,7 +100,7 @@
         if (val && val.length >= 2) {
           this.searchArcher(val)
         } else {
-          this.clearSearch([{ header: 'be more specific' }])
+          this.clearSearch([{ header: 'be more specific (at least 2 letters)' }])
         }
       },
       archer: function(obj) {
@@ -156,11 +108,11 @@
           this.participant.archer = obj
         } else {
           this.participant.archer = {
-            'full_name': '',
-            'gender': '',
-            'club': '',
-            'email': '',
-            'phone': '',
+            full_name: '',
+            gender: '',
+            club: '',
+            email: '',
+            phone: '',
           }
         }
       }
@@ -178,7 +130,7 @@
         return this.qresponse.map(a => {
           if (a.id) {
             // add text field only if we have valid archer object
-            let text = a.full_name + ' (' + a.club + ')' + (a.user ? ' - has account' : '')
+            let text = a.full_name + ' (' + a.club + ')' + (a.user ? ' - w account' : '') + (a.events ? ' ' + a.events + ' events': '')
             return Object.assign({}, a, { text })
           } else {
             return a
@@ -199,10 +151,28 @@
         if (this.action === "Add Me") {
           this.participant.archer = this.user.archer
         }
+        this.participant.food_choices = this.participant.food_choices.join('|')
         this.addParticipant(this.participant);
         this.dialog = false
         this.archer = null
         this.query = ''
+        this.new_archer = false
+        this.valid = false
+        this.participant = {
+          event: null,
+          archer: {
+            full_name: '',
+            gender: '',
+            club: '',
+            email: '',
+            phone: '',
+          },
+          style: '',
+          age_group: '',
+          comments: '',
+          food: false,
+          food_choices: [],
+        }
       },
     },
     created() {

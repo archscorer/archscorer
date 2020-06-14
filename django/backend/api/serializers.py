@@ -48,17 +48,21 @@ class ParticipantArcherSerializer(serializers.ModelSerializer):
     club = serializers.ReadOnlyField(source='club.name_short')
     user = serializers.ReadOnlyField(source='user.is_active')
     contact = serializers.SerializerMethodField()
+    events = serializers.SerializerMethodField()
     class Meta:
         model = Archer
-        fields = ['id', 'full_name', 'gender', 'club', 'user', 'contact']
+        fields = ['id', 'full_name', 'gender', 'club', 'user', 'contact', 'events']
 
     def get_contact(self, obj):
         if (isinstance(self.root.instance, Event) and
             isinstance(self.context['request'].user, User) and
             self.context['request'].user.email == self.root.instance.creator.email):
-            return obj.email + ', ' + obj.phone
+            return obj.email + '; ' + obj.phone
         else:
             return None
+
+    def get_events(self, obj):
+        return len(obj.events.all())
 
 class ParticipantSerializer(serializers.ModelSerializer):
     archer = ParticipantArcherSerializer(read_only=True)
@@ -86,23 +90,35 @@ class UserSerializer(serializers.ModelSerializer):
             return obj.csrftoken
         return None
 
-class ClubSerializer(serializers.ModelSerializer):
-    members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+class ClubsSerializerList(serializers.ModelSerializer):
+    members = serializers.SerializerMethodField()
+
     class Meta:
         model = Club
-        fields = ['id', 'name', 'contact', 'members']
-        depth = 1
+        fields = '__all__'
 
-class EventAdminSerializer(serializers.RelatedField):
+    def get_members(self, obj):
+        return len(obj.members.all())
+
+class ObjAdminSerializer(serializers.RelatedField):
     class Meta:
         model = User
 
     def to_representation(self, obj):
         return obj.email
 
+class ClubSerializer(serializers.ModelSerializer):
+    creator = serializers.ReadOnlyField(source='creator.email')
+    members = ArcherSerializer(many=True, read_only=True)
+    admins = ObjAdminSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Club
+        fields = '__all__'
+
 class EventSerializer(serializers.ModelSerializer):
     creator = serializers.ReadOnlyField(source='creator.email')
-    admins = EventAdminSerializer(many=True, read_only=True)
+    admins = ObjAdminSerializer(many=True, read_only=True)
     participants = ParticipantSerializer(many=True, read_only=True)
     rounds = RoundSerializer(many=True, read_only=True)
     class Meta:

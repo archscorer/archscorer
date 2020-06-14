@@ -35,76 +35,76 @@
         <v-stepper-content step="1">
           <v-card>
             <v-card-title>Add new archery event</v-card-title>
-            <v-container>
+            <v-card-text>
               <v-form v-model="valid_e1">
-                <v-container>
-                  <v-row>
-                    <v-col cols="4">
-                      <v-text-field
-                        autofocus
-                        v-model="event.name"
-                        :rules="[v => !!v || 'Name is required']"
-                        label="Event name"></v-text-field>
-                    </v-col>
-                    <v-col cols="4">
-                      <v-menu
-                        v-model="date_start_menu"
-                        :close-on-content-click="false"
-                        :nudge-right="40"
-                        transition="scale-transition"
-                        offset-y
-                        min-width="270px"
-                      >
-                        <template v-slot:activator="{ on }">
-                          <v-text-field
-                            v-model="event.date_start"
-                            label="Start date"
-                            prepend-icon="mdi-calendar"
-                            readonly
-                            :rules="[v => !!v || 'Start date is required']"
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker v-model="event.date_start" @input="date_start_menu = false"></v-date-picker>
-                      </v-menu>
-                    </v-col>
-                    <v-col cols="4">
-                      <v-switch v-model="multi_day" v-if="multi_day === false"
-                                label="Multiple days?"/>
-                      <v-menu
-                        v-else
-                        v-model="date_end_menu"
-                        :close-on-content-click="false"
-                        :nudge-right="40"
-                        transition="scale-transition"
-                        offset-y
-                        min-width="270px"
-                      >
-                        <template v-slot:activator="{ on }">
-                          <v-text-field
-                            v-model="event.date_end"
-                            label="End date"
-                            prepend-icon="mdi-calendar"
-                            readonly
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker v-model="event.date_end" @input="date_end_menu = false"></v-date-picker>
-                      </v-menu>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-textarea
-                        outlined
-                        v-model="event.description"
-                        label="Event details"
-                      ></v-textarea>
-                    </v-col>
-                  </v-row>
-                </v-container>
+                <v-row dense>
+                  <v-col>
+                    <v-text-field
+                      autofocus
+                      v-model="event.name"
+                      :rules="[v => !!v || 'Name is required']"
+                      label="Event name"></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col cols="6">
+                    <v-menu
+                      v-model="date_start_menu"
+                      :close-on-content-click="false"
+                      :nudge-right="40"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="270px"
+                    >
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                          v-model="event.date_start"
+                          label="Start date"
+                          prepend-icon="mdi-calendar"
+                          readonly
+                          :rules="[v => !!v || 'Start date is required']"
+                          v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker v-model="event.date_start" @input="date_start_menu = false"></v-date-picker>
+                    </v-menu>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-switch v-model="multi_day" v-if="multi_day === false"
+                              label="Multiple days?"/>
+                    <v-menu
+                      v-else
+                      v-model="date_end_menu"
+                      :close-on-content-click="false"
+                      :nudge-right="40"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="270px"
+                    >
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                          v-model="event.date_end"
+                          label="End date"
+                          prepend-icon="mdi-calendar"
+                          readonly
+                          v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker v-model="event.date_end" @input="date_end_menu = false"></v-date-picker>
+                    </v-menu>
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col cols="12">
+                    <v-textarea
+                      outlined
+                      v-model="event.description"
+                      label="Event details"
+                    ></v-textarea>
+                  </v-col>
+                </v-row>
               </v-form>
-            </v-container>
+            </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn text @click="dialog = false">Close</v-btn>
@@ -117,8 +117,8 @@
         <v-stepper-content step="2">
           <v-card>
             <v-card-title>Add rounds/course</v-card-title>
-            <v-form v-model="valid_e2">
-              <v-container>
+            <v-card-text>
+              <v-form v-model="valid_e2">
                 <v-row dense v-for="(round, index) in event.rounds" :key="index">
                   <v-col cols="4">
                     <v-text-field
@@ -158,8 +158,8 @@
                     <v-btn text color="primary" @click="addRound" icon fab><v-icon size="35">mdi-plus</v-icon></v-btn>
                   </v-col>
                 </v-row>
-              </v-container>
-            </v-form>
+              </v-form>
+            </v-card-text>
             <v-card-actions>
               <v-btn @click="e1 = 1">Back</v-btn>
               <v-spacer></v-spacer>
@@ -172,7 +172,7 @@
         </v-stepper-content>
         <v-stepper-content step="3">
           <v-card>
-            <v-row>
+            <v-row dense>
               <v-col cols="6">
                 <v-autocomplete
                   v-model="event.type"
@@ -188,8 +188,8 @@
                 ></v-switch>
               </v-col>
             </v-row>
-            <v-row>
-              <v-col cols="6">
+            <v-row dense>
+              <v-col cols="12">
                 <v-alert v-if="event.type === 'open'"
                   border="bottom"
                   type="warning"
@@ -216,28 +216,55 @@
                   </small>
                 </v-alert>
               </v-col>
-              <v-col cols="6">
+            </v-row>
+            <v-row>
+              <v-col cols="5">
                 <v-switch
                   v-model="event.catering"
                   :label="event.catering ? 'With catering**' : 'No catering'"
                 ></v-switch>
               </v-col>
+              <v-col cols="7">
+                <v-list dense flat v-if="event.catering">
+                  <v-subheader>Meals</v-subheader>
+                    <v-list-item inactive v-for="(meal, i) in event.catering_choices" :key="i">
+                      <v-list-item-content>
+                        <v-text-field
+                          v-model="event.catering_choices[i]"
+                          :rules="[v => !!v || 'Write something']"
+                          label="meal (price)"
+                          counter="25">
+                        </v-text-field>
+                      </v-list-item-content>
+                      <v-list-item-action>
+                        <v-btn text color="error" @click="delMeal(i)" icon><v-icon size="35">mdi-minus</v-icon></v-btn>
+                      </v-list-item-action>
+                    </v-list-item>
+                    <v-list-item inactive>
+                      <v-list-item-content>
+                        Add meal
+                      </v-list-item-content>
+                      <v-list-item-action>
+                        <v-btn text color="primary" @click="addMeal" icon><v-icon size="35">mdi-plus</v-icon></v-btn>
+                      </v-list-item-action>
+                    </v-list-item>
+                </v-list>
+              </v-col>
             </v-row>
             <small>
-              <p>* If event visibility is 'Private' and 'Registration is open', they can do
-                so by event URL. Click 'Finish' first and then you can navigate to the event
+              <p>* Events with 'Registration is open' can be found by event URL.
+                Click 'Finish' first and then you can navigate to the event
                 and copy the URL. The 'Open' events are discoverable by anyone on the
                 <router-link :to="'events'">Events page</router-link>.
                 The 'Club' events are discoverable by the club memebers only.</p>
-              <p>** If catering is provided, the details (menu) should be added to the description of
-                the event.</p>
+              <p>** Catering options should be by meal.</p>
             </small>
             <v-card-actions>
               <v-btn @click="e1 = 2">Back</v-btn>
               <v-spacer></v-spacer>
               <v-btn text @click="dialog = false">Close</v-btn>
               <v-btn color="primary"
-                @click="addEvent(checkEventDates()); dialog = false; e1 = 1">Finish</v-btn>
+                @click="addEvent(beforeSubmit()); dialog = false; e1 = 1">Finish</v-btn>
             </v-card-actions>
           </v-card>
         </v-stepper-content>
@@ -261,7 +288,9 @@
         description: '',
         type: 'private',
         is_open: false,
-        rounds: [{label: '', course: null, is_open: true}]
+        rounds: [{label: '', course: null, is_open: true}],
+        catering: false,
+        catering_choices: [""],
       },
 
       event_type_choices: [
@@ -301,10 +330,17 @@
       delRound(index) {
         this.event.rounds.splice(index, 1)
       },
-      checkEventDates() {
+      addMeal() {
+        this.event.catering_choices.push("")
+      },
+      delMeal(index) {
+        this.event.catering_choices.splice(index, 1)
+      },
+      beforeSubmit() {
         if (this.event.date_end === '' || new Date(this.event.date_end) <  new Date(this.event.date_start)) {
           this.event.date_end = this.event.date_start
         }
+        this.event.catering_choices = this.event.catering_choices.join('|')
         return this.event
       },
       ...mapActions('events', [

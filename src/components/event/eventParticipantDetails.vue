@@ -13,7 +13,7 @@
             {{ data.item.value }} -- {{ data.item.display_name }}
           </template>
           <template v-slot:selection="data">
-            {{ data.item.value }} -- {{ data.item.display_name }}
+            {{ data.item.value }}
           </template>
         </v-select>
       </v-col>
@@ -37,12 +37,21 @@
       </v-col>
     </v-row>
     <v-row dense>
-      <v-col cols="12">
+      <v-col cols="8">
         <v-textarea
           outlined
           v-model="participant.comments"
           label="Comments to organiser(s)"
         ></v-textarea>
+      </v-col>
+      <v-col cols="4" v-if="participant.food">
+        <template v-for="meal of catering_choices">
+          <v-checkbox dense v-model="participant.food_choices"
+            :label="meal"
+            :value="meal"
+            :key="meal"
+            :rules="[v => v.length > 0 || 'choose at least one meal']"/>
+        </template>
       </v-col>
     </v-row>
   </v-container>
@@ -58,6 +67,7 @@
     props: {
       participant: Object,
       catering: Boolean,
+      catering_choices: Array,
     },
     data: () => ({
       //

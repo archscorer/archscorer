@@ -31,7 +31,7 @@
         </v-btn>
       </v-toolbar-items>
       <v-spacer></v-spacer>
-      <AppLoginMenu/>
+      <loginMenu/>
     </v-app-bar>
     <v-navigation-drawer app disable-resize-watcher v-model="drawer">
       <v-list dense>
@@ -76,12 +76,12 @@
 </template>
 
 <script>
-  import AppLoginMenu from '@/components/accounts/AppLoginMenu.vue'
+  import loginMenu from '@/components/accounts/loginMenu.vue'
 
   export default {
     // name: 'ArchScorER',
     components: {
-      AppLoginMenu,
+      loginMenu,
     },
     data: () => ({
       drawer: false,
