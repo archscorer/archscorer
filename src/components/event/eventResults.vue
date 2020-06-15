@@ -179,7 +179,7 @@
 </script>
 
 <style scoped>
-  .v-data-table >>> * {
+  td {
     white-space: nowrap;
   }
 </style>

@@ -66,11 +66,11 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-content>
+    <v-main>
       <!-- <v-container fluid> -->
         <router-view></router-view>
       <!-- </v-container> -->
-    </v-content>
+    </v-main>
 
   </v-app>
 </template>
