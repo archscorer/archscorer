@@ -177,6 +177,9 @@ class Series(models.Model):
     club_ranking = models.BooleanField(default=False)
     club_ranking_max = models.IntegerField('Max nr of club members to contribute points to club per class', default=3)
 
+    class Meta:
+        ordering = ['-date_end']
+
 class Event(models.Model):
     creator = models.ForeignKey(User, related_name='events_created', null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)

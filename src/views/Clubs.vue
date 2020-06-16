@@ -4,15 +4,11 @@
       text-center
       wrap
     >
-      <v-card>
+      <v-card width="100%">
+        <v-card-title>FAAE Clubs</v-card-title>
         <v-card-text>
-          <p>This part of the site has not been developed yet. Listed clubs are
-            not interactive and currently only show how many members have been assigned
-            to them. You can assign yourself to a created club by editing your profile.</p>
-          <p>Plan is to give club management to the hands of club management board. User
-            can select their club once they create their account or there is archer profile
-            created for them. Club managers then can confirm membership and the choice will
-            be then locked for user (until kicked from club and/or lifted by managers).</p>
+          <p>Club managers, please contact 'info @ archscorer . faae . ee'  to request
+            admin access to your club.</p>
         </v-card-text>
       </v-card>
       <v-card v-for="club in clubs" :key="club.id" class="ma-5"

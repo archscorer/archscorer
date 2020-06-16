@@ -17,6 +17,7 @@
       :headers="s_table_header"
       :items="s_table"
       :search="s_search"
+      :loading="loading"
       group-by="class"
       multi-sort
       :items-per-page="50"
@@ -26,6 +27,7 @@
 </template>
 
 <script>
+  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
   import rankingService from '@/services/rankingService'
   import { mapState } from 'vuex'
 
@@ -43,6 +45,9 @@
       s() {
         return this.$store.getters['series/seriesById'](parseInt(this.$route.params.id))
       },
+      loading() {
+        return (this.s_table.length ? false : true)
+      },
       s_table_header() {
         if (this.s) {
           let header = [
@@ -55,7 +60,8 @@
           ]
           header.push(...this.s.stages.map(function(stage) {
             return { text: stage.name,
-                    value: 'stage' + stage.id.toString() }
+                    value: 'stage' + stage.id.toString(),
+                    class: 'stage-header' }
           }).reverse())
           return header
         }
@@ -144,9 +150,3 @@
     },
   }
 </script>
-
-<style scoped>
-  .v-data-table >>> * {
-    white-space: nowrap;
-  }
-</style>

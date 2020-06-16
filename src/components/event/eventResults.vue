@@ -20,6 +20,7 @@
       :headers="r_table_header"
       :items="r_table"
       :search="r_search"
+      :loading="loading"
       group-by="class"
       multi-sort
       :items-per-page="50"
@@ -89,6 +90,7 @@
     data: () => ({
       r_search: '',
       sc_dialog: false,
+      loading: false,
       participant: null,
     }),
     computed: {
@@ -108,7 +110,8 @@
           ]
           header.push(...this.event.rounds.map(function(r) {
             return { text: r.ord.toString() + '. ' + r.label,
-                    value: r.ord.toString() }
+                    value: r.ord.toString(),
+                    class: 'round-header'}
           }))
           header.push({ text: 'x', value: 'x', width: '1%' })
           header.push({ text: 'Sum', value: 'sum', width: '1%' })
@@ -164,7 +167,10 @@
     },
     methods: {
       update_r_table() {
-        this.$store.dispatch('events/updateEvent', this.event.id)
+        this.loading = true
+        this.$store.dispatch('events/updateEvent', this.event.id).then(() => {
+          this.loading = false
+        })
       },
       participant_sc(pId) {
         this.participant = this.event.participants.find(obj => obj.id === pId)

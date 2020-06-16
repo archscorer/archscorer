@@ -70,6 +70,7 @@
           :headers="p_table_header"
           :items="p_table"
           :search="p_search"
+          :loading="loading"
           group-by="class"
           :items-per-page="50"
           multi-sort
@@ -157,7 +158,9 @@
     <v-dialog v-model="dialog" max-width="500px">
       <v-card>
         <v-card-title>Edit participant info for {{ p_meta.name }}</v-card-title>
-        <eventParticipantDetails :participant="p_edit"/>
+        <eventParticipantDetails :participant="p_edit"
+          :catering="event.catering"
+          :catering_choices="event.catering_choices.split('|')"/>
         <v-card-actions>
           <v-spacer/>
           <v-btn text @click="cancel(); dialog = false">Cancel</v-btn>
@@ -198,8 +201,9 @@
       p_edit: {
         age_group: '',
         style: '',
-        food: '',
         comments: '',
+        food: false,
+        food_choices: []
       },
       target_rules: [
         v => !!v || 'required',
@@ -219,6 +223,9 @@
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
+      },
+      loading() {
+        return (this.p_table.length ? false : true)
       },
       p_table_header() {
         let header = [
@@ -271,6 +278,7 @@
         'putParticipant',
       ]),
       save(pId, attr) {
+        attr.food_choices = attr.food_choices.join('|')
         let p = Object.assign({}, this.event.participants.find(obj => obj.id === pId), attr)
         this.putParticipant({pId: p.id, participant: p}).then(() => {
           this.snack = true
@@ -289,8 +297,9 @@
         this.p_edit = {
           age_group: p.age_group,
           style: p.style,
-          food: p.food,
           comments: p.comments,
+          food: p.food,
+          food_choices: (p.food ? p.food_choices.split('|') : [])
         }
         this.dialog = true
       },

@@ -98,7 +98,7 @@
       m_table_header() {
         let header = [
           { text: 'Name', value: 'full_name'},
-          { text: 'Activity', value: 'events'}
+          { text: 'Activity', value: 'events', width: '90px'}
         ]
         if (this.club.admins.includes(this.user.email)) {
           header.push(...[{ text: 'Gender', value: 'gender' },
@@ -133,7 +133,8 @@
         } else if (this.club.admins.includes(this.user.email)) {
           return true
         } else if (Array.isArray(this.club.members)) {
-          return this.club.members.map(m => m.email).includes(this.user.email)
+          return this.club.members.map(m => m.email).includes(this.user.email) ||
+                 this.club.members.map(m => m.email).includes(this.user.archer.email)
         }
         return false
       }

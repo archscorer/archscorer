@@ -50,4 +50,9 @@
   th {
     white-space: nowrap;
   }
+  th.stage-header {
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 </style>
