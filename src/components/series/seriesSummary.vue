@@ -46,7 +46,17 @@
         return this.$store.getters['series/seriesById'](parseInt(this.$route.params.id))
       },
       loading() {
-        return (this.s_table.length ? false : true)
+        if (this.s_table.length) {
+          return false
+        }
+        if (this.s) {
+          for (let stage of this.s.stages) {
+            if (Array.isArray(stage.participants)) {
+              return false
+            }
+          }
+        }
+        return true
       },
       s_table_header() {
         if (this.s) {

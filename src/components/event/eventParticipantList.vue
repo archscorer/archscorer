@@ -225,7 +225,7 @@
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
       },
       loading() {
-        return (this.p_table.length ? false : true)
+        return (this.p_table.length || Array.isArray(this.event.participants) ? false : true)
       },
       p_table_header() {
         let header = [
@@ -278,7 +278,9 @@
         'putParticipant',
       ]),
       save(pId, attr) {
-        attr.food_choices = attr.food_choices.join('|')
+        if (attr.food_choices) {
+          attr.food_choices = attr.food_choices.join('|')
+        }
         let p = Object.assign({}, this.event.participants.find(obj => obj.id === pId), attr)
         this.putParticipant({pId: p.id, participant: p}).then(() => {
           this.snack = true

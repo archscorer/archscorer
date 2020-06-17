@@ -77,6 +77,7 @@ class myParticipantAdmin(admin.ModelAdmin):
     def event_name(self, obj):
         return obj.event.name
     event_name.short_description = 'Event'
+    event_name.admin_order_field = 'event'
 
 @admin.register(Event)
 class myEventAdmin(admin.ModelAdmin):
