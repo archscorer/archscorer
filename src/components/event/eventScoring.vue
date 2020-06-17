@@ -168,8 +168,8 @@
 </script>
 
 <style scoped>
-  .v-pagination >>> * {
-    transform: scale(0.75);
+  nav {
+    transform: scale(0.9);
   }
   .v-select {
     max-width: 200px;

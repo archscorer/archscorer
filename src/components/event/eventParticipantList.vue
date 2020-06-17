@@ -88,7 +88,7 @@
               <template v-slot:input>
                 <v-text-field
                   v-model="props.item.group"
-                  type="number"
+                  counter="10"
                   single-line
                   autofocus
                 ></v-text-field>
@@ -233,8 +233,8 @@
           { text: 'Class', value: 'class' },
           { text: 'Club', value: 'club' },
           { text: 'Group', value: 'group' },
+          { text: 'End', value: 'target' },
           { text: 'Position', value: 'pos' },
-          { text: 'Start From', value: 'target' },
         ]
         if (!this.event.archive && this.user.id) {
           header.push({ text: 'Actions', value: 'action', sortable: false, width: "1%" })

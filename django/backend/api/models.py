@@ -226,8 +226,8 @@ class Participant(models.Model):
     food_choices = models.CharField(max_length=255, blank=True)
     comments = models.CharField('Comments to organiser', max_length=255, blank=True)
     # TODO do these have to be integers? could/should I let them free?
-    group = models.IntegerField('Group', default=None, blank=True, null=True)
     group_target = models.IntegerField('End nr', default=1)
+    group = models.CharField('Group', max_length=10, blank=True, default='')
     group_pos = models.CharField('Archer position', max_length=1, blank=True, default='')
     level_class = models.CharField('Level class', max_length=1, blank=True, default='')
 
