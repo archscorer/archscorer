@@ -36,7 +36,7 @@ class RoundSerializer(serializers.ModelSerializer):
 class ArrowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Arrow
-        fields = '__all__'
+        fields = ['id', 'end', 'ord', 'score', 'x']
 
 class ParticipantScoreCardSerializer(serializers.ModelSerializer):
     arrows = ArrowSerializer(many=True, read_only=True)
