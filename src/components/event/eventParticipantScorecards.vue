@@ -45,11 +45,9 @@
             </v-col>
           </v-row>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions v-if="edit">
           <v-spacer />
-          <template v-if="edit">
-            <v-btn color="primary" text @click="edit_sc(round)">edit</v-btn>
-          </template>
+          <v-btn color="primary" text @click="edit_sc(round)">edit</v-btn>
         </v-card-actions>
       </v-card>
       <template v-else>
