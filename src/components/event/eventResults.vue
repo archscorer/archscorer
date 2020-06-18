@@ -68,7 +68,7 @@
 <script>
   import eventParticipantScorecards from '@/components/event/eventParticipantScorecards.vue'
   import rankingService from '@/services/rankingService'
-  import {mapState} from 'vuex'
+  import { mapState } from 'vuex'
 
 
 

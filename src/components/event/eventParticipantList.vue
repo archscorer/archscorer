@@ -95,20 +95,20 @@
               </template>
             </v-edit-dialog>
           </template>
-          <template v-slot:item.target="props"
+          <template v-slot:item.end="props"
             v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive">
             <v-edit-dialog
-              :return-value="props.item.target"
+              :return-value="props.item.end"
               :key="props.item.id"
-              @save="save(props.item.id, {group_target: props.item.target})"
+              @save="save(props.item.id, {group_target: props.item.end})"
               @cancel="cancel"
               large
               persistent
-            > {{ props.item.target }}
+            > {{ props.item.end }}
               <template v-slot:input>
                 <v-text-field
-                  v-model="props.item.target"
-                  :rules="target_rules"
+                  v-model="props.item.end"
+                  :rules="[v => !!v || 'Target nr for the participant.']"
                   type="number"
                   single-line
                   autofocus
@@ -128,7 +128,7 @@
               <template v-slot:input>
                 <v-text-field
                   v-model="props.item.pos"
-                  :rules="position_rules"
+                  :rules="[v => (!!v && v.length <= 1) || 'Position is marked with single capital letter']"
                   counter="1"
                   single-line
                   autofocus
@@ -150,9 +150,10 @@
             </template>
           </template>
         </v-data-table>
-        <p v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive">
-          <small>'Position *' - indicates that archer has user account and could be digital scorer.</small>
-        </p>
+        <template  v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive">
+          <p class='text-caption'>Export to <v-btn x-small @click="export2excel()">excel</v-btn><br/>
+          'Position *' - indicates that archer has user account and could be digital scorer.</p>
+        </template>
       </v-card-text>
     </v-card>
     <v-dialog v-model="dialog" max-width="500px">
@@ -177,6 +178,7 @@
 
 <script>
   import { mapState, mapActions } from 'vuex'
+  import { json2excel } from 'js2excel'
 
   import eventEdit from '@/components/event/eventEdit.vue'
   import eventParticipantDetails from '@/components/event/eventParticipantDetails.vue'
@@ -205,12 +207,6 @@
         food: false,
         food_choices: []
       },
-      target_rules: [
-        v => !!v || 'required',
-      ],
-      position_rules: [
-        v => !!v && v.length <= 1 || 'Position is marked with single capital letter',
-      ],
       dialog: false,
       creator_menu: false,
       snack: false,
@@ -233,7 +229,7 @@
           { text: 'Class', value: 'class' },
           { text: 'Club', value: 'club' },
           { text: 'Group', value: 'group' },
-          { text: 'End', value: 'target' },
+          { text: 'End', value: 'end' },
           { text: 'Position', value: 'pos' },
         ]
         if (!this.event.archive && this.user.id) {
@@ -258,9 +254,9 @@
               class: p.age_group + p.archer.gender + p.style,
               club: p.archer.club,
               group: p.group,
+              end: p.group_target,
               pos: p.group_pos,
               has_account: p.archer.user,
-              target: p.group_target,
               food: (p.food ? p.food_choices.split('|').join('; ') : 'No'),
               contact: (p.archer.contact || ''),
               comments: p.comments,
@@ -310,6 +306,23 @@
         confirm(p.archer.full_name + ' will be removed from participant list' +
         ' (and their scorecards will be lost)') &&
         this.delParticipant({pId: p.id, eId: p.event})
+      },
+      export2excel() {
+        let data = this.event.participants.map(function(p) {
+          return {
+            Class: p.age_group + p.archer.gender + p.style,
+            Name: p.archer.full_name,
+            Club: p.archer.club,
+            Group: p.group,
+            End: p.group_target,
+            'Position': p.group_pos,
+            'Has Account': p.archer.user,
+            Food: (p.food ? p.food_choices.split('|').join('; ') : 'No'),
+            Contact: (p.archer.contact || ''),
+            Comments: p.comments,
+          }
+        })
+        json2excel({data: data, name: this.event.name + '.participants'})
       }
     },
   }

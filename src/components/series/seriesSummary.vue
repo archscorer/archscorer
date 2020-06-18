@@ -63,7 +63,7 @@
           let header = [
             { text: 'Class', value: 'class' },
             { text: 'Place', value: 'place', width: '1%' },
-            { text: 'Name', value: 'name' },
+            { text: 'Name', value: 'name', width: '140px' },
             { text: 'Club', value: 'club' },
             { text: 'Points', value: 'points'},
             { text: 'Sum', value: 'sum' },

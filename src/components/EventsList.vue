@@ -3,13 +3,13 @@
     <v-list subheader dense class="my-2" v-for="(e_group, label) in events_list"
       :key="label"
       >
-      <v-subheader class="overline font-weight-black" v-if="e_group.length">{{ (label === 'ongoing' ? 'Held today' : label + ' events') }}</v-subheader>
+      <v-subheader class="text-overline font-weight-black" v-if="e_group.length">{{ (label === 'ongoing' ? 'Held today' : label + ' events') }}</v-subheader>
       <v-list-item v-for="event in e_group"
         :key="'event' + event.id"
         :to="{ name: 'event', params: { 'id': event.id}}"
         >
         <v-list-item-content>
-          <v-list-item-title>{{ event.name }} <span class="overline">{{ event.indays ? event.indays : '' }}</span> {{ event.creator == user.email ? '*' : '' }}</v-list-item-title>
+          <v-list-item-title>{{ event.name }} <span class="text-overline">{{ event.indays ? event.indays : '' }}</span> {{ event.creator == user.email ? '*' : '' }}</v-list-item-title>
           <v-list-item-subtitle>
             <template v-if="event.date_start != event.date_end">
               from {{ event.date_start }} to {{ event.date_end }}

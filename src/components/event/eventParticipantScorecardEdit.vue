@@ -110,22 +110,23 @@
   .v-input >>> .v-text-field__details {
     display: none;
   }
+  .v-text-field--outlined.v-input--dense >>> .v-input__control .v-input__slot {
+    min-height: 30px;
+    max-height: 30px;
+    padding: 0 5px;
+  }
   .v-input >>> .v-select__selection {
     max-width: 100%;
     width: 100%;
     text-align: center;
     margin: 0;
-    font-size: 0.875rem;
-    font-weight: 400;
-    line-height: 1.375rem;
-    height: 18px;
   }
   .text-cum {
     margin-top: 0.2rem;
     white-space: nowrap;
   }
   .end-arrow {
-    max-width: 43px;
+    max-width: 37px;
     min-width: 37px;
     max-height: 32px;
   }

@@ -58,14 +58,21 @@
 </template>
 
 <script>
+  import rankingService from '@/services/rankingService'
 
-  function sum(arr) {
-    return arr.reduce((sum, x) => sum + x);
-  }
-
-  function getScore(sc, e) {
-    if (e) {
+  function getScore(sc, e, h) {
+    if (e && h === null) {
       return sc.arrows.filter(obj => obj.end === e.id).map(a => {return a.score ? a.score : 0})
+    }
+    if (e && h) {
+      // TODO possible breaking issue if all ends in round with halves dont have
+      // equal number of arrows. Is not an issue with standard formats
+      // TAG custom fun format with 'halves'
+      let div = sc.arrows.length / 2 / e.nr_of_arrows
+      if (e.ord < div) {
+        return sc.arrows.slice(0, div).map(a => {return a.score ? a.score : 0})
+      }
+      return sc.arrows.slice(div).map(a => {return a.score ? a.score : 0})
     }
     return sc.arrows.map(a => {return a.score ? a.score : 0})
   }
@@ -75,6 +82,7 @@
       event: Object,
       round: Object,
       end: Object,
+      halves: Boolean,
       scorecards: Array,
       isActive: Boolean,
     },
@@ -142,10 +150,10 @@
         }
       },
       get_end_score(sc) {
-        return sum(getScore(sc, this.end))
+        return rankingService.sum(getScore(sc, this.end, null))
       },
       get_cum_score(sc) {
-        return sum(getScore(sc))
+        return rankingService.sum(getScore(sc, this.end, this.halves))
       },
       focus_first_empty() {
         // for this code to actually work it needs to be double $nextTick

@@ -23,7 +23,7 @@
           label="Select round for scoring."
           v-model="round"
           :items="event_rounds"
-          @input="get_scorecards(event.id, round.id); get_course(round.course)"
+          @input="get_scorecards(event.id, round.id)"
           return-object></v-select>
       </v-card-title>
       <v-divider/>
@@ -41,13 +41,14 @@
             :key="'e' + currentRound + ':' + end.id"
             ref="end"
           >
-            <v-sheet v-if="scorecards_loading === true" class="text-center py-10">
+            <v-sheet v-if="scorecards_loading" class="text-center py-10">
               <v-progress-circular indeterminate size="64" color="secondary"></v-progress-circular>
             </v-sheet>
             <eventScoringEnd v-else
                              :event="event"
                              :round="round"
                              :end="end"
+                             :halves="halves"
                              :scorecards="scorecards"
                              :isActive="end_view === ei ? true : false"
                              @end_nav="update_end_view"/>
@@ -81,6 +82,7 @@
       currentRound: null,
       course: {ends: []},
       round: {id: null},
+      halves: false,
       scorecards_loading: false,
 
       snack: false,
@@ -130,6 +132,7 @@
         this.$store.dispatch('courses/getCourses', cId)
         .then(() => {
           this.course = this.courses.find(obj => obj.id === cId)
+          this.halves = this.course.halves
         })
       },
       get_scorecards(eId, rId) {
@@ -138,7 +141,6 @@
         }
         // before getting new set, the current set should be destroyed
         this.$store.dispatch('events/resetScoreCardsUserGroup')
-        this.end_view = this.user_group.group_target - 1
         this.currentRound = rId
         this.scorecards_loading = true
         // ask for scorecards. Creating new ones will take time, therefore catch
@@ -148,8 +150,11 @@
                                                                pId: this.user_group.id })
         .then(() => {
           this.scorecards_loading = false
-          this.$nextTick(() => {
-            this.$refs.end[this.end_view].isActive = true
+          this.end_view = this.user_group.group_target - 1
+          this.get_course(this.round.course).then(() => {
+            this.$nextTick(() => {
+              this.$refs.end[this.end_view].isActive = true
+            })
           })
         }).catch(err => {
           this.scorecards_loading = false
