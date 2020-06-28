@@ -96,6 +96,7 @@
     computed: {
       ...mapState({
         user: state => state.user.user,
+        courses: state => state.courses.courses,
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
@@ -113,7 +114,9 @@
                     value: r.ord.toString(),
                     class: 'round-header'}
           }))
-          header.push({ text: 'x', value: 'x', width: '1%' })
+          if (this.rounds_have_x()) {
+            header.push({ text: 'x', value: 'x', width: '1%' })
+          }
           header.push({ text: 'Sum', value: 'sum', width: '1%' })
 
           return header
@@ -179,6 +182,20 @@
       },
       sc_edit() {
         return [this.event.creator, ...this.event.admins].includes(this.user.email) && !this.event.archive
+      },
+      rounds_have_x() {
+        for (let r of this.event.rounds) {
+          for (let c of this.courses) {
+            if (r.course === c.id) {
+              for (let e of c.ends) {
+                if (e.x) {
+                  return true
+                }
+              }
+            }
+          }
+        }
+        return false
       }
     }
   }

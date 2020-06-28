@@ -25,6 +25,10 @@
           :items="event_rounds"
           @input="get_scorecards(event.id, round.id)"
           return-object></v-select>
+        <v-switch
+          v-if="course.halves"
+          v-model="halves"
+        />
       </v-card-title>
       <v-divider/>
       <template v-if="round.id !== null">

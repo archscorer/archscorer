@@ -17,7 +17,7 @@
           {{ club.name }}
         </v-card-title>
         <v-card-text>
-          <p>There are {{ Array.isArray(club.members) ? club.members.length : club.members }} members</p>
+          <p>{{ get_club_members_string(club) }}</p>
         </v-card-text>
       </v-card>
     </v-layout>
@@ -36,6 +36,13 @@
         user: state => state.user.user,
         clubs: state => state.clubs.clubs,
       }),
+    },
+    methods: {
+      get_club_members_string(club) {
+        let nr = Array.isArray(club.members) ? club.members.length : club.members
+        return 'There ' + (nr > 1 ? 'are' : 'is') + ' ' + nr + ' ' +
+               (club.id === 1 ? 'user' : 'member') + (nr > 1 ? 's' : '')
+      }
     },
     created() {
       this.$store.dispatch('clubs/getClubs')

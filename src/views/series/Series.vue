@@ -8,8 +8,8 @@
         <v-card-title v-text="s.name"></v-card-title>
         <v-card-text>
           <p v-text="s.description"></p>
-          <seriesSummary/>
         </v-card-text>
+        <seriesSummary/>
       </v-card>
     </v-layout>
   </v-container>
@@ -47,9 +47,6 @@
 </script>
 
 <style>
-  th {
-    white-space: nowrap;
-  }
   th.stage-header {
     max-width: 90px;
     overflow: hidden;

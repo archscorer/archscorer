@@ -14,7 +14,7 @@
                     <th>End</th>
                     <th :colspan="round.nr_of_arrows">Arrows</th>
                     <th>Sum</th>
-                    <th>Cum</th>
+                    <th>Tot</th>
                   </tr>
                 </thead>
                 <tbody>

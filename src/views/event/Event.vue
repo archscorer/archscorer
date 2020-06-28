@@ -63,7 +63,6 @@
     computed: {
       ...mapState({
         user: state => state.user.user,
-        courses: state => state.courses.courses,
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
@@ -92,15 +91,11 @@
       this.$store.dispatch('events/updateEvent', parseInt(this.$route.params.id)).catch(() => {
         this.$router.push('/events')
       })
-      if (this.action === 'register') this.tab = 0
     }
   }
 </script>
 
 <style>
-  th {
-    white-space: nowrap;
-  }
   th.round-header {
     max-width: 90px;
     overflow: hidden;

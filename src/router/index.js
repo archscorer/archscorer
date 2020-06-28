@@ -22,7 +22,7 @@ const routes = [
     path: '/event/:id',
     name: 'event',
     component: () => import('@/views/event/Event.vue'),
-    props: (route) => ({ action: route.query.a })
+    // props: (route) => ({ action: route.query.a })
   },
   {
     path: '/series',

@@ -322,7 +322,7 @@
             Comments: p.comments,
           }
         })
-        json2excel({data: data, name: this.event.name + '.participants'})
+        json2excel({data: data, name: 'participants'})
       }
     },
   }

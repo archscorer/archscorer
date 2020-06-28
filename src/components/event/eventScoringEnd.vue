@@ -37,7 +37,7 @@
     </v-row>
     <v-row dense>
       <v-col cols="2">
-        <v-btn @click="currentFocus = null; $emit('end_nav', '-')" icon><v-icon>mdi-chevron-left</v-icon></v-btn>
+        <v-btn @click="currentFocus = null; $emit('end_nav', '-')" class="arr-btn"><v-icon>mdi-chevron-left</v-icon></v-btn>
       </v-col>
       <v-col cols="8">
         <template v-for="score in sc_eval(end.scoring, end.x)">
@@ -47,7 +47,7 @@
         </template>
       </v-col>
       <v-col cols="2">
-        <v-btn @click="currentFocus = null; $emit('end_nav', '+')" ref="next_end" icon><v-icon>mdi-chevron-right</v-icon></v-btn>
+        <v-btn @click="currentFocus = null; $emit('end_nav', '+')" ref="next_end" class="arr-btn"><v-icon>mdi-chevron-right</v-icon></v-btn>
       </v-col>
     </v-row>
     <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
@@ -62,7 +62,7 @@
 
   function getScore(sc, e, h) {
     if (e && h === null) {
-      return sc.arrows.filter(obj => obj.end === e.id).map(a => {return a.score ? a.score : 0})
+      return sc.arrows.filter(obj => obj.end === e.id).map(a => a.score)
     }
     if (e && h) {
       // TODO possible breaking issue if all ends in round with halves dont have
@@ -70,11 +70,11 @@
       // TAG custom fun format with 'halves'
       let div = sc.arrows.length / 2 / e.nr_of_arrows
       if (e.ord < div) {
-        return sc.arrows.slice(0, div).map(a => {return a.score ? a.score : 0})
+        return sc.arrows.slice(0, (div - 1) * e.nr_of_arrows).map(a => a.score)
       }
-      return sc.arrows.slice(div).map(a => {return a.score ? a.score : 0})
+      return sc.arrows.slice((div - 1) * e.nr_of_arrows).map(a => a.score)
     }
-    return sc.arrows.map(a => {return a.score ? a.score : 0})
+    return sc.arrows.map(a => a.score)
   }
 
   export default {
@@ -212,8 +212,14 @@
   }
   .sc-btn {
     margin-bottom: 3px;
-    margin-right: 3px;
-    min-width: 67px!important;
+    margin-right: 2px;
+    margin-left: 2px;
+    min-width: 66px!important;
     min-height: 58px;
+  }
+  .arr-btn {
+    min-height: 119px;
+    min-width: 48px!important;
+    padding: 0 10px!important;
   }
 </style>
