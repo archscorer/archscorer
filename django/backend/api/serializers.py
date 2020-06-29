@@ -164,9 +164,12 @@ class StageSerializer(serializers.ModelSerializer):
         # root.instance contains series object
         if self.root.instance.participant_restriction:
             try:
-                p, v = self.root.instance.participant_restriction.split(':')
-                kwargs = {p: v}
-                participants = obj.participants.filter(**kwargs)
+                for rule in self.root.instance.participant_restriction.split(','):
+                    p, v = rule.split(':')
+                    if p[0] == "!":
+                        participants = participants.exclude(**{p[1:]: v})
+                    else:
+                        participants = participants.filter(**{p: v})
             except:
                 print('parsing "' + self.root.instance.participant_restriction + '" failed')
 
