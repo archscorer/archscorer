@@ -267,7 +267,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
                         del req_archer['club']
                 archer = Archer.objects.create(**req_archer)
             else:
-                return Response(archer_serialized.is_valid().errors,
+                return Response(archer_serialized.errors,
                                 status=status.HTTP_400_BAD_REQUEST)
 
         req_participant = request.data
@@ -286,7 +286,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
                                 status=status.HTTP_409_CONFLICT)
             return Response(ParticipantSerializer(participant).data)
         else:
-            return Response(participant_serialized.is_valid().errors,
+            return Response(participant_serialized.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
 class ArrowViewSet(mixins.UpdateModelMixin,
