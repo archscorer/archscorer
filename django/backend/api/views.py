@@ -214,7 +214,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
             group_target = user_participant.group_target
 
         # get or create scorecards for given round in start group
-        for participant in event.participants.all():
+        for participant in event.participants.order_by():
             if (participant.group == group and
                 participant.group_target == group_target):
                 sc, created = ScoreCard.objects.get_or_create(participant=participant, round=round)
@@ -299,6 +299,11 @@ class ArrowViewSet(mixins.UpdateModelMixin,
     queryset = Arrow.objects.all()
 
     def perform_update(self, serializer):
+        # from rest_framework.exceptions import APIException
+        # import random
         # import time
-        # time.sleep(4) # use if needed to simulate slow net or smth
+        # time.sleep(1) # use if needed to simulate slow net or smth
         serializer.save(updated_by=self.request.user.email)
+
+        # if random.random() > 0.4:
+        #     raise APIException("too late")

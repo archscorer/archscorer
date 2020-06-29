@@ -161,6 +161,7 @@
         <v-card-title>Edit participant info for {{ p_meta.name }}</v-card-title>
         <eventParticipantDetails :participant="p_edit"
           :catering="event.catering"
+          :level_class="event.use_level_class"
           :catering_choices="event.catering_choices.split('|')"/>
         <v-card-actions>
           <v-spacer/>
@@ -225,13 +226,18 @@
       },
       p_table_header() {
         let header = [
-          { text: 'Name', value: 'name', width: '140px' },
+          { text: 'Name', value: 'name', width: '148px' },
+        ]
+        if (this.event.use_level_class) {
+          header.push({ text: 'Classification', value: 'classification'})
+        }
+        header.push(...[
           { text: 'Class', value: 'class' },
           { text: 'Club', value: 'club' },
           { text: 'Group', value: 'group' },
           { text: 'End', value: 'end' },
           { text: 'Position', value: 'pos' },
-        ]
+        ])
         if (!this.event.archive && this.user.id) {
           header.push({ text: 'Actions', value: 'action', sortable: false, width: "1%" })
           if (this.user.email === this.event.creator) {
@@ -251,6 +257,7 @@
               id: p.id,
               aId: p.archer.id,
               name: p.archer.full_name,
+              classification: p.level_class,
               class: p.age_group + p.archer.gender + p.style,
               club: p.archer.club,
               group: p.group,
@@ -295,6 +302,7 @@
         this.p_edit = {
           age_group: p.age_group,
           style: p.style,
+          level_class: p.level_class,
           comments: p.comments,
           food: p.food,
           food_choices: (p.food ? p.food_choices.split('|') : [])

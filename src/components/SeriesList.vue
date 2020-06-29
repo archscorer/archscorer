@@ -17,7 +17,7 @@
         </v-list-item-subtitle>
       </v-list-item-content>
       <v-list-item-action>
-        <v-chip v-if="s.type !== 'private'" v-text="s.type" :color="chip_color(s.type)"></v-chip>
+        <v-chip small v-if="s.type !== 'open'" v-text="s.type" :color="chip_color(s.type)"></v-chip>
       </v-list-item-action>
     </v-list-item>
   </v-list>
@@ -35,7 +35,7 @@
     },
     methods: {
       chip_color(type) {
-        return type === 'open' ? 'primary' : type === 'club' ? 'secondary' : ''
+        return type === 'private' ? 'primary' : type === 'club' ? 'secondary' : ''
       }
     },
     created() {

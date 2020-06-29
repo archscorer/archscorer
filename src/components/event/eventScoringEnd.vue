@@ -1,5 +1,5 @@
 <template>
-  <v-sheet light>
+  <v-sheet>
     <h4> End: {{ end.ord }} {{ end.label ? '(' + end.label + ')' : '' }}
       <small>
         -- Round: {{ round.ord }} {{ round.label ? '(' + round.label + ')': ''}} --

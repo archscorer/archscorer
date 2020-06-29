@@ -21,7 +21,8 @@
           </v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>
-          <v-chip v-if="event.type !== 'private'" v-text="event.type" :color="chip_color(event.type)"></v-chip>
+          <v-chip small v-if="event.type !== 'open'" v-text="event.type" :color="chip_color(event.type)"></v-chip>
+          <v-chip small v-for="tag of tags(event)" :key="tag.label" v-text="tag.label" :color="tag.color"></v-chip>
         </v-list-item-action>
       </v-list-item>
     </v-list>
@@ -61,7 +62,16 @@
     },
     methods: {
       chip_color(type) {
-        return type === 'open' ? 'primary' : type === 'club' ? 'secondary' : ''
+        return type === 'private' ? 'primary' : type === 'club' ? 'secondary' : ''
+      },
+      tags(e) {
+        if (e.tags) {
+          return e.tags.split(',').map(tag => {
+            let [l, c] = tag.split('|')
+            return {label: l, color: c}
+          })
+        }
+        return []
       }
     },
     created() {

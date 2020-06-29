@@ -13,11 +13,23 @@
     </template>
     <v-card
       class="mx-auto text-uppercase"
-      dark
       tile>
       <v-list dense>
         <v-subheader>user menu</v-subheader>
         <v-list-item-group>
+          <v-list-item
+            inactive>
+            <v-list-item-content>
+                <v-list-item-title>Theme Dark</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-switch
+                small
+                v-model="$vuetify.theme.dark"
+                hide-details
+                ></v-switch>
+            </v-list-item-action>
+          </v-list-item>
           <!-- this is a router link -->
           <v-list-item to="/accounts/profile">
             <v-list-item-icon>

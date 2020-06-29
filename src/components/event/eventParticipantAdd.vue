@@ -9,6 +9,7 @@
         <v-form v-model="valid">
           <eventParticipantDetails :participant="participant"
             :catering="event.catering"
+            :level_class="event.use_level_class"
             :catering_choices="event.catering_choices.split('|')"/>
           <v-container v-if="action !== 'Add Me'">
             <v-row>
@@ -88,6 +89,7 @@
         },
         style: '',
         age_group: '',
+        level_class: '',
         comments: '',
         food: false,
         food_choices: [],

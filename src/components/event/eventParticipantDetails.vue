@@ -35,6 +35,14 @@
           color="primary"
         ></v-switch>
       </v-col>
+      <v-col v-if="level_class" cols="3">
+        <v-select
+          v-model="participant.level_class"
+          :items="classification_classes"
+          label="Classification Class"
+          dense
+        ></v-select>
+      </v-col>
     </v-row>
     <v-row dense>
       <v-col cols="8">
@@ -67,10 +75,16 @@
     props: {
       participant: Object,
       catering: Boolean,
+      level_class: Boolean,
       catering_choices: Array,
     },
     data: () => ({
-      //
+      classification_classes : [
+        {text: 'A', value: 'A'},
+        {text: 'B', value: 'B'},
+        {text: 'C', value: 'C'},
+        {text: '*', value: '*'},
+      ]
     }),
     computed: {
       ...mapState({

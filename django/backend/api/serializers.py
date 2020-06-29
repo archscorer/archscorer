@@ -38,6 +38,21 @@ class ArrowSerializer(serializers.ModelSerializer):
         model = Arrow
         fields = ['id', 'end', 'ord', 'score', 'x']
 
+# NOTE this is actually slower.. but bandwidth might come into account??
+# this becomes useful for series and archived events
+# class ParticipantScoreCardSerializer(serializers.ModelSerializer):
+#     sum = serializers.SerializerMethodField()
+#     x = serializers.SerializerMethodField()
+#     class Meta:
+#         model = ScoreCard
+#         fields = ['round', 'sum', 'x']
+#
+#     def get_sum(self, obj):
+#         return sum(a['score'] for a in obj.arrows.order_by().values('score') if a['score'])
+#
+#     def get_x(self, obj):
+#         return sum(1 for a in obj.arrows.order_by().values('x') if a['x'])
+
 class ParticipantScoreCardSerializer(serializers.ModelSerializer):
     arrows = ArrowSerializer(many=True, read_only=True)
     class Meta:
@@ -62,7 +77,7 @@ class ParticipantArcherSerializer(serializers.ModelSerializer):
             return None
 
     def get_events(self, obj):
-        return len(obj.events.all())
+        return obj.events.all().count()
 
 class ParticipantSerializer(serializers.ModelSerializer):
     archer = ParticipantArcherSerializer(read_only=True)
@@ -98,7 +113,7 @@ class ClubsSerializerList(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_members(self, obj):
-        return len(obj.members.all())
+        return obj.members.all().count()
 
 class ObjAdminSerializer(serializers.RelatedField):
     class Meta:
@@ -134,7 +149,7 @@ class EventSerializerList(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_participants(self, obj):
-        return len(obj.participants.all())
+        return obj.participants.all().count()
 
 class StageSerializer(serializers.ModelSerializer):
     creator = serializers.ReadOnlyField(source='creator.email')
@@ -145,7 +160,7 @@ class StageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_participants(self, obj):
-        participants = obj.participants.all()
+        participants = obj.participants.order_by()
         # root.instance contains series object
         if self.root.instance.participant_restriction:
             try:

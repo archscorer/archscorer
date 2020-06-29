@@ -186,6 +186,10 @@
                   v-model="event.is_open"
                   :label="event.is_open ? 'Registration is open*' : 'Registration is closed'"
                 ></v-switch>
+                <v-switch
+                  v-model="event.use_level_class"
+                  :label="event.use_level_class ? 'Use Archer Classification Classes' : 'No Classification Classes'"
+                ></v-switch>
               </v-col>
             </v-row>
             <v-row dense>

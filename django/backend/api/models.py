@@ -53,7 +53,8 @@ STYLE_CHOICES = [
     ('FU', 'Freestyle Unlimited'),
     ('HB', 'Historic Longbow'),
     ('LB', 'Longbow'),
-    ('TR', 'Traditional Recurve')]
+    ('TR', 'Traditional Recurve'),
+    ('**', 'Variable')]
 
 LEVEL_CHOICES = [('A', 'A'),
                  ('B', 'B'),
@@ -192,12 +193,14 @@ class Event(models.Model):
 
     name = models.CharField(max_length=150, default='Unnamed event', blank=False)
     description = models.TextField(blank=True)
-    catering = models.BooleanField(default=False)
+    catering = models.BooleanField('Provide catering', default=False)
     catering_choices = models.CharField(max_length=255, blank=True)
     type = models.CharField('event type', max_length=10, default='private', choices=TYPE_CHOICES)
     tags = models.CharField('event tags', max_length=255, blank=True)
     admins = models.ManyToManyField(User, related_name='admin_events', blank=True)
+    # TODO: recrords could also be joice, default beeing 'Training' -- no records
     records = models.CharField('record category (nat/EM/MM)', max_length=50, blank=True, default='')
+    use_level_class = models.BooleanField('Use Level Classes', default=False)
 
     series = models.ForeignKey(Series, related_name='stages', null=True, blank=True, on_delete=models.SET_NULL)
 

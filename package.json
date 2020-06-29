@@ -11,6 +11,7 @@
     "core-js": "^3.6.5",
     "js-cookie": "^2.2.1",
     "js2excel": "^1.0.1",
+    "minify-css-string": "^1.0.0",
     "vue": "^2.6.11",
     "vue-router": "^3.3.4",
     "vuetify": "^2.3.1",

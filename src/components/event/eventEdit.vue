@@ -88,9 +88,8 @@
                 :label="event.is_open ? 'Registration is open' : 'Registration is closed'"
               ></v-switch>
               <v-switch
-                v-model="event.archive"
-                color="error"
-                :label="event.archive ? 'Event is read-only (archived)' : 'Active event'"
+                v-model="event.use_level_class"
+                :label="event.use_level_class ? 'Use Archer Classification Classes' : 'No Classification Classes'"
               ></v-switch>
               <v-switch
                 v-model="event.catering"
@@ -101,6 +100,11 @@
                 label="Meals"
                 hint='format of "meal1|meal2|meal3"'>
               </v-text-field>
+              <v-switch
+                v-model="event.archive"
+                color="error"
+                :label="event.archive ? 'Event is read-only (archived)' : 'Active event'"
+              ></v-switch>
             </v-col>
           </v-row>
         </v-card-text>
