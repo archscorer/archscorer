@@ -83,8 +83,8 @@
       event_desciption() {
         // TODO this is probably temp fix. some kind of html editor like https://www.vuetoolbox.com/projects/tiptap
         // or already ready made solution https://github.com/iliyaZelenko/tiptap-vuetify
-        return this.event.description.split('\n').join('</p><p>')
-      }
+        return this.event.description.split('\n\n').join('</p><p>').split('\n').join('<br/>')
+      },
     },
     created() {
       //do something after creating vue instance

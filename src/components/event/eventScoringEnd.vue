@@ -69,10 +69,10 @@
       // equal number of arrows. Is not an issue with standard formats
       // TAG custom fun format with 'halves'
       let div = sc.arrows.length / 2 / e.nr_of_arrows
-      if (e.ord < div) {
-        return sc.arrows.slice(0, (div - 1) * e.nr_of_arrows).map(a => a.score)
+      if (e.ord <= div) {
+        return sc.arrows.slice(0, div * e.nr_of_arrows).map(a => a.score)
       }
-      return sc.arrows.slice((div - 1) * e.nr_of_arrows).map(a => a.score)
+      return sc.arrows.slice(div * e.nr_of_arrows).map(a => a.score)
     }
     return sc.arrows.map(a => a.score)
   }

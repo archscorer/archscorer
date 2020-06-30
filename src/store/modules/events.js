@@ -4,7 +4,8 @@ import eventService from '@/services/eventService'
 const state = {
   events: [],
   participantModel: null,
-  scorecards: []
+  scorecards: [],
+  participants: [],
 }
 
 const getters = {
@@ -90,6 +91,12 @@ const actions = {
     })
   },
 
+  getParticipant({ commit }, pId) {
+    eventService.fetchParticipant(pId)
+    .then(participant => {
+      commit('updateParticipant', participant)
+    })
+  },
   getParticipantOpts({ commit }) {
     eventService.optsParticipant()
     .then(model => {
@@ -236,6 +243,15 @@ const mutations = {
       if (ri !== -1) {
         state.events[ei].rounds.splice(ri, 1)
       }
+    }
+  },
+
+  updateParticipant(state, participant) {
+    const index = state.participants.findIndex(obj => obj.id === participant.id);
+    if (index !== -1) {
+      state.participants.splice(index, 1, participant)
+    } else {
+      state.participants.push(participant)
     }
   },
 

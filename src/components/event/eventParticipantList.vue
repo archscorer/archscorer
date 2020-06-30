@@ -1,5 +1,14 @@
 <template>
   <v-sheet>
+    <v-alert
+      v-if="hint_archive"
+      type="info"
+      prominent
+      dismissible
+    >
+      The end date of this event has passed. Once all scores are entered and checked
+      make sure to finish this event by 'archiving' it in the 'edit event' menu!
+    </v-alert>
     <v-toolbar dense flat>
       <template v-if="event.is_open">
         <eventParticipantAdd action="Register"/>
@@ -273,6 +282,14 @@
           return []
         }
       },
+      hint_archive() {
+        if (this.event && [this.event.creator, ...this.event.admins].includes(this.user.email)) {
+          if (new Date(this.event.date_end).setHours(23, 59) < new Date() && !this.event.archive) {
+            return true
+          }
+        }
+        return false
+      }
     },
     methods: {
       ...mapActions('events', [

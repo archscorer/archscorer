@@ -1,6 +1,6 @@
 <template>
   <v-sheet>
-    <v-card>
+    <v-card class="mb-5">
       <v-card-title>
         <small>Archers Summary</small>
         <v-spacer />

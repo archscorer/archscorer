@@ -93,7 +93,4 @@
   th {
     white-space: nowrap;
   }
-  .v-data-table {
-    margin-bottom: 20px;
-  }
 </style>

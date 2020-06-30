@@ -33,6 +33,10 @@ export default {
               .then(response => response.data)
   },
 
+  fetchParticipant(pId) {
+    return api.get(`events/participants/${pId}/`)
+              .then(response => response.data)
+  },
   optsParticipant() {
     return api.options(`events/participants/register/`)
               .then(response => response.data.actions.POST)
