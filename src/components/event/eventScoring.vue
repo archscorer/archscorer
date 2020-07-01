@@ -36,31 +36,21 @@
           v-model="end_view_pager"
           :length="course.ends ? course.ends.length : 0"
           :total-visible="14"
-          circle></v-pagination>
-        <v-window v-model="end_view"
-          :show-arrows="false"
-          touchless>
-          <v-window-item
-            v-for="(end, ei) in course.ends"
-            :key="'e' + currentRound + ':' + end.id"
-            ref="end"
-          >
-            <v-sheet v-if="scorecards_loading" class="text-center py-10">
-              <v-progress-circular indeterminate size="64" color="secondary"></v-progress-circular>
-            </v-sheet>
-            <eventScoringEnd v-else
-                             :event="event"
-                             :round="round"
-                             :end="end"
-                             :halves="halves"
-                             :scorecards="scorecards"
-                             :isActive="end_view === ei ? true : false"
-                             @end_nav="update_end_view"/>
-          </v-window-item>
-        </v-window>
+          circle
+          @click.prevent=""></v-pagination>
+        <v-sheet v-if="scorecards_loading" class="text-center py-10">
+          <v-progress-circular indeterminate size="64" color="secondary"></v-progress-circular>
+        </v-sheet>
+        <eventScoringEnd v-else
+                         :event="event"
+                         :round="round"
+                         :end="course.ends[end_view]"
+                         :halves="halves"
+                         :scorecards="scorecards"
+                         @end_nav="update_end_view"/>
       </template>
     </template>
-    <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
+    <v-snackbar v-model="snack" :timeout="5000" :color="snackColor">
       {{ snackText }}
       <v-btn text @click="snack = false">Close</v-btn>
     </v-snackbar>
@@ -68,7 +58,7 @@
 </template>
 
 <script>
-  import { mapState} from 'vuex'
+  import { mapState, mapActions } from 'vuex'
   import eventScoringEnd from '@/components/event/eventScoringEnd.vue'
 
   export default {
@@ -82,7 +72,6 @@
     data: () => ({
       user_group: {id: null},
       end_view: 0,
-      arrow_inc: 0,
       currentRound: null,
       course: {ends: []},
       round: {id: null},
@@ -101,6 +90,14 @@
           if (!r || r.is_open === false) {
             this.round = {id: null}
           }
+        }
+      },
+      end_view: function(val) {
+        if (val < 0) {
+          this.end_view = this.course.ends.length - 1
+        }
+        if (val > this.course.ends.length - 1) {
+          this.end_view = 0
         }
       }
     },
@@ -131,35 +128,32 @@
       }
     },
     methods: {
+      ...mapActions('events', [
+        'resetScoreCards',
+        'getScoreCards'
+      ]),
       get_course(cId) {
         // course layout determines the order of ends and scoring
-        this.$store.dispatch('courses/getCourses', cId)
-        .then(() => {
-          this.course = this.courses.find(obj => obj.id === cId)
-          this.halves = this.course.halves
-        })
+        this.course = this.courses.find(obj => obj.id === cId)
+        this.halves = this.course.halves
+        this.end_view = (this.user_group.group_target < this.course.ends.length ? this.user_group.group_target - 1 : 0)
       },
       get_scorecards(eId, rId) {
         if (this.user_group.id === null) {
           this.user_group = this.p_user[0]
         }
         // before getting new set, the current set should be destroyed
-        this.$store.dispatch('events/resetScoreCardsUserGroup')
+        this.resetScoreCards()
         this.currentRound = rId
         this.scorecards_loading = true
         // ask for scorecards. Creating new ones will take time, therefore catch
         // timeout and let user know of it
-        this.$store.dispatch('events/getScoreCardsUserGroup', {eId: eId,
-                                                               rId: rId,
-                                                               pId: this.user_group.id })
+        this.getScoreCards({eId: eId,
+                            rId: rId,
+                            pId: this.user_group.id })
         .then(() => {
           this.scorecards_loading = false
-          this.end_view = this.user_group.group_target - 1
-          this.get_course(this.round.course).then(() => {
-            this.$nextTick(() => {
-              this.$refs.end[this.end_view].isActive = true
-            })
-          })
+          this.get_course(this.round.course)
         }).catch(err => {
           this.scorecards_loading = false
           if (err.code === 'ECONNABORTED') {

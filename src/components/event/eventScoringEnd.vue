@@ -13,20 +13,14 @@
         v-for="(a, ai) in sc.arrows.filter(obj => obj.end == end.id)"
         :key="'a' + a.id"
       >
-        <v-select
-          v-model="a.score"
-          :items="sc_eval(end.scoring)"
-          append-icon=""
+        <v-text-field
+          :value="a.x ? 'X' : a.score == 0 ? 'M': a.score"
           :loading="a.loading"
-          :error="a.error"
           :background-color="a.x ? '#FFC300' : a.score === 0 ? '#9E9E9E': ''"
           ref="arrow"
           readonly outlined dense
           @focus="currentFocus = [sc.id, a.id]; arrow_inc = si * sc.arrows.filter(obj => obj.end == end.id).length + ai">
-          <template v-slot:selection>
-            <div class='v-select__selection v-select__selection--comma'>{{ a ? a.x ? 'X' : a.score === 0 ? 'M' : a.score : '' }}</div>
-          </template>
-        </v-select>
+        </v-text-field>
       </v-col>
       <v-col cols="1" class="text-cum">
         {{ get_end_score(sc) }}
@@ -50,7 +44,7 @@
         <v-btn @click="currentFocus = null; $emit('end_nav', '+')" ref="next_end" class="arr-btn"><v-icon>mdi-chevron-right</v-icon></v-btn>
       </v-col>
     </v-row>
-    <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
+    <v-snackbar v-model="snack" :timeout="5000" :color="snackColor">
       {{ snackText }}
       <v-btn text @click="snack = false">Close</v-btn>
     </v-snackbar>
@@ -84,7 +78,6 @@
       end: Object,
       halves: Boolean,
       scorecards: Array,
-      isActive: Boolean,
     },
     data: () => ({
       arrow_inc: 0,
@@ -94,8 +87,8 @@
       snackColor: 'info',
     }),
     watch: {
-      isActive: function(val) {
-        if (val === true && this.currentFocus === null) {
+      end: function() {
+        if (this.currentFocus === null) {
           this.$nextTick(() => {
             this.focus_first_empty()
           })
@@ -159,9 +152,7 @@
         // for this code to actually work it needs to be double $nextTick
         for (let a in this.$refs.arrow) {
           if (this.$refs.arrow[a].value === null) {
-            this.$nextTick(() => {
               this.$refs.arrow[a].focus()
-            })
             break
           }
         }
@@ -184,7 +175,7 @@
     max-height: 30px;
     padding: 0 5px;
   }
-  .v-input >>> .v-select__selection {
+  .v-input >>> input {
     max-width: 100%;
     width: 100%;
     text-align: center;

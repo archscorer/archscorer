@@ -86,6 +86,9 @@
     data: () => ({
       drawer: false,
     }),
+    created() {
+      this.$store.dispatch('courses/getCourses')
+    }
   };
 </script>
 

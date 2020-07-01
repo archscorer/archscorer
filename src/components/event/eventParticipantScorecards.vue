@@ -69,7 +69,7 @@
         <eventParticipantScorecardEdit :round="edit_round"/>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click="edit_dialog = false">Close</v-btn>
+          <v-btn text @click="close_edit()">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -84,7 +84,7 @@
   /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 
   import eventParticipantScorecardEdit from '@/components/event/eventParticipantScorecardEdit.vue'
-  import {mapState} from 'vuex'
+  import { mapState, mapGetters, mapActions } from 'vuex'
 
   function sum(arr) {
     return arr.reduce((sum, x) => sum + x);
@@ -96,7 +96,8 @@
       eventParticipantScorecardEdit
     },
     props: {
-      participant: Object,
+      eId: Number,
+      pId: Number,
       rounds: Array,
       edit: Boolean,
     },
@@ -113,8 +114,19 @@
       ...mapState({
         courses: state => state.courses.courses,
       }),
+      ...mapGetters('events', [
+        'eventParticipantById',
+        'scorecardById'
+      ]),
+      participant() {
+        return this.eventParticipantById(this.eId, this.pId)
+      }
     },
     methods: {
+      ...mapActions('events', [
+        'getScoreCards',
+        'updateEvent'
+      ]),
       get_rounds() {
         // round object for scorecard, return list of modified round objects
         let rounds = [...this.rounds]
@@ -124,12 +136,6 @@
             return r
           }
           let course = this.courses.find(obj => obj.id === r.course)
-          // in some cases course is not loaded, probably related to dev hotreload
-          // but nevertheless, if couse is not loaded -- request it from backend
-          if (!course) {
-            this.$store.dispatch('courses/getCourses', r.course)
-            return null
-          }
           let ends = course.ends
           // max number of arrows for round ends
           let aNr = 0
@@ -153,15 +159,11 @@
             }
           }
           halves.push(sc_ends)
-          return Object.assign({}, r, {nr_of_arrows: aNr, halves: halves, sc: sc})
+          return Object.assign({}, r, {nr_of_arrows: aNr, halves: halves, sc: sc.id})
         })
       },
       edit_sc(r) {
         let course = this.courses.find(obj => obj.id === r.course)
-        if (!course) {
-          // in case courses have not been leaded
-          this.$store.dispatch('courses/getCourses', r.course)
-        }
         let ends = course.ends
         let aOrd = 0
         let halves = []
@@ -177,31 +179,27 @@
         }
         halves.push(sc_ends)
         this.edit_round = Object.assign({}, r, {halves: halves})
+        let sc = this.scorecardById(r.sc)
+        if (!sc) {
+          this.getScoreCards({eId: this.participant.event,
+                                   rId: r.id,
+                                   group: this.participant.group,
+                                   group_target: this.participant.group_target})
+        }
         this.edit_dialog = true
       },
       get_scorecards(rId) {
-        this.$store.dispatch('events/resetScoreCardsUserGroup')
-        this.scorecards_loading = true
-        // ask for scorecards. Creating new ones will take time, therefore catch
-        // timeout and let user know of it
-        // NOTE currently UserGroup and Admin modules are the same, but subject to alteration in the future
-        this.$store.dispatch('events/getScoreCardsAdmin', {eId: this.participant.event,
-                                                           rId: rId,
-                                                           group: this.participant.group,
-                                                           group_target: this.participant.group_target})
-        .then(() => {
-          this.scorecards_loading = false
-          this.$store.dispatch('events/updateEvent', this.participant.event)
-          this.snack = true
-          this.snackColor = 'info'
-          this.snackText = 'Reopen scorecard dialog for the changes to take effect!'
-        }).catch(err => {
-          this.scorecards_loading = false
-          if (err.code === 'ECONNABORTED') {
-            this.snack = true
-            this.snackColor = 'error'
-            this.snackText = 'Operation timed out. Try again in few seconds.'
-          }
+        this.getScoreCards({eId: this.participant.event,
+                                 rId: rId,
+                                 group: this.participant.group,
+                                 group_target: this.participant.group_target})
+                   .then(() => {
+                     this.updateEvent(this.participant.event)
+                   })
+      },
+      close_edit() {
+        this.updateEvent(this.participant.event).then(() => {
+          this.edit_dialog = false
         })
       }
     },

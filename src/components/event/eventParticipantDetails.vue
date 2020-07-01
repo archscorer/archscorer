@@ -86,6 +86,22 @@
         {text: '*', value: '*'},
       ]
     }),
+    watch: {
+      participant: {
+        deep: true,
+        handler(p) {
+          if (p.food && this.catering_choices.length === 1 &&
+              p.food_choices !== this.catering_choices) {
+            this.$nextTick(() => {
+              p.food_choices = this.catering_choices
+            })
+          }
+          if (!p.food && p.food_choices.length) {
+            p.food_choices = []
+          }
+        }
+      }
+    },
     computed: {
       ...mapState({
         pModel: state => state.events.participantModel,

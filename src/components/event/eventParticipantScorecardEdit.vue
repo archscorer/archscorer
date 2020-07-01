@@ -1,6 +1,6 @@
 <template>
   <v-card-text>
-    <v-row>
+    <v-row v-if="sc">
       <v-col v-for="(half, hi) in round.halves" :key="round.id + '_' + hi">
         <table>
           <thead>
@@ -15,39 +15,39 @@
               <td class="end-ord">
                 {{ end.ord }}
               </td>
-              <td class="end-arrow" v-for="(a, ai) in round.sc.arrows.filter(obj => obj.end == end.id)" :key="a.id">
-                <v-select
-                  v-model="a.score"
-                  :items="sc_eval(end.scoring)"
-                  append-icon=""
+              <td class="end-arrow" v-for="(a, ai) in sc.arrows.filter(obj => obj.end == end.id)" :key="a.id">
+                <v-text-field
+                  :value="a.x ? 'X' : a.score == 0 ? 'M': a.score"
                   :loading="a.loading"
-                  :error="a.error"
                   :background-color="a.x ? '#FFC300' : a.score === 0 ? '#9E9E9E': ''"
                   ref="arrow"
                   readonly outlined dense
-                  @focus="currentFocus = {end: end, aId: a.id}; arrow_inc = end.aOrd + ai">
-                  <template v-slot:selection>
-                    <div class='v-select__selection v-select__selection--comma'>{{ a ? a.x ? 'X' : a.score === 0 ? 'M' : a.score : '' }}</div>
-                  </template>
-                </v-select>
+                  @focus="handle_focus(end, a, ai)">
+                </v-text-field>
               </td>
               <td class="end-sums text-right">
-                {{ end_score(round.sc.arrows.filter(obj => obj.end == end.id)) }}
+                {{ end_score(sc.arrows.filter(obj => obj.end == end.id)) }}
               </td>
             </tr>
           </tbody>
         </table>
       </v-col>
     </v-row>
-    <v-row v-if="currentFocus">
-      <v-spacer />
-      <template v-for="score in sc_eval(currentFocus.end.scoring, currentFocus.end.x)">
-        <v-btn :key="'score' + currentFocus.end.id + '_' + score.text"
-        class="sc-btn"
-        @click.prevent="enter_score(score)">{{ score.text }}</v-btn>
-      </template>
-      <v-spacer />
-    </v-row>
+    <v-sheet v-else class="text-center py-10">
+      <v-progress-circular indeterminate size="64" color="secondary"></v-progress-circular>
+    </v-sheet>
+    <v-bottom-sheet v-model="sc_entering"
+      overlay-opacity="0"
+      inset
+      :retain-focus="false">
+      <v-row v-if="currentFocus" dense justify="center">
+        <template v-for="score in sc_eval(currentFocus.end.scoring, currentFocus.end.x)">
+          <v-btn :key="'score' + currentFocus.end.id + '_' + score.text"
+          class="sc-btn"
+          @click.prevent="enter_score(score)">{{ score.text }}</v-btn>
+        </template>
+      </v-row>
+    </v-bottom-sheet>
   </v-card-text>
 </template>
 
@@ -59,6 +59,7 @@
     },
     data: () => ({
       currentFocus: null,
+      sc_entering: false,
       arrow_inc: 0,
     }),
     watch: {
@@ -66,7 +67,18 @@
         this.currentFocus = null
       }
     },
+    computed: {
+      sc() {
+        return this.$store.getters['events/scorecardById'](this.round.sc)
+      },
+    },
     methods: {
+      handle_focus(end, a, ai) {
+        this.currentFocus = {end: end, aId: a.id}
+        this.arrow_inc = end.aOrd + ai
+        this.sc_entering = true
+
+      },
       sc_eval(arr, x) {
         let scores_choices = eval(arr).map(function(v) {
           return {'text': v, 'value': v}
@@ -77,14 +89,11 @@
       },
       enter_score(sc) {
         if (this.currentFocus) {
-          let arrow = this.round.sc.arrows.find(obj => obj.id === this.currentFocus.aId)
+          let arrow = this.sc.arrows.find(obj => obj.id === this.currentFocus.aId)
           arrow.x = sc.text === 'X' ? true : false
           arrow.score = sc.value
           arrow.loading = 'warning'
-          this.$store.dispatch('events/putArrowEdit', {eId: parseInt(this.$route.params.id),
-                                                       pId: this.round.sc.participant,
-                                                       scId: this.round.sc.id,
-                                                       arrow: arrow})
+          this.$store.dispatch('events/putArrow', {scId: this.sc.id, arrow: arrow})
           this.$refs.arrow[this.arrow_inc].blur()
         } else {
           this.arrow_inc = this.$refs.arrow.length + 1
@@ -93,9 +102,12 @@
         if (this.arrow_inc >= this.$refs.arrow.length) {
           // so that no scores would be changed if clicked again
           this.currentFocus = false
+          this.sc_entering = false
         } else {
           this.$nextTick(() => {
-            this.$refs.arrow[this.arrow_inc].focus()
+            let next_arrow = this.$refs.arrow[this.arrow_inc]
+            next_arrow.$el.scrollIntoView()
+            next_arrow.focus()
           })
         }
       },
@@ -115,7 +127,7 @@
     max-height: 30px;
     padding: 0 5px;
   }
-  .v-input >>> .v-select__selection {
+  .v-input >>> input {
     max-width: 100%;
     width: 100%;
     text-align: center;
@@ -128,7 +140,7 @@
   .end-arrow {
     max-width: 37px;
     min-width: 37px;
-    max-height: 32px;
+    max-height: 30px;
   }
   .sc-btn {
     margin-bottom: 3px;

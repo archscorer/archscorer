@@ -48,7 +48,7 @@
         <v-btn text @click="dialog = false; new_archer = false; archer = null">Close</v-btn>
         <v-btn color="primary"
           @click="addParticipantProxy()"
-          :disabled="!valid">{{ action }}</v-btn>
+          :disabled="!valid || !participant.archer.full_name">{{ action }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

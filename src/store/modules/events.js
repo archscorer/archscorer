@@ -14,6 +14,22 @@ const getters = {
   },
   eventById: (state) => (id) => {
     return state.events.find(obj => obj.id === id)
+  },
+  eventParticipantById: (state) => (eId, pId) => {
+    return state.events.find(obj => obj.id === eId)
+                .participants.find(obj => obj.id === pId)
+  },
+  scorecards: state => {
+    return state.scorecards
+  },
+  scorecardById: (state) => (id) => {
+    return state.scorecards.find(obj => obj.id === id)
+  },
+  participants: state => {
+    return state.participants
+  },
+  participantModel: state => {
+    return state.participantModel
   }
 }
 
@@ -143,21 +159,14 @@ const actions = {
     })
   },
 
-  getScoreCardsUserGroup({ commit }, attr) {
+  getScoreCards({ commit }, attr) {
     return eventService.fetchScoreCards(attr)
     .then(scorecards => {
       commit('setScoreCards', scorecards)
     })
   },
-  resetScoreCardsUserGroup({ commit }) {
+  resetScoreCards({ commit }) {
     commit('setScoreCards', [])
-  },
-  getScoreCardsAdmin({ commit }, attr) {
-    // this could become useful for third party scoring i.e. official scorer or admin in case of shootoff for example
-    return eventService.fetchScoreCards(attr)
-    .then(scorecards => {
-      commit('setScoreCards', scorecards)
-    })
   },
 
   putArrow({ dispatch, commit }, attr) {
@@ -170,39 +179,7 @@ const actions = {
       // server returned error (most likely timeout or some kind of throttle? try again)
       dispatch('putArrow', attr)
       console.log(error.response ? error.response.data : error)
-      //   // server returned error, store error state to store
-      //   let arrow = attr.arrow
-      //   arrow.error = true
-      //   arrow.loading = false
-      //   commit('updateArrow', {scId: attr.scId, arrow: arrow})
     })
-  },
-  putArrowEdit({ commit, state }, attr) {
-    const ei = state.events.findIndex(obj => obj.id === attr.eId)
-    if (ei !== -1) {
-      const pi = state.events[ei].participants.findIndex(obj => obj.id === attr.pId)
-      if (pi !== -1) {
-        const sci = state.events[ei].participants[pi].scorecards.findIndex(obj => obj.id === attr.scId)
-        if (sci !== -1) {
-          const ai = state.events[ei].participants[pi].scorecards[sci].arrows.findIndex(obj => obj.id === attr.arrow.id)
-          if (ai !== -1) {
-            // commit to be submitted arrow to local store
-            commit('updateArrowEdit', {ei: ei, pi: pi, sci: sci, ai: ai, arrow: attr.arrow})
-            eventService.putArrow(attr.arrow.id, attr.arrow)
-            .then(arrow => {
-              commit('updateArrowEdit', {ei: ei, pi: pi, sci: sci, ai: ai, arrow: arrow})
-            }).catch(error => {
-              // server returned error, store error state to store
-              let arrow = attr.arrow
-              arrow.error = true
-              arrow.loading = false
-              commit('updateArrowEdit', {ei: ei, pi: pi, sci: sci, ai: ai, arrow: arrow})
-              console.log(error.response.data)
-            })
-          }
-        }
-      }
-    }
   }
 }
 
@@ -270,9 +247,6 @@ const mutations = {
         state.scorecards[sci].arrows.splice(ai, 1, attr.arrow)
       }
     }
-  },
-  updateArrowEdit(state, attr) {
-    state.events[attr.ei].participants[attr.pi].scorecards[attr.sci].arrows.splice(attr.ai, 1, attr.arrow)
   }
 }
 

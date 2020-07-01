@@ -350,9 +350,6 @@
       ...mapActions('events', [
         'addEvent'
       ])
-    },
-    created() {
-      this.$store.dispatch('courses/getCourses')
     }
   }
 </script>

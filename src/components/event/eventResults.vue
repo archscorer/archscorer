@@ -54,7 +54,10 @@
         <v-card-title>{{ participant.archer.full_name }} {{ participant.class}} {{ participant.archer.club }}</v-card-title>
         <v-card-subtitle>{{ event.name }}</v-card-subtitle>
         <v-card-text>
-          <eventParticipantScorecards :participant="participant" :rounds="event.rounds" :edit="sc_edit()"/>
+          <eventParticipantScorecards :pId="participant.id"
+                                      :eId="event.id"
+                                      :rounds="event.rounds" 
+                                      :edit="sc_edit()"/>
         </v-card-text>
         <v-card-actions>
           <v-spacer/>

@@ -268,9 +268,6 @@
         // trigger event update before you start editing, so you would edit the right model
         this.$store.dispatch('events/updateEvent', parseInt(this.$route.params.id))
       }
-    },
-    created() {
-      this.$store.dispatch('courses/getCourses')
     }
   }
 </script>
