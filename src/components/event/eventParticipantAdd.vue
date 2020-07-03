@@ -1,12 +1,15 @@
 <template>
   <v-dialog v-model="dialog" max-width="600px" v-if="!event.archive">
     <template v-slot:activator="{ on }">
-      <v-btn color="primary" :text="action === 'Register' ? false : true" v-on="on">{{ action }}</v-btn>
+      <v-btn color="primary"
+        :text="action === 'Register' ? false : true"
+        @click="init_participant()"
+        v-on="on">{{ action }}</v-btn>
     </template>
     <v-card>
       <v-card-title>{{ action }} to "{{ event.name }}"</v-card-title>
       <v-card-text>
-        <v-form v-model="valid">
+        <v-form ref="add_participant_form" v-model="valid">
           <eventParticipantDetails :participant="participant"
             :catering="event.catering"
             :level_class="event.use_level_class"
@@ -77,25 +80,8 @@
       archer: null,
       query: '',
       new_archer: false,
-
-      participant: {
-        event: null,
-        archer: {
-          full_name: '',
-          gender: '',
-          club: '',
-          email: '',
-          phone: '',
-        },
-        style: '',
-        age_group: '',
-        level_class: '',
-        comments: '',
-        food: false,
-        food_choices: [],
-      },
+      participant: {}
       // TODO write validators for form fields: style, age, gender, full_name, email
-      // TODO quicklink to register me (skip archer fields or autofill them)
     }),
     watch: {
       query: function(val) {
@@ -148,18 +134,10 @@
         'searchArcher',
         'clearSearch',
       ]),
-      addParticipantProxy() {
-        this.participant.event = parseInt(this.$route.params.id);
-        if (this.action === "Add Me") {
-          this.participant.archer = this.user.archer
-        }
-        this.participant.food_choices = this.participant.food_choices.join('|')
-        this.addParticipant(this.participant);
-        this.dialog = false
-        this.archer = null
+      init_participant() {
         this.query = ''
         this.new_archer = false
-        this.valid = false
+        this.archer = null
         this.participant = {
           event: null,
           archer: {
@@ -171,10 +149,20 @@
           },
           style: '',
           age_group: '',
+          level_class: '',
           comments: '',
           food: false,
           food_choices: [],
         }
+        if (this.action === "Add Me") {
+          this.participant.archer = this.user.archer
+        }
+      },
+      addParticipantProxy() {
+        this.participant.event = parseInt(this.$route.params.id);
+        this.participant.food_choices = this.participant.food_choices.join('|')
+        this.addParticipant(this.participant);
+        this.dialog = false
       },
     },
     created() {

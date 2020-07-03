@@ -7,7 +7,7 @@
       dismissible
     >
       The end date of this event has passed. Once all scores are entered and checked
-      make sure to finish this event by 'archiving' it in the 'edit event' menu!
+      make sure to finish this event by making it inactive (archiving) it in the 'edit event' menu!
     </v-alert>
     <v-toolbar dense flat>
       <template v-if="event.is_open">
@@ -149,7 +149,7 @@
             </template>
           </template>
           <template v-slot:item.action="props">
-            <template v-if="(user.archer.id === props.item.aId && event.is_open) || [event.creator, ...event.admins].includes(user.email) && !event.archive">
+            <template v-if="(user.archer.id === props.item.aId && event.is_open) || [event.creator, ...event.admins].includes(user.email)">
               <v-icon small class="mr-2" @click="editP(props.item.id)">
                 mdi-pencil
               </v-icon>
@@ -248,7 +248,9 @@
           { text: 'Position', value: 'pos' },
         ])
         if (!this.event.archive && this.user.id) {
-          header.push({ text: 'Actions', value: 'action', sortable: false, width: "1%" })
+          if (this.event.is_open || [this.event.creator, ...this.event.admins].includes(this.user.email)) {
+            header.push({ text: 'Actions', value: 'action', sortable: false, width: "1%" })
+          }
           if (this.user.email === this.event.creator) {
             if (this.event.catering) {
               header.push({ text: 'Food', value: 'food' })

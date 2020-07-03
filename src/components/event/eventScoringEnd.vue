@@ -88,11 +88,10 @@
     }),
     watch: {
       end: function() {
-        if (this.currentFocus === null) {
-          this.$nextTick(() => {
-            this.focus_first_empty()
-          })
-        }
+        this.currentFocus = null
+        this.$nextTick(() => {
+          this.focus_first_empty()
+        })
       }
     },
     methods: {

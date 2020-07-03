@@ -14,6 +14,12 @@ from .serializers import (UserSerializer, ClubSerializer, ClubsSerializerList, C
                           RoundSerializer, ParticipantArcherSerializer, ParticipantSerializer,
                           ParticipantScoreCardSerializer, ArrowSerializer, SeriesSerializerList)
 
+class ActiveEvent(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if obj.event.archive:
+            return request.method in permissions.SAFE_METHODS
+        return True
+
 # Serve Vue Application
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
 
@@ -50,18 +56,16 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         setattr(user, 'csrftoken', get_token(self.request))
         return [user]
 
-
 class ClubViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows clubs to be viewed or edited.
     Edit / create is privileged to registered users only.
     """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    serializer_class = ClubSerializer
     queryset = Club.objects.all()
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action == 'list' or isinstance(self.request.user, AnonymousUser):
             return ClubsSerializerList
         return ClubSerializer
 
@@ -156,7 +160,7 @@ class RoundViewSet(viewsets.ModelViewSet):
     API endpoint that allows rounds to be viewed or edited.
     Edit / create is privileged to registered users only.
     """
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated&ActiveEvent]
     serializer_class = RoundSerializer
     queryset = Round.objects.all()
 
@@ -187,7 +191,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows participants to be added or viewed.
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated&ActiveEvent]
     serializer_class = ParticipantSerializer
     queryset = Participant.objects.all()
 
@@ -209,7 +213,6 @@ class ParticipantViewSet(viewsets.ModelViewSet):
             user_participant = event.participants.filter(
                archer__id=request.user.archer.id).get(
                pk=request.data['pId'])
-
             group = user_participant.group
             group_target = user_participant.group_target
 
@@ -252,13 +255,13 @@ class ParticipantViewSet(viewsets.ModelViewSet):
                     archer = Archer.objects.get(pk=req_archer['id'])
                 except ObjectDoesNotExist:
                     return Response({'details': 'Referenced archer does not exist.'},
-                                    status=status.HTTP_400_BAD_REQUEST)
+                                    status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response(archer_serialized.errors,
                                 status=status.HTTP_400_BAD_REQUEST)
         else:
             archer_serialized = ArcherSerializer(data=req_archer)
-            if ArcherSerializer(data=req_archer).is_valid():
+            if archer_serialized.is_valid():
                 if 'club' in req_archer:
                     try:
                         req_archer['club'] = Club.objects.get(pk=req_archer['club'])
@@ -278,7 +281,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
                 req_participant['event'] = Event.objects.get(pk=req_participant['event'])
             except ObjectDoesNotExist:
                 return Response({'details': 'Referenced event does not exist.'},
-                                status=status.HTTP_400_BAD_REQUEST)
+                                status=status.HTTP_404_NOT_FOUND)
             try:
                 participant = Participant.objects.create(**req_participant)
             except IntegrityError:
@@ -299,11 +302,13 @@ class ArrowViewSet(mixins.UpdateModelMixin,
     queryset = Arrow.objects.all()
 
     def perform_update(self, serializer):
-        # from rest_framework.exceptions import APIException
-        # import random
-        # import time
-        # time.sleep(1) # use if needed to simulate slow net or smth
-        serializer.save(updated_by=self.request.user.email)
-
-        # if random.random() > 0.4:
-        #     raise APIException("too late")
+        if not self.get_object().scorecard.participant.event.archive:
+            # import random
+            # import time
+            # time.sleep(1) # use if needed to simulate slow net or smth
+            # if random.random() > 0.4:
+            #     from rest_framework.exceptions import APIException
+            #     raise APIException("too late")
+            # arrow is saved only if event is active. otherwise returns silently
+            # existing model from the database
+            serializer.save(updated_by=self.request.user.email)

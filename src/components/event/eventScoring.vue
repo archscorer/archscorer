@@ -28,6 +28,7 @@
         <v-switch
           v-if="course.halves"
           v-model="halves"
+          :label="halves ? 'Sum half' : 'Sum total'"
         />
       </v-card-title>
       <v-divider/>
@@ -137,6 +138,7 @@
         this.course = this.courses.find(obj => obj.id === cId)
         this.halves = this.course.halves
         this.end_view = (this.user_group.group_target < this.course.ends.length ? this.user_group.group_target - 1 : 0)
+        // TODO: if course name or whatever matches indoor, then end_view should remain 0
       },
       get_scorecards(eId, rId) {
         if (this.user_group.id === null) {
