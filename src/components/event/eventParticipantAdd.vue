@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600px" v-if="!event.archive">
+  <v-dialog v-model="dialog" max-width="600px" :fullscreen="$vuetify.breakpoint.xsOnly" v-if="!event.archive">
     <template v-slot:activator="{ on }">
       <v-btn color="primary"
         :text="action === 'Register' ? false : true"
@@ -20,7 +20,7 @@
                 v-model="archer"
                 :search-input.sync="query"
                 :items="qresponse_items"
-                label="Find archer from database"
+                label="Find archer ..."
                 hint="Search is executed from 3 characters"
                 placeholder="Start typing .."
                 prepend-icon="mdi-database-search"
@@ -36,8 +36,7 @@
                    *new* archer profile is created -->
               <v-alert
                 type="info">
-                  Use query above to find archer from our database. If query does not find the archer you
-                  were looking for you can click <v-btn x-small @click="new_archer = (new_archer ? false : true)">here</v-btn> to add new archer profile
+                  Or click <v-btn x-small @click="new_archer = (new_archer ? false : true)">here</v-btn> to add new archer profile
                   to the database!
               </v-alert>
               <archerDetails v-model="participant.archer" :clubs="clubs" v-if="new_archer" />
@@ -118,7 +117,9 @@
         return this.qresponse.map(a => {
           if (a.id) {
             // add text field only if we have valid archer object
-            let text = a.full_name + ' (' + a.club + ')' + (a.user ? ' - w account' : '') + (a.events ? ' ' + a.events + ' events': '')
+            let text = a.full_name + ' (' + this.clubs.find(obj => obj.id === a.club).name_short + ')' +
+                      (a.user ? ' - w account' : '') +
+                      (a.events.length ? ' ' + a.events.length + ' events': '')
             return Object.assign({}, a, { text })
           } else {
             return a

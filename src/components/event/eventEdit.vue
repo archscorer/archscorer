@@ -116,7 +116,7 @@
                  @click="putEvent({eId: event.id, event: event})">Save Changes</v-btn>
         </v-card-actions>
       </v-card>
-      <v-card class="ma-5">
+      <v-card class="ma-5" v-if="!event.archive">
         <v-card-title>Manage Rounds</v-card-title>
         <v-card-text>
           <v-row dense v-for="(round, index) in event.rounds" :key="index">

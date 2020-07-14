@@ -194,6 +194,14 @@
   import eventParticipantDetails from '@/components/event/eventParticipantDetails.vue'
   import eventParticipantAdd from '@/components/event/eventParticipantAdd.vue'
 
+  function get_class(p, ops) {
+    // p is participant
+    if (ops && ops.search(p.age_group + '_' + p.style) !== -1) {
+      return p.age_group + '_' + p.style
+    }
+    return p.age_group + p.archer.gender + p.style
+  }
+
   export default {
 
     components: {
@@ -269,7 +277,7 @@
               aId: p.archer.id,
               name: p.archer.full_name,
               classification: p.level_class,
-              class: p.age_group + p.archer.gender + p.style,
+              class: get_class(p, this.ignore_gender),
               club: p.archer.club,
               group: p.group,
               end: p.group_target,
@@ -279,7 +287,7 @@
               contact: (p.archer.contact || ''),
               comments: p.comments,
             }
-          })
+          }, this.event)
         } else {
           return []
         }
@@ -337,7 +345,7 @@
       export2excel() {
         let data = this.event.participants.map(function(p) {
           return {
-            Class: p.age_group + p.archer.gender + p.style,
+            Class: get_class(p, this.ignore_gender),
             Name: p.archer.full_name,
             Club: p.archer.club,
             Group: p.group,
@@ -348,7 +356,7 @@
             Contact: (p.archer.contact || ''),
             Comments: p.comments,
           }
-        })
+        }, this.event)
         json2excel({data: data, name: 'participants'})
       }
     },

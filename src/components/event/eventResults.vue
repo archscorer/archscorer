@@ -56,7 +56,7 @@
         <v-card-text>
           <eventParticipantScorecards :pId="participant.id"
                                       :eId="event.id"
-                                      :rounds="event.rounds" 
+                                      :rounds="event.rounds"
                                       :edit="sc_edit()"/>
         </v-card-text>
         <v-card-actions>
@@ -73,8 +73,6 @@
   import rankingService from '@/services/rankingService'
   import { mapState } from 'vuex'
 
-
-
   function getScore(r, p) {
     let r_sc = p.scorecards.find(obj => obj.round === r.id)
     return r_sc ?  r_sc.arrows.map(a => a.score) : [null]
@@ -83,6 +81,14 @@
   function getX(r, p) {
     let r_sc = p.scorecards.find(obj => obj.round === r.id)
     return r_sc ?  r_sc.arrows.map(a => a.x ? 1 : 0) : [null]
+  }
+
+  function get_class(p, ops) {
+    // p is participant
+    if (ops && ops.search(p.age_group + '_' + p.style) !== -1) {
+      return p.age_group + '_' + p.style
+    }
+    return p.age_group + p.archer.gender + p.style
   }
 
   export default {
@@ -137,12 +143,12 @@
             let row = {
               id: p.id,
               name: p.archer.full_name,
-              class: p.age_group + p.archer.gender + p.style,
+              class: get_class(p, this.ignore_gender),
               club: p.archer.club
             }
             let sums = this.rounds.map(function(r) {
               row[r.ord] = rankingService.sum( getScore(r, p) )
-              if (r.course_name.search('shootoff') !== -1) {
+              if (r.course_type === 's') {
                 if (row[r.ord] > 0) {
                   row.shootoff = row[r.ord]
                 }
@@ -152,7 +158,7 @@
             })
             row['sum'] = sums.length ? rankingService.sum( sums ) : 0
             let x = this.rounds.map(function(r) {
-              if (r.course_name.search('shootoff') !== -1) {
+              if (r.course_type === 's') {
                 return 0
               }
               return rankingService.sum( getX(r, p) )

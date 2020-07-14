@@ -166,7 +166,11 @@ class RoundViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['POST'])
     def add(self, request, *args, **kwargs):
+        if Event.objects.get(pk=self.request.data.get('event')).archive:
+            return Response({'details': 'No new rounds on archived event.'},
+                            status=status.HTTP_403_FORBIDDEN)
         return self.create(request, *args, **kwargs)
+
 
 class ArcherViewSet(viewsets.ModelViewSet):
     """
@@ -185,7 +189,7 @@ class ArcherViewSet(viewsets.ModelViewSet):
         if len(archers) == 0:
             return Response([{ 'header': 'no matching archer profiles' }],
                             status=status.HTTP_200_OK)
-        return Response(ParticipantArcherSerializer(archers, many=True).data)
+        return Response(ArcherSerializer(archers, many=True).data)
 
 class ParticipantViewSet(viewsets.ModelViewSet):
     """
@@ -248,20 +252,15 @@ class ParticipantViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
         req_archer = request.data['archer']
-        if 'id' in req_archer:
-            archer_serialized = ParticipantArcherSerializer(data=req_archer)
-            if archer_serialized.is_valid():
+        archer_serialized = ArcherSerializer(data=req_archer)
+        if archer_serialized.is_valid():
+            if 'id' in req_archer:
                 try:
                     archer = Archer.objects.get(pk=req_archer['id'])
                 except ObjectDoesNotExist:
                     return Response({'details': 'Referenced archer does not exist.'},
                                     status=status.HTTP_404_NOT_FOUND)
             else:
-                return Response(archer_serialized.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-        else:
-            archer_serialized = ArcherSerializer(data=req_archer)
-            if archer_serialized.is_valid():
                 if 'club' in req_archer:
                     try:
                         req_archer['club'] = Club.objects.get(pk=req_archer['club'])
@@ -269,16 +268,20 @@ class ParticipantViewSet(viewsets.ModelViewSet):
                         # if club does not exist just remove it silently
                         del req_archer['club']
                 archer = Archer.objects.create(**req_archer)
-            else:
-                return Response(archer_serialized.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(archer_serialized.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
         req_participant = request.data
         req_participant['archer'] = archer
         participant_serialized = ParticipantSerializer(data=req_participant)
         if participant_serialized.is_valid():
             try:
-                req_participant['event'] = Event.objects.get(pk=req_participant['event'])
+                event = Event.objects.get(pk=req_participant['event'])
+                if event.archive:
+                    return Response({'details': 'No new participants on archived event.'},
+                                    status=status.HTTP_403_FORBIDDEN)
+                req_participant['event'] = event
             except ObjectDoesNotExist:
                 return Response({'details': 'Referenced event does not exist.'},
                                 status=status.HTTP_404_NOT_FOUND)
@@ -309,6 +312,7 @@ class ArrowViewSet(mixins.UpdateModelMixin,
             # if random.random() > 0.4:
             #     from rest_framework.exceptions import APIException
             #     raise APIException("too late")
+
             # arrow is saved only if event is active. otherwise returns silently
             # existing model from the database
             serializer.save(updated_by=self.request.user.email)

@@ -49,6 +49,14 @@
   import rankingService from '@/services/rankingService'
   import { mapState } from 'vuex'
 
+  function get_class(p, ops) {
+    // p is participant
+    if (ops && ops.search(p.age_group + '_' + p.style) !== -1) {
+      return p.age_group + '_' + p.style
+    }
+    return p.age_group + p.archer.gender + p.style
+  }
+
   export default {
     // name: 'Series',
     components: {
@@ -120,14 +128,14 @@
             }
             let p_table = stage.participants.map(p => {
               // handle shootoff
-              let so = stage.rounds.find(obj => obj.course_name.search('shootoff') !== -1)
+              let so = stage.rounds.find(obj => obj.course_type === 's')
               // NOTE: however it works, if there are multiple shootoff rounds (there should not), then find
               // returns first shootoff round and rest of them are treated as normal.
               // get shootoff round id (if it exists) to test against in scorecard filtering
               so = so ? so.id : null
               return {
                 name: p.archer.full_name,
-                class: p.age_group + p.archer.gender + p.style,
+                class: get_class(p, this.s.ignore_gender),
                 id: p.archer.id + p.age_group + p.style,
                 club: p.archer.club,
                 sum: rankingService.sum([].concat(...p.scorecards.filter(obj => obj.round !== so).map(sc => [...sc.arrows.map(a => a.score)]))),
@@ -253,32 +261,41 @@
           for (let stage of this.s.stages) {
             let stageID = 'stage' + stage.id.toString()
             // this.s.club_ranking_max shows how many participants per class per club score points
-            let club_max = {class: null, counter: {}}
+            let club_max = {}
             for (let p of this.s_table) {
               if (p[stageID]) {
-                if (p.class != club_max.class) {
-                  club_max.class = p.class
-                  club_max.counter = {}
+                if (!(p.class in club_max)) {
+                  club_max[p.class] = {}
                 }
-                if (!(p.club in club_max.counter)) {
-                  club_max.counter[p.club] = 0
+                if (!(p.club in club_max[p.class])) {
+                  club_max[p.class][p.club] = []
                 }
-                if (club_max.counter[p.club] < this.s.club_ranking_max) {
-                  let points = parseInt(p[stageID].split(' ')[0]) || 0
-                  let ci = c_table.findIndex(obj => obj.club === p.club)
-                  if (ci === -1) {
-                    c_table.push({club: p.club, place: null, points: points})
-                    c_table[c_table.length - 1][stageID] = points
+                let points = parseInt(p[stageID].split(' ')[0]) || 0
+                club_max[p.class][p.club].push(points)
+              }
+            }
+            for (let cls of Object.values(club_max)) {
+              for (let club in cls) {
+                let points = 0
+                if (cls[club].length > this.s.club_ranking_max) {
+                  points = rankingService.sum(cls[club].sort(function(a, b) {
+                    return b - a
+                  }).splice(0,this.s.club_ranking_max))
+                } else {
+                  points = rankingService.sum(cls[club])
+                }
+                let ci = c_table.findIndex(obj => obj.club === club)
+                if (ci === -1) {
+                  c_table.push({club: club, place: null, points: points})
+                  c_table[c_table.length - 1][stageID] = points
+                } else {
+                  if (stageID in c_table[ci]) {
+                    c_table[ci][stageID] += points
                   } else {
-                    if (stageID in c_table[ci]) {
-                      c_table[ci][stageID] += points
-                    } else {
-                      c_table[ci][stageID] = points
-                    }
-                    c_table[ci].points += points
+                    c_table[ci][stageID] = points
                   }
+                  c_table[ci].points += points
                 }
-                club_max.counter[p.club] += 1
               }
             }
           }

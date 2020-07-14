@@ -1,6 +1,7 @@
 from .models import (User,
                      Club,
                      Archer,
+                     LevelClass,
                      Course,
                      End,
                      Series,
@@ -21,10 +22,11 @@ class CourseSerializer(serializers.ModelSerializer):
     ends = EndSerializer(many=True)
     class Meta:
         model = Course
-        fields = ['id', 'creator', 'name', 'description', 'location', 'ends', 'halves']
+        fields = '__all__'
 
 class RoundSerializer(serializers.ModelSerializer):
     course_name = serializers.SerializerMethodField()
+    course_type = serializers.SerializerMethodField()
     scorecards = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Round
@@ -32,6 +34,9 @@ class RoundSerializer(serializers.ModelSerializer):
 
     def get_course_name(self, obj):
         return obj.course.name
+
+    def get_course_type(self, obj):
+        return obj.course.type
 
 class ArrowSerializer(serializers.ModelSerializer):
     class Meta:
@@ -86,9 +91,16 @@ class ParticipantSerializer(serializers.ModelSerializer):
         model = Participant
         fields = '__all__'
 
+class LevelClassSerializer(serializers.ModelSerializer):
+    # this will serialize archer classification classes to be part of archer serializer
+    class Meta:
+        model = LevelClass
+        fields = '__all__'
+
 class ArcherSerializer(serializers.ModelSerializer):
     events = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     user = serializers.ReadOnlyField(source='user.is_active')
+    level_classes = LevelClassSerializer(many=True, read_only=True)
     class Meta:
         model = Archer
         fields = '__all__'

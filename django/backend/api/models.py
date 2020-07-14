@@ -61,6 +61,13 @@ LEVEL_CHOICES = [('A', 'A'),
                  ('C', 'C'),
                  ('*', '*')]
 
+RECORD_CHOICES = [
+    ('flint', 'IFAA Flint'),
+    ('indoor', 'IFAA Indoor'),
+    ('animal', 'IFAA Animal (Marked Distances)'),
+    ('field', 'IFAA Field'),
+    ('hunter', 'IFAA Hunter')]
+
 class User(AbstractUser):
     username = models.CharField('username', max_length=30, blank=True)
     email = models.EmailField('email address', unique=True)
@@ -125,6 +132,10 @@ class Course(models.Model):
     description = models.TextField(blank=True)  # If creating custom non-standard course, describe its purpose
     location = models.CharField(max_length=150, blank=True)
     halves = models.BooleanField(default=False)
+    # type 'Unit' has to be twice in the competition to account for records, 'Round' once
+    type = models.CharField('Round/Unit', max_length=1, default='r', choices=[('u', 'Unit'),
+                                                                              ('r', 'Round'),
+                                                                              ('s', 'Shootoff')])
 
     class Meta:
         ordering = ['name']
@@ -145,17 +156,18 @@ class Record(models.Model):
     date = models.DateField('Date of achievement', blank=True, null=True)
     age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
-    round = models.CharField('Round', max_length=255, blank=False)
+    round = models.CharField('Round', max_length=255, blank=False, choices=RECORD_CHOICES)
     event = models.CharField('Event', max_length=255, blank=True)
     score = models.IntegerField('Record score', blank=False)
-    scope = models.CharField('record scope (personal/FAAE/EM/MM)', max_length=50, blank=True, default='FAAE')
+    # scope should be explained - country code (EE, LAT, etc) for national ones, EU, USA for unions, W for world
+    scope = models.CharField('record scope (EE/EU/W)', max_length=50, blank=False, default='EE')
 
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.EmailField(blank=True, null=True)
 
     class Meta:
-        ordering = ['style', 'age_group']
-        unique_together = ['style', 'age_group', 'scope']
+        ordering = ['age_group', 'style', '-date']
+        unique_together = ['style', 'round', 'age_group', 'scope', 'date']
 
 class Series(models.Model):
     creator = models.ForeignKey(User, related_name='series_created', null=True, on_delete=models.SET_NULL)
@@ -177,6 +189,7 @@ class Series(models.Model):
     # Aimed to accommodate club cup and comparing clubs
     club_ranking = models.BooleanField(default=False)
     club_ranking_max = models.IntegerField('Max nr of club members to contribute points to club per class', default=3)
+    ignore_gender = models.CharField('age_style to merge gender (A_TR, V_TR)', max_length=50, blank=True, default='')
 
     class Meta:
         ordering = ['-date_end']
@@ -201,6 +214,7 @@ class Event(models.Model):
     # TODO: recrords could also be joice, default beeing 'Training' -- no records
     records = models.CharField('record category (nat/EM/MM)', max_length=50, blank=True, default='')
     use_level_class = models.BooleanField('Use Level Classes', default=False)
+    ignore_gender = models.CharField('age_style to merge gender (A_TR, V_TR)', max_length=50, blank=True, default='')
 
     series = models.ForeignKey(Series, related_name='stages', null=True, blank=True, on_delete=models.SET_NULL)
 

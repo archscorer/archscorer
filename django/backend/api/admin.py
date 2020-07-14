@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 
 from .models import (User, Club, Archer, Course, End,
                      Participant, Series, Event, Round,
-                     Record, Arrow, ScoreCard)
+                     Record, LevelClass, Arrow, ScoreCard)
 
 # Register your models here.
 @admin.register(User)
@@ -87,6 +87,11 @@ class myEventAdmin(admin.ModelAdmin):
 @admin.register(Series)
 class mySeriesAdmin(admin.ModelAdmin):
     list_display = ('name', 'creator')
+
+@admin.register(LevelClass)
+class myLevelClassAdmin(admin.ModelAdmin):
+    raw_id_fields = ('archer',)
+    list_display = ('archer', 'level', 'age_group', 'style')
 
 @admin.register(Record)
 class myRecordAdmin(admin.ModelAdmin):

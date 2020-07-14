@@ -58,6 +58,9 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### Documentation snippets
 
-* shootoff is currently set up so, that from rounds we look courses, that name
- contains word 'shootoff'. If such appears, it is not used to compute sum, but
- its score is used for ordering if it is real value (not 0, null, undefined).
+* shootoff is markerd under the type of a course. If creating new shootoff course,
+  make sure to assign it correct type.
+  Courses with type 's' are not used to compute sum, but its score is used for
+  ordering if it is real value (not 0, null, undefined).
+  In addition, it is not checked, but 'shootoff' course should appear only once
+  per event.
