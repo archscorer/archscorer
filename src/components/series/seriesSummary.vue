@@ -49,14 +49,6 @@
   import rankingService from '@/services/rankingService'
   import { mapState } from 'vuex'
 
-  function get_class(p, ops) {
-    // p is participant
-    if (ops && ops.search(p.age_group + '_' + p.style) !== -1) {
-      return p.age_group + '_' + p.style
-    }
-    return p.age_group + p.archer.gender + p.style
-  }
-
   export default {
     // name: 'Series',
     components: {
@@ -135,7 +127,7 @@
               so = so ? so.id : null
               return {
                 name: p.archer.full_name,
-                class: get_class(p, this.s.ignore_gender),
+                class: rankingService.getClass(p, this.s.ignore_gender),
                 id: p.archer.id + p.age_group + p.style,
                 club: p.archer.club,
                 sum: rankingService.sum([].concat(...p.scorecards.filter(obj => obj.round !== so).map(sc => [...sc.arrows.map(a => a.score)]))),

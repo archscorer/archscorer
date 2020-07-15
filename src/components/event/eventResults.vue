@@ -83,14 +83,6 @@
     return r_sc ?  r_sc.arrows.map(a => a.x ? 1 : 0) : [null]
   }
 
-  function get_class(p, ops) {
-    // p is participant
-    if (ops && ops.search(p.age_group + '_' + p.style) !== -1) {
-      return p.age_group + '_' + p.style
-    }
-    return p.age_group + p.archer.gender + p.style
-  }
-
   export default {
 
     components: {
@@ -143,7 +135,7 @@
             let row = {
               id: p.id,
               name: p.archer.full_name,
-              class: get_class(p, this.ignore_gender),
+              class: rankingService.getClass(p, this.ignore_gender),
               club: p.archer.club
             }
             let sums = this.rounds.map(function(r) {

@@ -193,14 +193,7 @@
   import eventEdit from '@/components/event/eventEdit.vue'
   import eventParticipantDetails from '@/components/event/eventParticipantDetails.vue'
   import eventParticipantAdd from '@/components/event/eventParticipantAdd.vue'
-
-  function get_class(p, ops) {
-    // p is participant
-    if (ops && ops.search(p.age_group + '_' + p.style) !== -1) {
-      return p.age_group + '_' + p.style
-    }
-    return p.age_group + p.archer.gender + p.style
-  }
+  import rankingService from '@/services/rankingService'
 
   export default {
 
@@ -277,7 +270,7 @@
               aId: p.archer.id,
               name: p.archer.full_name,
               classification: p.level_class,
-              class: get_class(p, this.ignore_gender),
+              class: rankingService.getClass(p, this.ignore_gender),
               club: p.archer.club,
               group: p.group,
               end: p.group_target,
@@ -345,7 +338,7 @@
       export2excel() {
         let data = this.event.participants.map(function(p) {
           return {
-            Class: get_class(p, this.ignore_gender),
+            Class: rankingService.getClass(p, this.ignore_gender),
             Name: p.archer.full_name,
             Club: p.archer.club,
             Group: p.group,
