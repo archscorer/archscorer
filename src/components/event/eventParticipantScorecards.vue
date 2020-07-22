@@ -14,7 +14,7 @@
                     <th>End</th>
                     <th :colspan="round.nr_of_arrows">Arrows</th>
                     <th>Sum</th>
-                    <th>Tot</th>
+                    <th>Total</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -60,12 +60,14 @@
       </template>
     </v-row>
     <v-dialog
+      max-width="650px"
       v-model="edit_dialog"
     >
       <v-card>
         <v-card-title v-if="edit_round">
           {{ edit_round.ord }}. {{ edit_round.label }}
         </v-card-title>
+        <v-card-subtitle>{{ participant.archer.full_name }}</v-card-subtitle>
         <eventParticipantScorecardEdit :round="edit_round"/>
         <v-card-actions>
           <v-spacer />

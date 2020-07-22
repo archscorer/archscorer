@@ -36,7 +36,7 @@
                 <v-icon size="16">mdi-book-open-outline</v-icon>
               </v-btn>
             </template>
-            <span v-html="row[col.value]"/>
+            <span :class="col.value === 'sum' ? 'font-weight-medium' : ''" v-html="row[col.value]"/>
             <template v-if="'pr'+col.value in row && event.archive === false">
               <v-progress-circular
                 v-model="row['pr'+col.value]"
@@ -110,7 +110,7 @@
             { text: 'Club', value: 'club' },
             { text: 'Class', value: 'class' },
           ]
-          header.push(...this.event.rounds.map(function(r) {
+          header.push(...this.event.rounds.filter(obj => obj.course_type !== 's').map(function(r) {
             return { text: r.ord.toString() + '. ' + r.label,
                     value: r.ord.toString(),
                     class: 'round-header'}
@@ -119,7 +119,11 @@
             header.push({ text: 'x', value: 'x', width: '1%' })
           }
           header.push({ text: 'Sum', value: 'sum', width: '1%' })
-
+          header.push(...this.event.rounds.filter(obj => obj.course_type === 's').map(function(r) {
+            return { text: r.label,
+                    value: r.ord.toString(),
+                    class: 'round-header'}
+          }))
           return header
         } else {
             return [

@@ -252,6 +252,9 @@
           if (this.event.is_open || [this.event.creator, ...this.event.admins].includes(this.user.email)) {
             header.push({ text: 'Actions', value: 'action', sortable: false, width: "1%" })
           }
+          if ([this.event.creator, ...this.event.admins].includes(this.user.email)) {
+            header.push({ text: 'Score', value: 'sum'})
+          }
           if (this.user.email === this.event.creator) {
             if (this.event.catering) {
               header.push({ text: 'Food', value: 'food' })
@@ -264,23 +267,26 @@
       },
       p_table() {
         if (Array.isArray(this.event.participants)) {
-          return this.event.participants.map(function(p) {
+          let so = this.event.rounds.find(obj => obj.course_type === 's')
+          so = so ? so.id : null
+          return this.event.participants.map(p => {
             return {
               id: p.id,
               aId: p.archer.id,
               name: p.archer.full_name,
               classification: p.level_class,
-              class: rankingService.getClass(p, this.ignore_gender),
+              class: rankingService.getClass(p, this.event.ignore_gender),
               club: p.archer.club,
               group: p.group,
               end: p.group_target,
               pos: p.group_pos,
               has_account: p.archer.user,
+              sum: ([this.event.creator, ...this.event.admins].includes(this.user.email) && !this.event.archive ? rankingService.participantScore(p, so) : null),
               food: (p.food ? p.food_choices.split('|').join('; ') : 'No'),
               contact: (p.archer.contact || ''),
               comments: p.comments,
             }
-          }, this.event)
+          })
         } else {
           return []
         }

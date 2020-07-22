@@ -97,7 +97,7 @@
 
 <style>
   th.round-header {
-    max-width: 90px;
+    max-width: 75px;
     overflow: hidden;
     text-overflow: ellipsis;
   }

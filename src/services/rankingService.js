@@ -2,6 +2,10 @@ export default {
   sum(arr) {
     return Array.isArray(arr) && arr.length ? arr.reduce((sum, x) => sum + x) : null;
   },
+  participantScore( p, so ) {
+    // so shootoff round
+    return this.sum([].concat(...p.scorecards.filter(obj => obj.round !== so).map(sc => [...sc.arrows.map(a => a.score)])))
+  },
   participantOrder( a, b ) {
     if ( a.class < b.class) {
       return -1;
@@ -41,9 +45,9 @@ export default {
         place.sum = p.sum
         place.x = p.x
       }
-      if (p.sum < place.sum) {
+      if (typeof p.shootoff !== 'undefined' && p.shootoff !== null) {
         place.place = place.ord
-      } else if (p.shootoff != null) {
+      } else if (p.sum < place.sum) {
         place.place = place.ord
       } else if (p.x < place.x && place.ord > 3) {
         place.place = place.ord
