@@ -36,7 +36,7 @@
                 <v-icon size="16">mdi-book-open-outline</v-icon>
               </v-btn>
             </template>
-            {{ row[col.value] }}
+            <span v-html="row[col.value]"/>
             <template v-if="'pr'+col.value in row && event.archive === false">
               <v-progress-circular
                 v-model="row['pr'+col.value]"
@@ -139,13 +139,22 @@
               club: p.archer.club
             }
             let sums = this.rounds.map(function(r) {
-              row[r.ord] = rankingService.sum( getScore(r, p) )
               if (r.course_type === 's') {
-                if (row[r.ord] > 0) {
-                  row.shootoff = row[r.ord]
+                let so_arrows = getScore(r, p)
+                let so_sum = rankingService.sum( so_arrows )
+                if (so_sum !== null) {
+                  row.shootoff = so_sum
+                  let last_arrow = so_arrows[so_arrows.length - 1]
+                  if (last_arrow !== null) {
+                    // we have last arrow
+                    row[r.ord] = so_sum - last_arrow + '<sup>' + -last_arrow + '</sup>'
+                  } else {
+                    row[r.ord] = so_sum
+                  }
                 }
                 return 0
               }
+              row[r.ord] = rankingService.sum( getScore(r, p) )
               return row[r.ord]
             })
             row['sum'] = sums.length ? rankingService.sum( sums ) : 0
@@ -157,8 +166,10 @@
             })
             row['x'] = x.length ? rankingService.sum( x ) : 0
             this.rounds.map(function (r) {
-              let r_sc = getScore(r, p)
-              row['pr' + r.ord] = (r_sc.filter(obj => obj !== null).length / r_sc.length) * 100
+              if (r.is_open) {
+                let r_sc = getScore(r, p)
+                row['pr' + r.ord] = (r_sc.filter(obj => obj !== null).length / r_sc.length) * 100
+              }
             })
             return row
           }, this.event)

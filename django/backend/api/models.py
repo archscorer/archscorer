@@ -155,6 +155,7 @@ class Record(models.Model):
     archer = models.CharField('Archer name', max_length=255, blank=False)
     date = models.DateField('Date of achievement', blank=True, null=True)
     age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
+    gender = models.CharField('gender', max_length=1, blank=False, choices=[('M', 'Male'), ('F', 'Female')])
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     round = models.CharField('Round', max_length=255, blank=False, choices=RECORD_CHOICES)
     event = models.CharField('Event', max_length=255, blank=True)

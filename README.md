@@ -1,19 +1,18 @@
 # archscorer
 
-## Web UI for project management
-Vue has web based UI that among other things lets you serve, build and lint your project.
-```
-cd ..
-vue ui -H 0.0.0.0 -p 8000
-```
-
-However web based UI is heavier on computer than not web based UI
-
 Brief overview of the development enviroment. I use vanilla debian docker images
 to build my development enviroment. We need:
-* python3
-* npm
-* mysql
+
+### Run container
+docker run -ti --name Archer -v $PWD:/opt/Archery:rw -p 8000-8100:8000-8100 debian
+
+### Install node and vue
+apt-get update
+apt-get upgrade
+apt-get install -y git-core curl build-essential openssl libssl-dev fish man-db procps python3-pip sqlite3 default-mysql-server nginx
+curl -sL https://deb.nodesource.com/setup_14.x | bash -
+apt-get install -y nodejs
+npm install -g @vue/cli
 
 If all dependencies are there you should use docker as following:
 * to start and enter container
@@ -29,6 +28,14 @@ npm ports are in `vue.config.js` file
 start backend (in django folder -- with manage.py file)
 `python3 manage.py runserver 0:8008`
 
+## Web UI for project management
+Vue has web based UI that among other things lets you serve, build and lint your project.
+```
+cd ..
+vue ui -H 0.0.0.0 -p 8000
+```
+
+However web based UI is heavier on computer than not web based UI
 
 ## List of commands that are otherwise useful
 

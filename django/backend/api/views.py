@@ -8,11 +8,12 @@ from django.middleware.csrf import get_token
 from django.db.models import Q
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
-from .models import (User, Club, Course, Archer, Series, Event, Round, Participant, ScoreCard, Arrow)
+from .models import (User, Club, Course, Archer, Series, Event, Round, Participant, ScoreCard, Arrow, Record)
 from .serializers import (UserSerializer, ClubSerializer, ClubsSerializerList, CourseSerializer,
                           ArcherSerializer, SeriesSerializer, EventSerializer, EventSerializerList,
                           RoundSerializer, ParticipantArcherSerializer, ParticipantSerializer,
-                          ParticipantScoreCardSerializer, ArrowSerializer, SeriesSerializerList)
+                          ParticipantScoreCardSerializer, ArrowSerializer, SeriesSerializerList,
+                          RecordSerializer)
 
 class ActiveEvent(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -316,3 +317,11 @@ class ArrowViewSet(mixins.UpdateModelMixin,
             # arrow is saved only if event is active. otherwise returns silently
             # existing model from the database
             serializer.save(updated_by=self.request.user.email)
+
+class RecordViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    List all records. Only list them, no update nor create currently implemented
+    """
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = RecordSerializer
+    queryset = Record.objects.all()

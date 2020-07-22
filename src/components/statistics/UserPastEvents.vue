@@ -1,7 +1,7 @@
 <template>
   <v-card class="mt-5">
+    <v-card-title>My Rounds</v-card-title>
     <v-card-text>
-      List of your past events with scores will appear here
       <v-data-table
         dense
         :mobile-breakpoint="300"
@@ -56,9 +56,8 @@
               for (let sc of p.scorecards) {
                 let r = e.rounds.find(obj => obj.id === sc.round)
                 let c = this.courses.find(obj => obj.id === r.course)
-                let r_label = r.label
-                let c_name = c.name
                 let score = rankingService.sum(sc.arrows.map(a => a.score))
+                let [r_label, c_name] = [r.label, c.name]
                 if (c.type === 's') {
                   continue
                 }

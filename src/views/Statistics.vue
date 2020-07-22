@@ -11,6 +11,7 @@
         </v-card-text>
       </v-card>
       <UserPastEvents v-if="user.id !== null"/>
+      <Records/>
     </v-layout>
   </v-container>
 </template>
@@ -20,11 +21,13 @@
 
   // import SeriesAdd from '@/components/SeriesAdd.vue'
   import UserPastEvents from '@/components/statistics/UserPastEvents.vue'
+  import Records from '@/components/statistics/Records.vue'
 
   export default {
     name: 'Statistics',
     components: {
-      UserPastEvents
+      UserPastEvents,
+      Records,
     },
     data: () => ({
       //

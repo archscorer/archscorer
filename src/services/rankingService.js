@@ -9,26 +9,25 @@ export default {
     if ( a.class > b.class) {
       return 1;
     }
-    if ( a.sum > b.sum ){
-      return -1;
-    }
-    if ( a.sum < b.sum ){
-      return 1;
-    }
-    if (a.shootoff && b.shootoff) {
+    if (a.shootoff !== null && b.shootoff !== null) {
       if (a.shootoff > b.shootoff) {
         return -1;
       }
       if (a.shootoff < b.shootoff) {
         return 1;
       }
-    } else {
-      if (a.x > b.x) {
-        return -1;
-      }
-      if (a.x < b.x) {
-        return 1;
-      }
+    }
+    if ( a.sum > b.sum ){
+      return -1;
+    }
+    if ( a.sum < b.sum ){
+      return 1;
+    }
+    if (a.x > b.x) {
+      return -1;
+    }
+    if (a.x < b.x) {
+      return 1;
     }
     return 0;
   },
@@ -44,7 +43,7 @@ export default {
       }
       if (p.sum < place.sum) {
         place.place = place.ord
-      } else if (p.shootoff) {
+      } else if (p.shootoff != null) {
         place.place = place.ord
       } else if (p.x < place.x && place.ord > 3) {
         place.place = place.ord

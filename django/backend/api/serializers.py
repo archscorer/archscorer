@@ -7,6 +7,7 @@ from .models import (User,
                      Series,
                      Event,
                      Round,
+                     Record,
                      Participant,
                      ScoreCard,
                      Arrow)
@@ -200,4 +201,9 @@ class SeriesSerializerList(serializers.ModelSerializer):
     stages = EventSerializerList(many=True, read_only=True)
     class Meta:
         model = Series
+        fields = '__all__'
+
+class RecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Record
         fields = '__all__'
