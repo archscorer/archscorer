@@ -1,11 +1,21 @@
 <template>
   <v-card class="mt-5">
-    <v-card-title>Records</v-card-title>
+    <v-card-title>Records
+      <v-spacer />
+      <v-text-field
+        v-model="r_search"
+        append-icon="mdi-magnify"
+        label="Filter"
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
     <v-card-text>
       <v-data-table
         dense
         :mobile-breakpoint="300"
         :headers="r_table_header"
+        :search="r_search"
         :items="r_table"
         :items-per-page="50"
         multi-sort
@@ -24,7 +34,7 @@
     components: {
     },
     data: () => ({
-      //
+      r_search: ''
     }),
     computed: {
       ...mapState({

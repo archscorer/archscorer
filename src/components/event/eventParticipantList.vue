@@ -342,20 +342,23 @@
         this.delParticipant({pId: p.id, eId: p.event})
       },
       export2excel() {
-        let data = this.event.participants.map(function(p) {
+        let so = this.event.rounds.find(obj => obj.course_type === 's')
+        so = so ? so.id : null
+        let data = this.event.participants.map(p => {
           return {
-            Class: rankingService.getClass(p, this.ignore_gender),
+            Class: rankingService.getClass(p, this.event.ignore_gender),
             Name: p.archer.full_name,
             Club: p.archer.club,
             Group: p.group,
             End: p.group_target,
             'Position': p.group_pos,
             'Has Account': p.archer.user,
+            Score: rankingService.participantScore(p, so),
             Food: (p.food ? p.food_choices.split('|').join('; ') : 'No'),
             Contact: (p.archer.contact || ''),
             Comments: p.comments,
           }
-        }, this.event)
+        })
         json2excel({data: data, name: 'participants'})
       }
     },

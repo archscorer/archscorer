@@ -1,6 +1,6 @@
 <template>
   <v-card-text>
-    <v-row v-if="sc">
+    <v-row v-if="sc" class="flex-nowrap sc-round">
       <v-col v-for="(half, hi) in round.halves" :key="round.id + '_' + hi">
         <table>
           <thead>
@@ -147,6 +147,9 @@
     margin-right: 3px;
     min-width: 67px!important;
     min-height: 58px;
+  }
+  .sc-round {
+    overflow: auto;
   }
   th {
     padding: 0 5px;

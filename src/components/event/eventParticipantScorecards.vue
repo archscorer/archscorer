@@ -6,7 +6,7 @@
           {{ round.ord }}. {{ round.label }}
         </v-card-title>
         <v-card-text>
-          <v-row>
+          <v-row class="flex-nowrap sc-round">
             <v-col v-for="(half, hi) in round.halves" :key="hi">
               <table>
                 <thead>
@@ -39,6 +39,25 @@
                     <td class="end-sums text-right">
                       {{ end.cum }}
                     </td>
+                  </tr>
+                </tbody>
+              </table>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col class="text-no-wrap text-subtitle-1">
+              Stats:
+            </v-col>
+            <v-col>
+              <table>
+                <thead>
+                  <tr>
+                    <th v-for="(text, ti) in Object.keys(round.stats)" :key="'sth' + ti">{{ text === '0' ? 'M' : text === 'null' ? 'N/A' : text }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="end-arrow" v-for="(val, vi) in Object.values(round.stats)" :key="'sv' + vi">{{ val }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -144,12 +163,27 @@
           let cum = 0
           let halves = []
           let sc_ends = []
+          let stats = {}
           for (let e of ends) {
             // end arrows
             let eAr = sc.arrows.filter(obj => obj.end === e.id)
             let eSum = 0
             if (eAr !== null) {
-              eSum = sum( eAr.map(a => a.score ))
+              eSum = sum( eAr.map(a => {
+                if (a.score in stats) {
+                  stats[a.score] += 1
+                } else {
+                  stats[a.score] = 1
+                }
+                if (a.x) {
+                  if ('x' in stats) {
+                    stats.x += 1
+                  } else {
+                    stats.x = 1
+                  }
+                }
+                return a.score
+              }))
             }
             // update max number
             aNr = e.nr_of_arrows > aNr ? e.nr_of_arrows : aNr
@@ -161,7 +195,7 @@
             }
           }
           halves.push(sc_ends)
-          return Object.assign({}, r, {nr_of_arrows: aNr, halves: halves, sc: sc.id})
+          return Object.assign({}, r, {nr_of_arrows: aNr, halves: halves, sc: sc.id, stats: stats})
         })
       },
       edit_sc(r) {
@@ -222,6 +256,9 @@
     text-align: center;
     min-width: 24px;
     height: 28px;
+  }
+  .sc-round {
+    overflow: auto;
   }
   th {
     padding: 0 5px;
