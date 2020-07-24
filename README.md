@@ -12,7 +12,7 @@ docker run -ti --name Archer -v ${PWD}:/opt/Archery:rw -p 8000-8100:8000-8100 de
 ```
 apt-get update
 apt-get upgrade
-apt-get install -y git-core curl build-essential openssl libssl-dev fish procps python3-pip default-mysql-server
+apt-get install -y git-core curl build-essential openssl libssl-dev fish procps python3-pip mariadb-server-10.3 libmariadb-dev
 curl -sL https://deb.nodesource.com/setup_14.x | bash -
 apt-get install -y nodejs
 npm install -g @vue/cli

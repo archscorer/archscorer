@@ -3,3 +3,4 @@ djangorestframework
 whitenoise
 django-allauth
 django-widget-tweaks
+mysqlclient
