@@ -4,15 +4,26 @@ Brief overview of the development enviroment. I use vanilla debian docker images
 to build my development enviroment. We need:
 
 ### Run container
-docker run -ti --name Archer -v $PWD:/opt/Archery:rw -p 8000-8100:8000-8100 debian
+```
+docker run -ti --name Archer -v ${PWD}:/opt/Archery:rw -p 8000-8100:8000-8100 debian
+```
 
 ### Install node and vue
+```
 apt-get update
 apt-get upgrade
-apt-get install -y git-core curl build-essential openssl libssl-dev fish man-db procps python3-pip sqlite3 default-mysql-server nginx
+apt-get install -y git-core curl build-essential openssl libssl-dev fish procps python3-pip default-mysql-server
 curl -sL https://deb.nodesource.com/setup_14.x | bash -
 apt-get install -y nodejs
 npm install -g @vue/cli
+```
+* running mysql in docker takes few more steps
+```
+mkdir /run/mysqld
+chmod 777 /run/mysqld
+mysqld &
+mysql_secure_installation
+```
 
 If all dependencies are there you should use docker as following:
 * to start and enter container
