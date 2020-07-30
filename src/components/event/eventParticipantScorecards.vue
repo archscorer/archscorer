@@ -164,6 +164,7 @@
           let halves = []
           let sc_ends = []
           let stats = {}
+          let [h, t] = [0, 0]
           for (let e of ends) {
             // end arrows
             let eAr = sc.arrows.filter(obj => obj.end === e.id)
@@ -182,6 +183,13 @@
                     stats.x = 1
                   }
                 }
+                // hit percentage
+                if (a.score !== null) {
+                  if (a.score !== 0) {
+                    h += 1
+                  }
+                  t += 1
+                }
                 return a.score
               }))
             }
@@ -194,6 +202,7 @@
               sc_ends = []
             }
           }
+          stats['%'] = (t !== 0 ? (h/t).toFixed(2) : null)
           halves.push(sc_ends)
           return Object.assign({}, r, {nr_of_arrows: aNr, halves: halves, sc: sc.id, stats: stats})
         })

@@ -73,6 +73,17 @@
         ></v-text-field>
       </v-card-title>
       <v-card-text>
+        <v-row dense
+          v-if="[event.creator, ...event.admins].includes(user.email)">
+          <v-select 
+            v-model="group_by"
+            dense
+            :items="[{ text: '--disabled--', value: null },
+                    { text: 'Class', value: 'class'},
+                    { text: 'End', value: 'end'}]"
+            label="organise archers by">
+          </v-select>
+        </v-row>
         <v-data-table
           dense
           :mobile-breakpoint="300"
@@ -80,7 +91,7 @@
           :items="p_table"
           :search="p_search"
           :loading="loading"
-          group-by="class"
+          :group-by="group_by"
           :items-per-page="50"
           multi-sort
         >
@@ -218,6 +229,7 @@
         food: false,
         food_choices: []
       },
+      group_by: 'class',
       dialog: false,
       creator_menu: false,
       snack: false,
@@ -364,3 +376,10 @@
     },
   }
 </script>
+
+<style scoped>
+  .v-select {
+    transform: scale(0.75);
+    max-width: 150px;
+  } 
+</style>
