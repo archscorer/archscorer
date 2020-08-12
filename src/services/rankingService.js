@@ -49,7 +49,7 @@ export default {
         place.place = place.ord
       } else if (p.sum < place.sum) {
         place.place = place.ord
-      } else if (p.x < place.x && place.ord > 3) {
+      } else if (p.x < place.x && place.place > 3) {
         place.place = place.ord
       }
       p['place'] = place.place

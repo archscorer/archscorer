@@ -14,41 +14,48 @@
         hide-details
       ></v-text-field>
     </v-card-title>
-    <v-data-table
-      :mobile-breakpoint="300"
-      dense
-      :headers="r_table_header"
-      :items="r_table"
-      :search="r_search"
-      :loading="loading"
-      group-by="class"
-      multi-sort
-      :items-per-page="50"
-    >
-      <template v-slot:group="props">
-        <tr class="v-row-group__header">
-          <td :colspan="props.headers.length">{{ props.group }}</td>
-        </tr>
-        <tr v-for="row in props.items" :key="row.id">
-          <td v-for="col in props.headers" :key="col.text">
-            <template v-if="col.value === 'name'">
-              <v-btn icon @click="participant_sc(row.id)" small>
-                <v-icon size="16">mdi-book-open-outline</v-icon>
-              </v-btn>
-            </template>
-            <span :class="col.value === 'sum' ? 'font-weight-medium' : ''" v-html="row[col.value]"/>
-            <template v-if="'pr'+col.value in row && event.archive === false">
-              <v-progress-circular
-                v-model="row['pr'+col.value]"
-                :color="row['pr'+col.value] === 100 ? 'green' : 'error'"
-                width="1"
-                size="12">
-              </v-progress-circular>
-            </template>
-          </td>
-        </tr>
+    <v-card-text>
+      <v-data-table
+        :mobile-breakpoint="300"
+        dense
+        :headers="r_table_header"
+        :items="r_table"
+        :search="r_search"
+        :loading="loading"
+        group-by="class"
+        multi-sort
+        :items-per-page="50"
+      >
+        <template v-slot:group="props">
+          <tr class="v-row-group__header">
+            <td :colspan="props.headers.length">{{ props.group }}</td>
+          </tr>
+          <tr v-for="row in props.items" :key="row.id">
+            <td v-for="col in props.headers" :key="col.text">
+              <template v-if="col.value === 'name'">
+                <v-btn icon @click="participant_sc(row.id)" small>
+                  <v-icon size="16">mdi-book-open-outline</v-icon>
+                </v-btn>
+              </template>
+              <span :class="col.value === 'sum' ? 'font-weight-medium' : ''" v-html="row[col.value]"/>
+              <template v-if="'pr'+col.value in row && event.archive === false">
+                <v-progress-circular
+                  v-model="row['pr'+col.value]"
+                  :color="row['pr'+col.value] === 100 ? 'green' : 'error'"
+                  width="1"
+                  size="12">
+                </v-progress-circular>
+              </template>
+            </td>
+          </tr>
+        </template>
+      </v-data-table>
+    </v-card-text>
+    <v-card-actions>
+      <template v-if="[this.event.creator, ...this.event.admins].includes(this.user.email) || this.event.archive">
+        <p class='text-caption'>Export <v-btn @click="export2pdf()" x-small>to PDF</v-btn></p>
       </template>
-    </v-data-table>
+    </v-card-actions>
     <v-dialog v-model="sc_dialog" max-width="650px">
       <v-card v-if="participant !== null">
         <v-card-title>{{ participant.archer.full_name }} {{ participant.class}} {{ participant.archer.club }}</v-card-title>
@@ -69,9 +76,15 @@
 </template>
 
 <script>
+  import pdfMake from 'pdfmake/build/pdfmake'
+  import pdfFonts from 'pdfmake/build/vfs_fonts'
+
+  pdfMake.vfs = pdfFonts.pdfMake.vfs
+
+  import { mapState } from 'vuex'
+
   import eventParticipantScorecards from '@/components/event/eventParticipantScorecards.vue'
   import rankingService from '@/services/rankingService'
-  import { mapState } from 'vuex'
 
   function getScore(r, p) {
     let r_sc = p.scorecards.find(obj => obj.round === r.id)
@@ -182,7 +195,7 @@
         } else {
           return []
         }
-      },
+      }
     },
     methods: {
       update_r_table() {
@@ -212,6 +225,74 @@
           }
         }
         return false
+      },
+      export2pdf() {
+        let docDefinition = {
+          pageOrientation: this.event.rounds.length > 2 ? 'landscape' : 'portrait',
+          footer: {
+            columns: [
+              { text: window.location.origin + this.$route.path, style: 'footer' },
+              { text: new Date().toLocaleString(), alignment: 'right', style: 'footer' }
+            ]
+          },
+          content: [{text: this.event.name, style: 'header'},
+            [...new Set(this.r_table.map(r => r.class))].map(cls => {
+            return {
+              layout: 'lightHorizontalLines',
+              table: {
+                headerRows: 2,
+                widths: [30, 125, 25, ...Array(this.r_table_header.length - 4).fill('*')],
+                body: [
+                  [{text: cls, colSpan: this.r_table_header.length - 1, style: 'styleheader' },
+                   ...Array(this.r_table_header.length - 2).fill('')],
+
+                  this.r_table_header.filter(h => h.value !== 'class').map(h => {
+                    return {text: h.text, style: 'tableheader'}
+                  }),
+
+                  ...this.r_table.filter(r => r.class === cls).map(r => {
+                    return this.r_table_header.filter(h => h.value !== 'class').map(h => {
+                      if (typeof(r[h.value]) === 'undefined') {
+                        return ''
+                      }
+                      if (typeof(r[h.value]) === 'string' && r[h.value].match(/<sup>(\d)<\/sup>/)) {
+                        let m = r[h.value].match(/(\d+)<sup>(\d)<\/sup>/)
+                        return {columns: [
+                          {text: m[1], width: 'auto'},
+                          {text: m[2], fontSize: 8}
+                        ]}
+                      }
+                      return h.value === 'sum' ? {text: r[h.value], bold: true} : r[h.value]
+                    })
+                  })
+                ]
+              }
+            }
+          })],
+          styles: {
+            header: {
+              fontSize: 24,
+              bold: true,
+              alignment: 'center',
+              margin: [0, 15, 0, 5]
+            },
+            styleheader: {
+              fontSize: 18,
+              bold: true,
+              margin: [0, 15, 0, 5]
+            },
+            tableheader: {
+              fontSize: 12,
+              bold: true,
+              margin: [0, 0, 0, 0]
+            },
+            footer: {
+              fontSize: 10,
+              margin: [5, 0, 5, 0]
+            }
+          },
+        }
+        pdfMake.createPdf(docDefinition).open()
       }
     }
   }

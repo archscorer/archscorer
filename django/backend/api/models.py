@@ -168,7 +168,7 @@ class Record(models.Model):
 
     class Meta:
         ordering = ['age_group', 'style', '-date']
-        unique_together = ['style', 'round', 'age_group', 'scope', 'date']
+        unique_together = ['round', 'age_group', 'gender', 'style', 'scope', 'date']
 
 class Series(models.Model):
     creator = models.ForeignKey(User, related_name='series_created', null=True, on_delete=models.SET_NULL)

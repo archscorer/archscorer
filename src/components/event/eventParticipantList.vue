@@ -75,7 +75,7 @@
       <v-card-text>
         <v-row dense
           v-if="[event.creator, ...event.admins].includes(user.email)">
-          <v-select 
+          <v-select
             v-model="group_by"
             dense
             :items="[{ text: '--disabled--', value: null },
@@ -111,6 +111,7 @@
                   counter="10"
                   single-line
                   autofocus
+                  @focus="$event.target.select()"
                 ></v-text-field>
               </template>
             </v-edit-dialog>
@@ -132,6 +133,7 @@
                   type="number"
                   single-line
                   autofocus
+                  @focus="$event.target.select()"
                 ></v-text-field>
               </template>
             </v-edit-dialog>
@@ -152,6 +154,7 @@
                   counter="1"
                   single-line
                   autofocus
+                  @focus="$event.target.select()"
                 ></v-text-field>
               </template>
             </v-edit-dialog>
@@ -170,11 +173,13 @@
             </template>
           </template>
         </v-data-table>
+      </v-card-text>
+      <v-card-actions>
         <template  v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive">
-          <p class='text-caption'>Export to <v-btn x-small @click="export2excel()">excel</v-btn><br/>
+          <p class='text-caption'>Export <v-btn x-small @click="export2excel()">to excel</v-btn> <v-btn x-small @click="export2ends()">end assignments</v-btn><br/>
           'Position *' - indicates that archer has user account and could be digital scorer.</p>
         </template>
-      </v-card-text>
+      </v-card-actions>
     </v-card>
     <v-dialog v-model="dialog" max-width="500px">
       <v-card>
@@ -198,8 +203,13 @@
 </template>
 
 <script>
+  import json2excel from 'js2excel'
+  import pdfMake from 'pdfmake/build/pdfmake'
+  import pdfFonts from 'pdfmake/build/vfs_fonts'
+
+  pdfMake.vfs = pdfFonts.pdfMake.vfs
+
   import { mapState, mapActions } from 'vuex'
-  import { json2excel } from 'js2excel'
 
   import eventEdit from '@/components/event/eventEdit.vue'
   import eventParticipantDetails from '@/components/event/eventParticipantDetails.vue'
@@ -372,6 +382,67 @@
           }
         })
         json2excel({data: data, name: 'participants'})
+      },
+      export2ends() {
+        let docDefinition = {
+          footer: {
+            columns: [
+              { text: window.location.origin + this.$route.path, style: 'footer' },
+              { text: new Date().toLocaleString(), alignment: 'right', style: 'footer' }
+            ]
+          },
+          content: [{text: this.event.name, style: 'header'}],
+          styles: {
+            header: {
+              fontSize: 24,
+              bold: true,
+              alignment: 'center',
+              margin: [0, 15, 0, 5]
+            },
+            subheader: {
+              fontSize: 16,
+              bold: true,
+              alignment: 'center',
+              margin: [0, 5, 0, 5]
+            },
+            endTitle: {
+              fontSize: 32,
+              bold: true,
+              alignment: 'center',
+              margin: [0, 20, 0, 20]
+            },
+            footer: {
+              fontSize: 10,
+              margin: [5, 0, 5, 0]
+            }
+          },
+        }
+        for (let group of [...new Set(this.p_table.map(p => p.group))]) {
+          docDefinition.content.push({text: group, style: 'subheader'})
+          let groupGrp = this.p_table.filter(p => p.group === group)
+          new Array(...new Set(groupGrp.map(p => p.end))).sort( function(a, b) {return a - b}).map(end => {
+            docDefinition.content.push({
+              table: {
+                widths: [75, '*'],
+                body: [
+                  [{text: end, style: 'endTitle'}, {
+                    layout: 'lightHorizontalLines',
+                    table: {
+                      headerRows: 0,
+                      widths: [125, '*', '*'],
+                      body: [
+                        ...groupGrp.filter(p => p.end === end).sort(function (a, b) {return a.pos < b.pos ? -1 : a.pos > b.pos ? 1 : 0}).map(p => {
+                          return [p.name, p.pos, p.sum > 0 ? p.sum : '']
+                        })
+                      ]
+                    }
+                  }]
+                ]
+              }
+            })
+          })
+        }
+        pdfMake.createPdf(docDefinition).open()
       }
     },
   }
@@ -381,5 +452,5 @@
   .v-select {
     transform: scale(0.75);
     max-width: 150px;
-  } 
+  }
 </style>
