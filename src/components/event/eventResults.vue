@@ -18,8 +18,8 @@
       <v-data-table
         :mobile-breakpoint="300"
         dense
-        :headers="r_table_header"
-        :items="r_table"
+        :headers="r_table.header"
+        :items="r_table.data"
         :search="r_search"
         :loading="loading"
         group-by="class"
@@ -53,7 +53,7 @@
     </v-card-text>
     <v-card-actions>
       <template v-if="[this.event.creator, ...this.event.admins].includes(this.user.email) || this.event.archive">
-        <p class='text-caption'>Export <v-btn @click="export2pdf()" x-small>to PDF</v-btn></p>
+        <p class='text-caption'>Export <v-btn @click="results2pdfProxy()" x-small>to PDF</v-btn></p>
       </template>
     </v-card-actions>
     <v-dialog v-model="sc_dialog" max-width="650px">
@@ -76,15 +76,12 @@
 </template>
 
 <script>
-  import pdfMake from 'pdfmake/build/pdfmake'
-  import pdfFonts from 'pdfmake/build/vfs_fonts'
-
-  pdfMake.vfs = pdfFonts.pdfMake.vfs
-
   import { mapState } from 'vuex'
 
   import eventParticipantScorecards from '@/components/event/eventParticipantScorecards.vue'
   import rankingService from '@/services/rankingService'
+  import pdfService from '@/services/pdfService'
+
 
   function getScore(r, p) {
     let r_sc = p.scorecards.find(obj => obj.round === r.id)
@@ -97,7 +94,6 @@
   }
 
   export default {
-
     components: {
       eventParticipantScorecards,
     },
@@ -115,40 +111,35 @@
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
       },
-      r_table_header() {
+      r_table() {
+        let r_table = {header: [{ text: 'Name', value: 'name' },
+                                { text: 'Class', value: 'class' },
+                                { text: 'Round', value: 'round'}],
+                       data: []}
         if (this.event) {
-          let header = [
+          r_table.header = [
             { text: 'Place', value: 'place', width: '1%' },
             { text: 'Name', value: 'name' },
             { text: 'Club', value: 'club' },
             { text: 'Class', value: 'class' },
           ]
-          header.push(...this.event.rounds.filter(obj => obj.course_type !== 's').map(function(r) {
+          r_table.header.push(...this.event.rounds.filter(obj => obj.course_type !== 's').map(function(r) {
             return { text: r.ord.toString() + '. ' + r.label,
                     value: r.ord.toString(),
                     class: 'round-header'}
           }))
           if (this.rounds_have_x()) {
-            header.push({ text: 'x', value: 'x', width: '1%' })
+            r_table.header.push({ text: 'x', value: 'x', width: '1%' })
           }
-          header.push({ text: 'Sum', value: 'sum', width: '1%' })
-          header.push(...this.event.rounds.filter(obj => obj.course_type === 's').map(function(r) {
+          r_table.header.push({ text: 'Sum', value: 'sum', width: '1%' })
+          r_table.header.push(...this.event.rounds.filter(obj => obj.course_type === 's').map(function(r) {
             return { text: r.label,
                     value: r.ord.toString(),
                     class: 'round-header'}
           }))
-          return header
-        } else {
-            return [
-              { text: 'Name', value: 'name' },
-              { text: 'Class', value: 'class' },
-              { text: 'Round', value: 'round'},
-            ]
         }
-      },
-      r_table() {
         if (Array.isArray(this.event.participants)) {
-          let r_table = this.event.participants.map(function(p) {
+          r_table.data = this.event.participants.map(function(p) {
             let row = {
               id: p.id,
               name: p.archer.full_name,
@@ -190,12 +181,10 @@
             })
             return row
           }, this.event)
-          rankingService.participantRank(r_table)
-          return r_table
-        } else {
-          return []
+          rankingService.participantRank(r_table.data)
         }
-      }
+        return r_table
+      },
     },
     methods: {
       update_r_table() {
@@ -226,75 +215,10 @@
         }
         return false
       },
-      export2pdf() {
-        let docDefinition = {
-          pageOrientation: this.event.rounds.length > 2 ? 'landscape' : 'portrait',
-          footer: {
-            columns: [
-              { text: window.location.origin + this.$route.path, style: 'footer' },
-              { text: new Date().toLocaleString(), alignment: 'right', style: 'footer' }
-            ]
-          },
-          content: [{text: this.event.name, style: 'header'},
-            Array.from(new Set(this.r_table.map(r => r.class))).map(cls => {
-            return {
-              layout: 'lightHorizontalLines',
-              table: {
-                headerRows: 2,
-                widths: [30, 125, 30, ...Array(this.r_table_header.length - 4).fill('*')],
-                body: [
-                  [{text: cls, colSpan: this.r_table_header.length - 1, style: 'styleheader' },
-                   ...Array(this.r_table_header.length - 2).fill('')],
-
-                  this.r_table_header.filter(h => h.value !== 'class').map(h => {
-                    return {text: h.text, style: 'tableheader'}
-                  }),
-
-                  ...this.r_table.filter(r => r.class === cls).map(r => {
-                    return this.r_table_header.filter(h => h.value !== 'class').map(h => {
-                      if (typeof(r[h.value]) === 'undefined') {
-                        return ''
-                      }
-                      if (typeof(r[h.value]) === 'string' && r[h.value].match(/<sup>(\d)<\/sup>/)) {
-                        let m = r[h.value].match(/(\d+)<sup>(\d)<\/sup>/)
-                        return {columns: [
-                          {text: m[1], width: 'auto'},
-                          {text: m[2], fontSize: 8}
-                        ]}
-                      }
-                      return h.value === 'sum' ? {text: r[h.value], bold: true} : r[h.value]
-                    })
-                  })
-                ]
-              }
-            }
-          })],
-          styles: {
-            header: {
-              fontSize: 24,
-              bold: true,
-              alignment: 'center',
-              margin: [0, 15, 0, 5]
-            },
-            styleheader: {
-              fontSize: 18,
-              bold: true,
-              margin: [0, 15, 0, 5]
-            },
-            tableheader: {
-              fontSize: 12,
-              bold: true,
-              margin: [0, 0, 0, 0]
-            },
-            footer: {
-              fontSize: 10,
-              margin: [5, 0, 5, 0]
-            }
-          },
-        }
-        pdfMake.createPdf(docDefinition).open()
+      results2pdfProxy() {
+        pdfService.results2pdf(this.event, this.r_table, this.$route.path)
       }
-    }
+    },
   }
 </script>
 

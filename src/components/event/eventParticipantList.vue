@@ -87,8 +87,8 @@
         <v-data-table
           dense
           :mobile-breakpoint="300"
-          :headers="p_table_header"
-          :items="p_table"
+          :headers="p_table.header"
+          :items="p_table.data"
           :search="p_search"
           :loading="loading"
           :group-by="group_by"
@@ -176,7 +176,7 @@
       </v-card-text>
       <v-card-actions>
         <template  v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive">
-          <p class='text-caption'>Export <v-btn x-small @click="export2excel()">to excel</v-btn> <v-btn x-small @click="export2ends()">end assignments</v-btn><br/>
+          <p class='text-caption'>Export <v-btn x-small @click="export2excel()">to excel</v-btn> <v-btn x-small @click="endAssignments2pdfProxy()">end assignments</v-btn><br/>
           'Position *' - indicates that archer has user account and could be digital scorer.</p>
         </template>
       </v-card-actions>
@@ -204,10 +204,6 @@
 
 <script>
   import json2excel from 'js2excel'
-  import pdfMake from 'pdfmake/build/pdfmake'
-  import pdfFonts from 'pdfmake/build/vfs_fonts'
-
-  pdfMake.vfs = pdfFonts.pdfMake.vfs
 
   import { mapState, mapActions } from 'vuex'
 
@@ -215,6 +211,7 @@
   import eventParticipantDetails from '@/components/event/eventParticipantDetails.vue'
   import eventParticipantAdd from '@/components/event/eventParticipantAdd.vue'
   import rankingService from '@/services/rankingService'
+  import pdfService from '@/services/pdfService'
 
   export default {
 
@@ -256,14 +253,16 @@
       loading() {
         return (this.p_table.length || Array.isArray(this.event.participants) ? false : true)
       },
-      p_table_header() {
-        let header = [
-          { text: 'Name', value: 'name', width: '148px' },
-        ]
+      p_table() {
+        let p_table = {header: [{ text: 'Name',
+                                  value: 'name',
+                                  width: '148px' }],
+                       data: []}
+        // populate table header
         if (this.event.use_level_class) {
-          header.push({ text: 'Classification', value: 'classification'})
+          p_table.header.push({ text: 'Classification', value: 'classification'})
         }
-        header.push(...[
+        p_table.header.push(...[
           { text: 'Class', value: 'class' },
           { text: 'Club', value: 'club' },
           { text: 'Group', value: 'group' },
@@ -272,26 +271,24 @@
         ])
         if (!this.event.archive && this.user.id) {
           if (this.event.is_open || [this.event.creator, ...this.event.admins].includes(this.user.email)) {
-            header.push({ text: 'Actions', value: 'action', sortable: false, width: "1%" })
+            p_table.header.push({ text: 'Actions', value: 'action', sortable: false, width: "1%" })
           }
           if ([this.event.creator, ...this.event.admins].includes(this.user.email)) {
-            header.push({ text: 'Score', value: 'sum'})
+            p_table.header.push({ text: 'Score', value: 'sum'})
           }
           if (this.user.email === this.event.creator) {
             if (this.event.catering) {
-              header.push({ text: 'Food', value: 'food' })
+              p_table.header.push({ text: 'Food', value: 'food' })
             }
-            header.push(...[{ text: 'Contact', value: 'contact' },
+            p_table.header.push(...[{ text: 'Contact', value: 'contact' },
                             { text: 'Comments', value: 'comments' }])
           }
         }
-        return header
-      },
-      p_table() {
+        // populate table data part
         if (Array.isArray(this.event.participants)) {
           let so = this.event.rounds.find(obj => obj.course_type === 's')
           so = so ? so.id : null
-          return this.event.participants.map(p => {
+          p_table.data =  this.event.participants.map(p => {
             return {
               id: p.id,
               aId: p.archer.id,
@@ -309,9 +306,8 @@
               comments: p.comments,
             }
           })
-        } else {
-          return []
         }
+        return p_table
       },
       hint_archive() {
         if (this.event && [this.event.creator, ...this.event.admins].includes(this.user.email)) {
@@ -383,66 +379,8 @@
         })
         json2excel({data: data, name: 'participants'})
       },
-      export2ends() {
-        let docDefinition = {
-          footer: {
-            columns: [
-              { text: window.location.origin + this.$route.path, style: 'footer' },
-              { text: new Date().toLocaleString(), alignment: 'right', style: 'footer' }
-            ]
-          },
-          content: [{text: this.event.name, style: 'header'}],
-          styles: {
-            header: {
-              fontSize: 24,
-              bold: true,
-              alignment: 'center',
-              margin: [0, 15, 0, 5]
-            },
-            subheader: {
-              fontSize: 16,
-              bold: true,
-              alignment: 'center',
-              margin: [0, 5, 0, 5]
-            },
-            endTitle: {
-              fontSize: 32,
-              bold: true,
-              alignment: 'center',
-              margin: [0, 20, 0, 20]
-            },
-            footer: {
-              fontSize: 10,
-              margin: [5, 0, 5, 0]
-            }
-          },
-        }
-        for (let group of Array.from(new Set(this.p_table.map(p => p.group)))) {
-          docDefinition.content.push({text: group, style: 'subheader'})
-          let groupGrp = this.p_table.filter(p => p.group === group)
-          Array.from(new Set(groupGrp.map(p => p.end))).sort( function(a, b) {return a - b}).map(end => {
-            docDefinition.content.push({
-              table: {
-                widths: [75, '*'],
-                body: [
-                  [{text: end, style: 'endTitle'}, {
-                    layout: 'lightHorizontalLines',
-                    table: {
-                      headerRows: 0,
-                      widths: [125, '*', '*', '*'],
-                      body: [
-                        ...groupGrp.filter(p => p.end === end).sort(function (a, b) {return a.pos < b.pos ? -1 : a.pos > b.pos ? 1 : 0}).map(p => {
-                          return [p.name, p.class, p.pos, p.sum > 0 ? p.sum : '']
-                        })
-                      ]
-                    }
-                  }]
-                ]
-              }
-            })
-          })
-        }
-        pdfMake.createPdf(docDefinition).open()
+      endAssignments2pdfProxy() {
+        pdfService.endAssignments2pdf(this.event, this.p_table, this.$route.path)
       }
     },
   }
