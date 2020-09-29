@@ -202,7 +202,7 @@
               sc_ends = []
             }
           }
-          stats['%'] = (t !== 0 ? (h/t).toFixed(2) : null)
+          stats['%'] = (t !== 0 ? (h/t * 100).toFixed(1) : null)
           halves.push(sc_ends)
           return Object.assign({}, r, {nr_of_arrows: aNr, halves: halves, sc: sc.id, stats: stats})
         })

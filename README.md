@@ -1,7 +1,7 @@
 # archscorer
 
 Brief overview of the development enviroment. I use vanilla debian docker images
-to build my development enviroment. We need:
+to build my development enviroment. You'll need:
 
 ### Run container
 ```
@@ -34,12 +34,14 @@ docker exec -ti Archer fish
 multiple container entries are need for convenience
 start frontend (in project folder -- with package.json file)
 npm ports are in `vue.config.js` file
-`npm run serve --watch`
+`npm run serve`
 
 start backend (in django folder -- with manage.py file)
 `python3 manage.py runserver 0:8008`
 
-## Web UI for project management
+## Legacy howto npm and vue commands
+
+### Web UI for project management
 Vue has web based UI that among other things lets you serve, build and lint your project.
 ```
 cd ..
@@ -48,37 +50,27 @@ vue ui -H 0.0.0.0 -p 8000
 
 However web based UI is heavier on computer than not web based UI
 
-## List of commands that are otherwise useful
+### List of commands that are otherwise useful
 
-### Project setup
+#### Project setup
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+#### Compiles and hot-reloads for development
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+#### Compiles and minifies for production
 ```
 npm run build
 ```
 
-### Lints and fixes files
+#### Lints and fixes files
 ```
 npm run lint
 ```
 
-### Customize configuration
+#### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
-
-
-### Documentation snippets
-
-* shootoff is markerd under the type of a course. If creating new shootoff course,
-  make sure to assign it correct type.
-  Courses with type 's' are not used to compute sum, but its score is used for
-  ordering if it is real value (not 0, null, undefined).
-  In addition, it is not checked, but 'shootoff' course should appear only once
-  per event.

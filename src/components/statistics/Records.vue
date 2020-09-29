@@ -60,9 +60,6 @@
         }
         return []
       },
-    },
-    created() {
-      this.$store.dispatch('statistics/getRecords')
     }
   }
 </script>

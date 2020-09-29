@@ -76,7 +76,14 @@
       p_user() {
         let p_user = null
         if (Array.isArray(this.event.participants)) {
-          p_user = this.event.participants.filter(obj => obj.archer.id === this.user.archer.id)
+          if ([this.event.creator, ...this.event.admins].includes(this.user.email)) {
+            p_user = this.event.participants
+          } else {
+            p_user = this.event.participants.filter(obj => obj.archer.id === this.user.archer.id)
+          }
+          p_user = p_user.map(p => {
+            return Object.assign(p, {text: p.group_target + (p.group ? ' ('+ p.group +')' : '') })
+          })
         }
         return p_user ? p_user : null
       },

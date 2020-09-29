@@ -236,12 +236,12 @@
             ]
           },
           content: [{text: this.event.name, style: 'header'},
-            [...new Set(this.r_table.map(r => r.class))].map(cls => {
+            Array.from(new Set(this.r_table.map(r => r.class))).map(cls => {
             return {
               layout: 'lightHorizontalLines',
               table: {
                 headerRows: 2,
-                widths: [30, 125, 25, ...Array(this.r_table_header.length - 4).fill('*')],
+                widths: [30, 125, 30, ...Array(this.r_table_header.length - 4).fill('*')],
                 body: [
                   [{text: cls, colSpan: this.r_table_header.length - 1, style: 'styleheader' },
                    ...Array(this.r_table_header.length - 2).fill('')],

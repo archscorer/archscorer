@@ -417,10 +417,10 @@
             }
           },
         }
-        for (let group of [...new Set(this.p_table.map(p => p.group))]) {
+        for (let group of Array.from(new Set(this.p_table.map(p => p.group)))) {
           docDefinition.content.push({text: group, style: 'subheader'})
           let groupGrp = this.p_table.filter(p => p.group === group)
-          new Array(...new Set(groupGrp.map(p => p.end))).sort( function(a, b) {return a - b}).map(end => {
+          Array.from(new Set(groupGrp.map(p => p.end))).sort( function(a, b) {return a - b}).map(end => {
             docDefinition.content.push({
               table: {
                 widths: [75, '*'],
@@ -429,10 +429,10 @@
                     layout: 'lightHorizontalLines',
                     table: {
                       headerRows: 0,
-                      widths: [125, '*', '*'],
+                      widths: [125, '*', '*', '*'],
                       body: [
                         ...groupGrp.filter(p => p.end === end).sort(function (a, b) {return a.pos < b.pos ? -1 : a.pos > b.pos ? 1 : 0}).map(p => {
-                          return [p.name, p.pos, p.sum > 0 ? p.sum : '']
+                          return [p.name, p.class, p.pos, p.sum > 0 ? p.sum : '']
                         })
                       ]
                     }

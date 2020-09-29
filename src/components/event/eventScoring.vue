@@ -17,8 +17,9 @@
           label="Select your group to score."
           v-model="user_group"
           :items="p_user"
-          item-text="group"
-          return-object></v-select>
+          return-object
+          @change="resetScoreCards(); round = {id: null}">
+        </v-select>
         <v-select
           label="Select round for scoring."
           v-model="round"
@@ -150,9 +151,14 @@
         this.scorecards_loading = true
         // ask for scorecards. Creating new ones will take time, therefore catch
         // timeout and let user know of it
-        this.getScoreCards({eId: eId,
-                            rId: rId,
-                            pId: this.user_group.id })
+        let request = {eId: eId,
+                       rId: rId,
+                       pId: this.user_group.id }
+        if ([this.event.creator, ...this.event.admins].includes(this.user.email)) {
+          Object.assign(request, {group: this.user_group.group,
+                                  group_target: this.user_group.group_target})
+        }
+        this.getScoreCards(request)
         .then(() => {
           this.scorecards_loading = false
           this.get_course(this.round.course)

@@ -88,6 +88,7 @@
     }),
     created() {
       this.$store.dispatch('courses/getCourses')
+      this.$store.dispatch('statistics/getRecords')
     }
   };
 </script>
