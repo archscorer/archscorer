@@ -75,14 +75,18 @@
       <v-card-text>
         <v-row dense
           v-if="[event.creator, ...event.admins].includes(user.email)">
-          <v-select
-            v-model="group_by"
-            dense
-            :items="[{ text: '--disabled--', value: null },
-                    { text: 'Class', value: 'class'},
-                    { text: 'End', value: 'end'}]"
-            label="organise archers by">
-          </v-select>
+          <v-col>
+            <v-select
+              v-model="group_by"
+              dense
+              :items="[{ text: '--disabled--', value: null },
+                      { text: 'Class', value: 'class'},
+                      { text: 'End', value: 'end'}]"
+              label="organise archers by">
+            </v-select>
+            <p>Export end assignments to <v-btn x-small color="primary" @click="endAssignments2pdfProxy()">PDF</v-btn><br/>
+            Export all participant data to <v-btn x-small color="green" dark @click="export2excel()">EXCEL</v-btn></p>
+          </v-col>
         </v-row>
         <v-data-table
           dense
@@ -176,8 +180,7 @@
       </v-card-text>
       <v-card-actions>
         <template  v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive">
-          <p class='text-caption'>Export <v-btn x-small @click="export2excel()">to excel</v-btn> <v-btn x-small @click="endAssignments2pdfProxy()">end assignments</v-btn><br/>
-          'Position *' - indicates that archer has user account and could be digital scorer.</p>
+          <p class='text-caption'>'Position *' - indicates that archer has user account and could be digital scorer.</p>
         </template>
       </v-card-actions>
     </v-card>
@@ -203,7 +206,7 @@
 </template>
 
 <script>
-  import json2excel from 'js2excel'
+  import { json2excel } from 'js2excel'
 
   import { mapState, mapActions } from 'vuex'
 
@@ -388,7 +391,6 @@
 
 <style scoped>
   .v-select {
-    transform: scale(0.75);
-    max-width: 150px;
+    max-width: 120px;
   }
 </style>

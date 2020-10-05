@@ -52,9 +52,18 @@
       </v-data-table>
     </v-card-text>
     <v-card-actions>
-      <template v-if="[this.event.creator, ...this.event.admins].includes(this.user.email) || this.event.archive">
-        <p class='text-caption'>Export <v-btn @click="results2pdfProxy()" x-small>to PDF</v-btn></p>
-      </template>
+      <v-col>
+        <template v-if="[this.event.creator, ...this.event.admins].includes(this.user.email) || this.event.archive">
+          <p class='text-caption'>Export <v-btn @click="results2pdfProxy()" x-small>to PDF</v-btn></p>
+        </template>
+        <template v-if="[this.event.creator, ...this.event.admins].includes(this.user.email)">
+          <p class='text-caption'>Infinite scroll loop
+            <v-btn @click="scroll_loop=(scroll_loop ? false : true)" x-small>
+              {{ scroll_loop ? 'End' : 'Start' }}
+            </v-btn>
+          </p>
+        </template>
+      </v-col>
     </v-card-actions>
     <v-dialog v-model="sc_dialog" max-width="650px">
       <v-card v-if="participant !== null">
@@ -72,6 +81,15 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-btn v-if="scroll_loop"
+      @click="scroll_loop = false"
+      color="error"
+      fixed
+      dark
+      bottom
+      right
+      fab
+    ><v-icon>mdi-stop</v-icon></v-btn>
   </v-card>
 </template>
 
@@ -102,11 +120,22 @@
       sc_dialog: false,
       loading: false,
       participant: null,
+      scroll_loop: false,
     }),
+    watch: {
+      scroll_loop: {
+        handler() {
+          if (this.scroll_loop) {
+            this.infinite_loop()
+          }
+        }
+      }
+    },
     computed: {
       ...mapState({
         user: state => state.user.user,
         courses: state => state.courses.courses,
+        records: state => state.statistics.records,
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
@@ -214,6 +243,27 @@
           }
         }
         return false
+      },
+      infinite_loop() {
+        let scroll_target = document.body.scrollHeight - window.innerHeight
+        console.log(scroll_target)
+
+        console.log('first scroll: ' + new Date())
+        this.$vuetify.goTo(0, {duration: 100}).then(() => {
+          console.log('reload: ' + new Date())
+          this.$store.dispatch('events/updateEvent', this.event.id).then(() => {
+            console.log('slow scroll: ' + new Date())
+            this.$vuetify.goTo(scroll_target, {
+              duration: scroll_target * 20,
+              easing: 'linear'
+            }).then(() => {
+              if (this.scroll_loop) {
+                console.log('init timeout: ' + new Date())
+                setTimeout(this.infinite_loop, 3000)
+              }
+            })
+          })
+        })
       },
       results2pdfProxy() {
         pdfService.results2pdf(this.event, this.r_table, this.$route.path)

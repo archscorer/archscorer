@@ -138,8 +138,10 @@
         // course layout determines the order of ends and scoring
         this.course = this.courses.find(obj => obj.id === cId)
         this.halves = this.course.halves
-        this.end_view = (this.user_group.group_target < this.course.ends.length ? this.user_group.group_target - 1 : 0)
-        // TODO: if course name or whatever matches indoor, then end_view should remain 0
+        this.end_view = 0
+        if (this.user_group.group_target < this.course.ends.length && this.course.name.indexOf('Indoor') === -1) {
+          this.end_view = this.user_group.group_target - 1
+        }
       },
       get_scorecards(eId, rId) {
         if (this.user_group.id === null) {

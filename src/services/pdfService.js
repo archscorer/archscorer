@@ -43,7 +43,7 @@ export default {
           fontSize: 32,
           bold: true,
           alignment: 'center',
-          margin: [0, 20, 0, 20]
+          margin: [0, 16, 0, 16]
         }
       }, styles)
     }
