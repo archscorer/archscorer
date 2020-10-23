@@ -7,7 +7,7 @@
         :mobile-breakpoint="300"
         :headers="p_table_header"
         :items="p_table"
-        :items-per-page="50"
+        :items-per-page="5"
         multi-sort
       >
       <template v-slot:item.event="props">
@@ -19,12 +19,9 @@
 </template>
 
 <script>
-  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
   import { mapState } from 'vuex'
-  import rankingService from '@/services/rankingService'
 
   export default {
-    // name: 'Series',
     components: {
     },
     data: () => ({
@@ -56,7 +53,7 @@
               for (let sc of p.scorecards) {
                 let r = e.rounds.find(obj => obj.id === sc.round)
                 let c = this.courses.find(obj => obj.id === r.course)
-                let score = rankingService.sum(sc.arrows.map(a => a.score))
+                let score = sc.score
                 let [r_label, c_name] = [r.label, c.name]
                 if (c.type === 's') {
                   continue

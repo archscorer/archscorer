@@ -5,14 +5,11 @@
     </template>
     <v-card>
       <v-toolbar dark color="primary">
+        <v-toolbar-title>Edit {{ event.name }}</v-toolbar-title>
+        <v-spacer />
         <v-btn icon dark @click="dialog = false">
             <v-icon>mdi-close</v-icon>
         </v-btn>
-        <v-toolbar-title>Edit {{ event.name }}</v-toolbar-title>
-        <v-spacer />
-        <v-toolbar-items>
-          <v-btn dark text @click="putEvent({eId: event.id, event: event}); dialog = false">Save</v-btn>
-        </v-toolbar-items>
       </v-toolbar>
       <v-card class="ma-5">
         <v-card-title>General Info</v-card-title>
@@ -107,13 +104,14 @@
               ></v-switch>
             </v-col>
           </v-row>
+          <eventParticipantCategories :event="event"/>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn color="error"
                  @click="deleteE(event.id)">Delete Event</v-btn>
           <v-btn color="primary"
-                 @click="putEvent({eId: event.id, event: event})">Save Changes</v-btn>
+                 @click="putEventProxy(event)">Save Changes</v-btn>
         </v-card-actions>
       </v-card>
       <v-card class="ma-5" v-if="!event.archive">
@@ -179,7 +177,12 @@
 
   import { mapState, mapActions } from 'vuex'
 
+  import eventParticipantCategories from '@/components/event/eventParticipantCategories.vue'
+
   export default {
+    components: {
+      eventParticipantCategories,
+    },
     data: () => ({
       dialog: false,
       date_start_menu: false,
@@ -257,11 +260,17 @@
           this.delRound({eId: this.event.id, rId: r.id})
         }
       },
+      putEventProxy(e) {
+        this.putEvent({eId: e.id, event: Object.assign({}, e, {age_style_used: e.age_style_used.join(',')})})
+      },
       e_edit() {
         // for edit dialog create clone of stored event, so closing wihtout saving would
         // not affect store state.
-        this.event = Object.assign({}, this.p_event)
-        this.event.rounds = [...this.event.rounds]
+        this.event = Object.assign({}, this.p_event,
+          {
+            age_style_used: this.p_event.age_style_used.split(','),
+            rounds: [...this.p_event.rounds]
+          })
       },
       e_update() {
         // TODO there is possible async clash with e_edit. It is possible that e_edit is finished first

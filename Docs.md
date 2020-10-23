@@ -14,3 +14,7 @@
   ordering if it is real value (not 0, null, undefined).
   In addition, it is not checked, but 'shootoff' course should appear only once
   per event.
+
+### Participant categories for IFAA, FAAE and WA
+* the lists of eligible categories are defined in only one Vue component and thus
+  should be maintained there: src/components/event/eventParticipantCategories.vue.

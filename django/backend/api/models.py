@@ -35,11 +35,13 @@ TYPE_CHOICES = [('private', 'Private'),
                 ('club', 'Club'),
                 ('open', 'Open')]
 
-AGEGROUP_CHOICES = [('C', 'Cub'),
+AGEGROUP_CHOICES = [('C', 'Cub/Cadet'),
                     ('J', 'Junior'),
+                    ('Y', 'Young Adult'),
                     ('A', 'Adult'),
                     ('V', 'Veteran'),
-                    ('S', 'Senior')]
+                    ('S', 'Senior'),
+                    ('M', 'Master')]
 
 STYLE_CHOICES = [
     ('BB-C', 'Barebow Compound'),
@@ -54,7 +56,11 @@ STYLE_CHOICES = [
     ('HB', 'Historic Longbow'),
     ('LB', 'Longbow'),
     ('TR', 'Traditional Recurve'),
-    ('**', 'Variable')]
+    ('**', 'Variable'),
+    ('R', 'Recurve'),
+    ('C', 'Compound'),
+    ('L', 'Longbow'),
+    ('I', 'Instinctive')]
 
 LEVEL_CHOICES = [('A', 'A'),
                  ('B', 'B'),
@@ -136,6 +142,7 @@ class Course(models.Model):
     type = models.CharField('Round/Unit', max_length=1, default='r', choices=[('u', 'Unit'),
                                                                               ('r', 'Round'),
                                                                               ('s', 'Shootoff')])
+    format = models.CharField('Format', max_length=255, blank=True, choices=RECORD_CHOICES)
 
     class Meta:
         ordering = ['name']
@@ -157,7 +164,7 @@ class Record(models.Model):
     age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
     gender = models.CharField('gender', max_length=1, blank=False, choices=[('M', 'Male'), ('F', 'Female')])
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
-    round = models.CharField('Round', max_length=255, blank=False, choices=RECORD_CHOICES)
+    format = models.CharField('Format', max_length=255, blank=False, choices=RECORD_CHOICES)
     event = models.CharField('Event', max_length=255, blank=True)
     score = models.IntegerField('Record score', blank=False)
     # scope should be explained - country code (EE, LAT, etc) for national ones, EU, USA for unions, W for world
@@ -168,7 +175,7 @@ class Record(models.Model):
 
     class Meta:
         ordering = ['age_group', 'style', '-date']
-        unique_together = ['round', 'age_group', 'gender', 'style', 'scope', 'date']
+        unique_together = ['format', 'age_group', 'gender', 'style', 'scope', 'date']
 
 class Series(models.Model):
     creator = models.ForeignKey(User, related_name='series_created', null=True, on_delete=models.SET_NULL)
@@ -216,6 +223,7 @@ class Event(models.Model):
     records = models.CharField('record category (nat/EM/MM)', max_length=50, blank=True, default='')
     use_level_class = models.BooleanField('Use Level Classes', default=False)
     ignore_gender = models.CharField('age_style to merge gender (A_TR, V_TR)', max_length=50, blank=True, default='')
+    age_style_used = models.TextField('age_style classes used in the event', blank=True)
 
     series = models.ForeignKey(Series, related_name='stages', null=True, blank=True, on_delete=models.SET_NULL)
 
@@ -243,12 +251,10 @@ class Participant(models.Model):
     food = models.BooleanField(default=False)
     food_choices = models.CharField(max_length=255, blank=True)
     comments = models.CharField('Comments to organiser', max_length=255, blank=True)
-    # TODO do these have to be integers? could/should I let them free?
     group_target = models.IntegerField('End nr', default=1)
     group = models.CharField('Group', max_length=10, blank=True, default='')
     group_pos = models.CharField('Archer position', max_length=1, blank=True, default='')
     level_class = models.CharField('Level class', max_length=1, blank=True, default='')
-
 
     class Meta:
         ordering = ['created']
@@ -258,6 +264,7 @@ class ScoreCard(models.Model):
     participant = models.ForeignKey(Participant, related_name='scorecards', on_delete=models.CASCADE)
     round = models.ForeignKey(Round, related_name='scorecards', on_delete=models.CASCADE)
     score = models.IntegerField('Final score', default=None, null=True)
+    spots = models.IntegerField('nr of "x" or equivalent', default=None, null=True)
 
     class Meta:
         ordering = ['participant__group_pos']

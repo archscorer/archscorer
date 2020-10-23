@@ -24,7 +24,7 @@
         :loading="loading"
         group-by="class"
         multi-sort
-        :items-per-page="50"
+        :items-per-page="4 * 28"
       >
         <template v-slot:group="props">
           <tr class="v-row-group__header">
@@ -33,6 +33,9 @@
           <tr v-for="row in props.items" :key="row.id">
             <td v-for="col in props.headers" :key="col.text">
               <template v-if="col.value === 'name'">
+                <!-- <v-btn v-if="row.records" icon @click="participant_records(row.records)" small>
+                  <v-icon size="16" color="primary">mdi-star</v-icon>
+                </v-btn> -->
                 <v-btn icon @click="participant_sc(row.id)" small>
                   <v-icon size="16">mdi-book-open-outline</v-icon>
                 </v-btn>
@@ -43,7 +46,9 @@
                   v-model="row['pr'+col.value]"
                   :color="row['pr'+col.value] === 100 ? 'green' : 'error'"
                   width="1"
-                  size="12">
+                  size="12"
+                  class='progress-text'>
+                  {{ row['pr'+col.value] === 100 ? '' : row['pr'+col.value] === 0 ? '' : row['pr'+col.value] }}
                 </v-progress-circular>
               </template>
             </td>
@@ -53,21 +58,22 @@
     </v-card-text>
     <v-card-actions>
       <v-col>
-        <template v-if="[this.event.creator, ...this.event.admins].includes(this.user.email) || this.event.archive">
-          <p class='text-caption'>Export <v-btn @click="results2pdfProxy()" x-small>to PDF</v-btn></p>
-        </template>
-        <template v-if="[this.event.creator, ...this.event.admins].includes(this.user.email)">
-          <p class='text-caption'>Infinite scroll loop
-            <v-btn @click="scroll_loop=(scroll_loop ? false : true)" x-small>
-              {{ scroll_loop ? 'End' : 'Start' }}
-            </v-btn>
-          </p>
-        </template>
+        <p class='text-caption'>
+          <template v-if="[this.event.creator, ...this.event.admins].includes(this.user.email) || this.event.archive">
+            Export results to <v-btn x-small color="primary" @click="results2pdfProxy()">PDF</v-btn>
+          </template>
+          <template v-if="[this.event.creator, ...this.event.admins].includes(this.user.email)">
+            <br />Infinite scroll loop
+              <v-btn  x-small color="secondary" @click="scroll_loop=(scroll_loop ? false : true)">
+                {{ scroll_loop ? 'End' : 'Start' }}
+              </v-btn>
+          </template>
+        </p>
       </v-col>
     </v-card-actions>
     <v-dialog v-model="sc_dialog" max-width="650px">
       <v-card v-if="participant !== null">
-        <v-card-title>{{ participant.archer.full_name }} {{ participant.class}} {{ participant.archer.club }}</v-card-title>
+        <v-card-title>{{ participant.archer.full_name }} {{ participant.class}} {{ participant.archer.club_details.name_short }}</v-card-title>
         <v-card-subtitle>{{ event.name }}</v-card-subtitle>
         <v-card-text>
           <eventParticipantScorecards :pId="participant.id"
@@ -81,6 +87,20 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- <v-dialog v-model="records_dialog" max-width="650px">
+      <v-card>
+        <v-card-title>New records</v-card-title>
+        <v-card-text>
+          <v-row v-for="(rec, i) in new_records" :key="'rec_' + i">
+            <v-col v-for="(attr, j) in ['archer','format','class','score','scope']" :key="'rec_' + i + '_' + j">{{ rec[attr] }}</v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer/>
+          <v-btn text @click="records_dialog = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog> -->
     <v-btn v-if="scroll_loop"
       @click="scroll_loop = false"
       color="error"
@@ -102,12 +122,12 @@
 
 
   function getScore(r, p) {
-    let r_sc = p.scorecards.find(obj => obj.round === r.id)
+    let r_sc = p.scorecards.find(sc => sc.round === r.id)
     return r_sc ?  r_sc.arrows.map(a => a.score) : [null]
   }
 
-  function getX(r, p) {
-    let r_sc = p.scorecards.find(obj => obj.round === r.id)
+  function getSpots(r, p) {
+    let r_sc = p.scorecards.find(sc => sc.round === r.id)
     return r_sc ?  r_sc.arrows.map(a => a.x ? 1 : 0) : [null]
   }
 
@@ -118,9 +138,16 @@
     data: () => ({
       r_search: '',
       sc_dialog: false,
+      // records_dialog: false,
       loading: false,
       participant: null,
+      // new_records: [],
       scroll_loop: false,
+      // scope_nat: {
+      //   FAAE: 'EE',
+      //   // TODO when more clubs with different associations appear add here
+      //   // or add it to the database with relevant getter
+      // },
     }),
     watch: {
       scroll_loop: {
@@ -152,7 +179,7 @@
             { text: 'Club', value: 'club' },
             { text: 'Class', value: 'class' },
           ]
-          r_table.header.push(...this.event.rounds.filter(obj => obj.course_type !== 's').map(function(r) {
+          r_table.header.push(...this.event.rounds.filter(r => r.course_details.type !== 's').map(function(r) {
             return { text: r.ord.toString() + '. ' + r.label,
                     value: r.ord.toString(),
                     class: 'round-header'}
@@ -161,56 +188,117 @@
             r_table.header.push({ text: 'x', value: 'x', width: '1%' })
           }
           r_table.header.push({ text: 'Sum', value: 'sum', width: '1%' })
-          r_table.header.push(...this.event.rounds.filter(obj => obj.course_type === 's').map(function(r) {
+          r_table.header.push(...this.event.rounds.filter(r => r.course_details.type === 's').map(function(r) {
             return { text: r.label,
                     value: r.ord.toString(),
                     class: 'round-header'}
           }))
-        }
-        if (Array.isArray(this.event.participants)) {
-          r_table.data = this.event.participants.map(function(p) {
-            let row = {
-              id: p.id,
-              name: p.archer.full_name,
-              class: rankingService.getClass(p, this.ignore_gender),
-              club: p.archer.club
-            }
-            let sums = this.rounds.map(function(r) {
-              if (r.course_type === 's') {
-                let so_arrows = getScore(r, p)
-                let so_sum = rankingService.sum( so_arrows )
-                if (so_sum !== null) {
-                  row.shootoff = so_sum
-                  let last_arrow = so_arrows[so_arrows.length - 1]
-                  if (last_arrow !== null) {
-                    // we have last arrow
-                    row[r.ord] = so_sum - last_arrow + '<sup>' + -last_arrow + '</sup>'
-                  } else {
-                    row[r.ord] = so_sum
+          if (Array.isArray(this.event.participants)) {
+            r_table.data = this.event.participants.map(p => {
+              let row = {
+                id: p.id,
+                name: p.archer.full_name,
+                class: rankingService.getClass(p, this.event.ignore_gender),
+                club: p.archer.club_details.name_short,
+                rounds: [],
+              }
+              let sums = this.event.rounds.map(function(r) {
+                if (r.course_details.type === 's') {
+                  let so_arrows = getScore(r, p)
+                  let so_sum = rankingService.sum( so_arrows )
+                  if (so_sum !== null) {
+                    row.shootoff = so_sum
+                    let last_arrow = so_arrows[so_arrows.length - 1]
+                    if (last_arrow !== null) {
+                      // we have last arrow
+                      row[r.ord] = so_sum - last_arrow + '<sup>' + -last_arrow + '</sup>'
+                    } else {
+                      row[r.ord] = so_sum
+                    }
+                  }
+                  return 0
+                }
+                let sc_score = rankingService.sum( getScore(r, p) )
+                if (r.course_details.format !== '') {
+                  if (r.course_details.type === 'r') {
+                    row.rounds.push({ format: r.course_details.format, score: sc_score })
+                  }
+                  if (r.course_details.type === 'u') {
+                    let ui = this.findIndex(obj => obj.unit === r.course)
+                    if (ui === -1) {
+                      this.push({unit: r.course, sc_score: sc_score})
+                    } else {
+                      row.rounds.push({ format: r.course_details.format, score: sc_score + this[ui].sc_score })
+                      this.splice(ui, 1)
+                    }
                   }
                 }
-                return 0
-              }
-              row[r.ord] = rankingService.sum( getScore(r, p) )
-              return row[r.ord]
+                // add scorecard score to results table
+                row[r.ord] = sc_score
+                // return score as part of scores array to calculate sum
+                return sc_score
+              }, []) // anonymus array for unit to round score transform
+              row.sum = sums.length ? rankingService.sum( sums ) : 0
+              let spots = this.event.rounds.map(function(r) {
+                if (r.course_details.type === 's') {
+                  return 0
+                }
+                return rankingService.sum( getSpots(r, p) )
+              })
+              row.x = spots.length ? rankingService.sum( spots ) : 0
+              this.event.rounds.map(function (r) {
+                if (r.is_open) {
+                  let arrows = getScore(r, p)
+                  row['pr' + r.ord] = Math.round((arrows.filter(a => a !== null).length / arrows.length) * 100)
+                }
+              })
+              // // NOTE here **no club** ID has been hardcoded
+              // if (this.event.records && p.archer.club_details.id !== 1) {
+              //   let records = []
+              //   let row_class = p.age_group + p.archer.gender + p.style
+              //   for (let r of row.rounds) {
+              //     let current_record = this.records.filter(record => {
+              //       let rec_class = record.age_group + record.gender + record.style
+              //       // build scope here
+              //       let scope = this.event.records
+              //       if (scope === 'nat') {
+              //         scope = this.scope_nat[p.archer.club_details.association]
+              //       } else {
+              //         // NOTE scope order is important here - 'nat/EU/W'
+              //         // the combinations are still tricky and might not work
+              //         scope = this.scope_nat[p.archer.club_details.association] + '/' + scope
+              //       }
+              //       if ( rec_class === row_class &&
+              //           record.format === r.format &&
+              //           record.scope.includes(scope)) {
+              //         //  && record.scope.includes(this.event.records) - this is not entirely accurate
+              //         // as it needs to be cleared -- event record score should be one of 'nat', 'EU', 'W'
+              //         // this is hierary, not sure about if 'W' can be shot at 'EU' turnament, 'nat' can be
+              //         // shot on either
+              //         return true
+              //       }
+              //       return false
+              //     })
+              //     if (r.score && r.score > Math.max(...current_record.map(record => record.score))) {
+              //       records.push({
+              //         scope: this.event.records,
+              //         event: this.event.name,
+              //         date: this.event.date_start,
+              //         format: r.format,
+              //         archer: row.name,
+              //         class: row_class,
+              //         score: r.score
+              //       })
+              //     }
+              //   }
+              //   if (records.length) {
+              //     row.records = records
+              //   }
+              // }
+              return row
             })
-            row['sum'] = sums.length ? rankingService.sum( sums ) : 0
-            let x = this.rounds.map(function(r) {
-              if (r.course_type === 's') {
-                return 0
-              }
-              return rankingService.sum( getX(r, p) )
-            })
-            row['x'] = x.length ? rankingService.sum( x ) : 0
-            this.rounds.map(function (r) {
-              if (r.is_open) {
-                let r_sc = getScore(r, p)
-                row['pr' + r.ord] = (r_sc.filter(obj => obj !== null).length / r_sc.length) * 100
-              }
-            })
-            return row
-          }, this.event)
-          rankingService.participantRank(r_table.data)
+            rankingService.participantRank(r_table.data)
+          }
         }
         return r_table
       },
@@ -223,10 +311,14 @@
         })
       },
       participant_sc(pId) {
-        this.participant = this.event.participants.find(obj => obj.id === pId)
-        this.participant['class'] = this.participant.age_group + this.participant.archer.gender + this.participant.style
+        this.participant = this.event.participants.find(p => p.id === pId)
+        this.participant['class'] = rankingService.getClass(this.participant, this.event.ignore_gender)
         this.sc_dialog = true
       },
+      // participant_records(records) {
+      //   this.new_records = records
+      //   this.records_dialog = true
+      // },
       sc_edit() {
         return [this.event.creator, ...this.event.admins].includes(this.user.email) && !this.event.archive
       },
@@ -246,19 +338,13 @@
       },
       infinite_loop() {
         let scroll_target = document.body.scrollHeight - window.innerHeight
-        console.log(scroll_target)
-
-        console.log('first scroll: ' + new Date())
         this.$vuetify.goTo(0, {duration: 100}).then(() => {
-          console.log('reload: ' + new Date())
           this.$store.dispatch('events/updateEvent', this.event.id).then(() => {
-            console.log('slow scroll: ' + new Date())
             this.$vuetify.goTo(scroll_target, {
               duration: scroll_target * 20,
               easing: 'linear'
             }).then(() => {
               if (this.scroll_loop) {
-                console.log('init timeout: ' + new Date())
                 setTimeout(this.infinite_loop, 3000)
               }
             })
@@ -275,5 +361,8 @@
 <style scoped>
   td {
     white-space: nowrap;
+  }
+  .progress-text {
+    font-size: 7px;
   }
 </style>

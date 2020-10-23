@@ -96,7 +96,7 @@
           :search="p_search"
           :loading="loading"
           :group-by="group_by"
-          :items-per-page="50"
+          :items-per-page="4 * 28"
           multi-sort
         >
           <template v-slot:item.group="props"
@@ -190,7 +190,8 @@
         <eventParticipantDetails :participant="p_edit"
           :catering="event.catering"
           :level_class="event.use_level_class"
-          :catering_choices="event.catering_choices.split('|')"/>
+          :catering_choices="event.catering_choices.split('|')"
+          :age_style_choices="event.age_style_used.split(',')"/>
         <v-card-actions>
           <v-spacer/>
           <v-btn text @click="cancel(); dialog = false">Cancel</v-btn>
@@ -289,7 +290,7 @@
         }
         // populate table data part
         if (Array.isArray(this.event.participants)) {
-          let so = this.event.rounds.find(obj => obj.course_type === 's')
+          let so = this.event.rounds.find(r => r.course_details.type === 's')
           so = so ? so.id : null
           p_table.data =  this.event.participants.map(p => {
             return {
@@ -298,7 +299,7 @@
               name: p.archer.full_name,
               classification: p.level_class,
               class: rankingService.getClass(p, this.event.ignore_gender),
-              club: p.archer.club,
+              club: p.archer.club_details.name_short,
               group: p.group,
               end: p.group_target,
               pos: p.group_pos,
@@ -363,13 +364,13 @@
         this.delParticipant({pId: p.id, eId: p.event})
       },
       export2excel() {
-        let so = this.event.rounds.find(obj => obj.course_type === 's')
+        let so = this.event.rounds.find(obj => obj.course_details.type === 's')
         so = so ? so.id : null
         let data = this.event.participants.map(p => {
           return {
             Class: rankingService.getClass(p, this.event.ignore_gender),
             Name: p.archer.full_name,
-            Club: p.archer.club,
+            Club: p.archer.club_details.name_short,
             Group: p.group,
             End: p.group_target,
             'Position': p.group_pos,

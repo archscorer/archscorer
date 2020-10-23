@@ -12,7 +12,7 @@ from .models import (User, Club, Course, Archer, Series, Event, Round, Participa
 from .serializers import (UserSerializer, ClubSerializer, ClubsSerializerList, CourseSerializer,
                           ArcherSerializer, SeriesSerializer, EventSerializer, EventSerializerList,
                           RoundSerializer, ParticipantArcherSerializer, ParticipantSerializer,
-                          ParticipantScoreCardSerializer, ArrowSerializer, SeriesSerializerList,
+                          ScoreCardSerializer, ArrowSerializer, SeriesSerializerList,
                           RecordSerializer)
 
 class ActiveEvent(permissions.BasePermission):
@@ -167,13 +167,14 @@ class RoundViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['POST'])
     def add(self, request, *args, **kwargs):
-        if Event.objects.get(pk=self.request.data.get('event')).archive:
+        if Event.objects.get(pk=request.data.get('event')).archive:
             return Response({'details': 'No new rounds on archived event.'},
                             status=status.HTTP_403_FORBIDDEN)
         return self.create(request, *args, **kwargs)
 
 
-class ArcherViewSet(viewsets.ModelViewSet):
+class ArcherViewSet(mixins.UpdateModelMixin,
+                    viewsets.GenericViewSet):
     """
     API endpoint that allows archer to be viewed or edited.
     """
@@ -239,7 +240,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
                                             round=round)
 
         # return scorecards
-        return Response(ParticipantScoreCardSerializer(scorecards, many=True).data)
+        return Response(ScoreCardSerializer(scorecards, many=True).data)
 
     @action(detail=False, methods=['POST'], permission_classes=[permissions.AllowAny])
     def register(self, request):
@@ -306,7 +307,8 @@ class ArrowViewSet(mixins.UpdateModelMixin,
     queryset = Arrow.objects.all()
 
     def perform_update(self, serializer):
-        if not self.get_object().scorecard.participant.event.archive:
+        sc = self.get_object().scorecard
+        if not sc.participant.event.archive:
             # import random
             # import time
             # time.sleep(1) # use if needed to simulate slow net or smth
@@ -317,6 +319,12 @@ class ArrowViewSet(mixins.UpdateModelMixin,
             # arrow is saved only if event is active. otherwise returns silently
             # existing model from the database
             serializer.save(updated_by=self.request.user.email)
+            # update scorecard on arrow update
+            args = {'score': sum(a['score'] for a in sc.arrows.order_by().values('score') if a['score'])}
+            spots = sum(1 for a in sc.arrows.order_by().values('x') if a['x'])
+            if spots:
+                args['spots'] = spots
+            ScoreCard.objects.filter(pk = sc.id).update(**args)
 
 class RecordViewSet(viewsets.ReadOnlyModelViewSet):
     """

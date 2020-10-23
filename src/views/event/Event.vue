@@ -15,7 +15,7 @@
           <v-subheader>Rounds</v-subheader>
           <v-list-item v-for="round in event.rounds" :key="'round_' + round.id">
             <v-list-item-title>
-              {{ round.ord }}. {{ round.label }} {{ round.course_name ? '(' + round.course_name + ')' : ''}}
+              {{ round.ord }}. {{ round.label }} ({{ round.course_details.name }})
             </v-list-item-title>
           </v-list-item>
         </v-list>

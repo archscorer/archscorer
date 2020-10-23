@@ -18,6 +18,7 @@
         :search="r_search"
         :items="r_table"
         :items-per-page="50"
+        group-by="format"
         multi-sort
       >
       </v-data-table>
@@ -26,7 +27,6 @@
 </template>
 
 <script>
-  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
   import { mapState } from 'vuex'
 
   export default {
@@ -34,7 +34,14 @@
     components: {
     },
     data: () => ({
-      r_search: ''
+      r_search: '',
+      format: {
+        'hunter': 'IFAA Hunter',
+        'field': 'IFAA Field',
+        'animal': 'IFAA Animal (Marked distances)',
+        'flint': 'IFAA Flint Indoor',
+        'indoor': 'IFAA Indoor'
+      }
     }),
     computed: {
       ...mapState({
@@ -42,20 +49,23 @@
       }),
       r_table_header() {
         return [
-          { text: 'Round', value: 'round' },
+          { text: 'Format', value: 'format' },
           { text: 'Class', value: 'class' },
           { text: 'Score', value: 'score' },
           { text: 'Archer', value: 'archer'},
           { text: 'Event', value: 'event' },
-          { text: 'EE/EU/W', value: 'scope' },
+          { text: 'national/EU/W', value: 'scope' },
           { text: 'Date', value: 'date', width: '120px'},
         ]
       },
       r_table() {
         if (this.records.length) {
           return this.records.map(record => {
-            record.class = record.age_group + record.gender + record.style
-            return record
+            return Object.assign(
+              { class: record.age_group + record.gender + record.style },
+              record,
+              { format: this.format[record.format] }
+            )
           })
         }
         return []

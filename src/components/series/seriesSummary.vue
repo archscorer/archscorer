@@ -118,21 +118,21 @@
             if (!Array.isArray(stage.participants)) {
               continue
             }
+            // handle shootoff
+            // NOTE: however it works, if there are multiple shootoff rounds (there should not), then find
+            // returns first shootoff round and rest of them are treated as normal.
+            let so = stage.rounds.find(r => r.course_details.type === 's')
+            // get shootoff round id (if it exists) to test against in scorecard filtering
+            so = so ? so.id : null
             let p_table = stage.participants.map(p => {
-              // handle shootoff
-              // NOTE: however it works, if there are multiple shootoff rounds (there should not), then find
-              // returns first shootoff round and rest of them are treated as normal.
-              let so = stage.rounds.find(obj => obj.course_type === 's')
-              // get shootoff round id (if it exists) to test against in scorecard filtering
-              so = so ? so.id : null
               return {
                 name: p.archer.full_name,
                 class: rankingService.getClass(p, this.s.ignore_gender),
                 id: p.archer.id + p.age_group + p.style,
                 club: p.archer.club,
-                sum: rankingService.sum([].concat(...p.scorecards.filter(obj => obj.round !== so).map(sc => [...sc.arrows.map(a => a.score)]))),
-                x: rankingService.sum([].concat(...p.scorecards.filter(obj => obj.round !== so).map(sc => [...sc.arrows.map(a => a.x)]))),
-                shootoff: so ? rankingService.sum(...p.scorecards.filter(obj => obj.round === so).map(sc => [...sc.arrows.map(a => a.score)])) : null,
+                sum: rankingService.sum(p.scorecards.filter(obj => obj.round !== so).map(sc => sc.score)),
+                x: rankingService.sum(p.scorecards.filter(obj => obj.round !== so).map(sc => sc.spots)),
+                shootoff: so ? rankingService.sum(p.scorecards.filter(obj => obj.round === so).map(sc => sc.score)) : null,
               }
             })
 

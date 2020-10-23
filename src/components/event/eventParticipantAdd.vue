@@ -10,10 +10,6 @@
       <v-card-title>{{ action }} to "{{ event.name }}"</v-card-title>
       <v-card-text>
         <v-form ref="add_participant_form" v-model="valid">
-          <eventParticipantDetails :participant="participant"
-            :catering="event.catering"
-            :level_class="event.use_level_class"
-            :catering_choices="event.catering_choices.split('|')"/>
           <v-container v-if="action !== 'Add Me'">
             <v-row>
               <v-autocomplete
@@ -21,7 +17,7 @@
                 :search-input.sync="query"
                 :items="qresponse_items"
                 label="Find archer ..."
-                hint="Search is executed from 3 characters"
+                hint="Search is executed from 2 characters"
                 placeholder="Start typing .."
                 prepend-icon="mdi-database-search"
                 return-object
@@ -42,6 +38,11 @@
               <archerDetails v-model="participant.archer" :clubs="clubs" v-if="new_archer" />
             </template>
           </v-container>
+          <eventParticipantDetails :participant="participant"
+            :catering="event.catering"
+            :level_class="event.use_level_class"
+            :catering_choices="event.catering_choices.split('|')"
+            :age_style_choices="event.age_style_used.split(',')"/>
         </v-form>
         <small><p>fields marked with '*' are mandatory</p></small>
       </v-card-text>
@@ -92,14 +93,34 @@
       },
       archer: function(obj) {
         if (obj) {
+          let pId = obj.events[obj.events.length - 1]
+          if (pId) {
+            this.$store.dispatch('events/getParticipant', pId)
+          }
           this.participant.archer = obj
         } else {
+          this.participant.age_group = ''
+          this.participant.style = ''
           this.participant.archer = {
             full_name: '',
             gender: '',
             club: '',
             email: '',
             phone: '',
+          }
+        }
+      },
+      participants: {
+        deep: true,
+        handler() {
+          // this is prompted by archer watcher after getParticipant has returned
+          // data
+          let events = this.participant.archer.events
+          let pId = events[events.length - 1]
+          let p = this.participants.find(p => p.id === pId)
+          if (p) {
+            this.participant.age_group = p.age_group
+            this.participant.style = p.style
           }
         }
       }
@@ -109,6 +130,7 @@
         user: state => state.user.user,
         qresponse: state => state.user.qresponse,
         clubs: state => state.clubs.clubs,
+        participants: state => state.events.participants,
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))

@@ -158,6 +158,7 @@
                     <v-btn text color="primary" @click="addRound" icon fab><v-icon size="35">mdi-plus</v-icon></v-btn>
                   </v-col>
                 </v-row>
+                <eventParticipantCategories :event="event"/>
               </v-form>
             </v-card-text>
             <v-card-actions>
@@ -280,7 +281,12 @@
 <script>
   import { mapState, mapActions } from 'vuex'
 
+  import eventParticipantCategories from '@/components/event/eventParticipantCategories.vue'
+
   export default {
+    components: {
+      eventParticipantCategories,
+    },
     data: () => ({
       dialog: false,
       e1: 1,
@@ -295,6 +301,7 @@
         rounds: [{label: '', course: null, is_open: true}],
         catering: false,
         catering_choices: [""],
+        age_style_used: [""],
       },
 
       event_type_choices: [
@@ -344,8 +351,10 @@
         if (this.event.date_end === '' || new Date(this.event.date_end) <  new Date(this.event.date_start)) {
           this.event.date_end = this.event.date_start
         }
-        this.event.catering_choices = this.event.catering_choices.join('|')
-        return this.event
+        return Object.assign({}, this.event, {
+          catering_choices: this.event.catering_choices.join('|'),
+          age_style_used: this.event.age_style_used.join(',')
+        })
       },
       ...mapActions('events', [
         'addEvent'

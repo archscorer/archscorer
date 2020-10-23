@@ -4,7 +4,7 @@ export default {
   },
   participantScore( p, so ) {
     // so shootoff round
-    return this.sum([].concat(...p.scorecards.filter(obj => obj.round !== so).map(sc => [...sc.arrows.map(a => a.score)])))
+    return this.sum(p.scorecards.filter(obj => obj.round !== so).map(sc => sc.score))
   },
   participantOrder( a, b ) {
     if ( a.class < b.class) {

@@ -115,7 +115,7 @@
       event_rounds() {
         // populate items for round selector
         return this.event.rounds.map(r => {
-          let text = r.ord + '. ' + r.label + ' (' + r.course_name + ')'
+          let text = r.ord + '. ' + r.label + ' (' + r.course_details.name + ')'
           let disabled = !r.is_open
           return Object.assign({}, r, {text: text, disabled: disabled})
         })

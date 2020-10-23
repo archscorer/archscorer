@@ -10,16 +10,8 @@ export default {
               })
     //
   },
-  postArcher(payload) {
-    return api.post(`archer/`, payload)
-              .then(response => response.data)
-  },
   putArcher(aId, payload) {
     return api.put(`archer/${aId}/`, payload)
-              .then(response => response.data)
-  },
-  delArcher(aId) {
-    return api.delete(`archer/${aId}`)
               .then(response => response.data)
   },
   searchArcher(payload) {
