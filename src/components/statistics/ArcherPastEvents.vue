@@ -1,6 +1,10 @@
 <template>
   <v-card class="mt-5">
-    <v-card-title>My Rounds</v-card-title>
+    <v-card-title>
+      Showing past rounds for {{ target_name }}
+      <v-spacer />
+      <archerSearch v-model="archer" />
+    </v-card-title>
     <v-card-text>
       <v-data-table
         dense
@@ -11,7 +15,7 @@
         multi-sort
       >
       <template v-slot:item.event="props">
-        {{ props.item.event }} (<router-link :to="{ name: 'event', params: { 'id': props.item.eId}}">link</router-link>)
+        {{ props.item.event }} (<router-link :to="{ name: 'event', params: { 'id': props.item.eId }}">link</router-link>)
       </template>
       </v-data-table>
     </v-card-text>
@@ -21,12 +25,29 @@
 <script>
   import { mapState } from 'vuex'
 
+  import archerSearch from '@/components/archer/archerSearch.vue'
+
   export default {
     components: {
+      archerSearch
     },
     data: () => ({
-      //
+      archer: null,
+      target_name: '',
     }),
+    watch: {
+      archer: function(current_archer) {
+        if (current_archer && current_archer.events) {
+          this.target_name = this.archer.full_name
+          this.$store.dispatch('events/clearParticipants')
+          for (let pId of current_archer.events) {
+            if (!this.participants.find(obj => obj.id === pId)) {
+              this.$store.dispatch('events/getParticipant', pId)
+            }
+          }
+        }
+      }
+    },
     computed: {
       ...mapState({
         user: state => state.user.user,
@@ -94,11 +115,7 @@
       },
     },
     created() {
-      for (let pId of this.user.archer.events) {
-        if (!this.participants.find(obj => obj.id === pId)) {
-          this.$store.dispatch('events/getParticipant', pId)
-        }
-      }
+      this.archer = this.user.archer
       this.$store.dispatch('events/getEvents')
     }
   }

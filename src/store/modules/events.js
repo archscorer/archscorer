@@ -87,7 +87,6 @@ const actions = {
       commit('delEvent', eId)
     })
   },
-
   addRound({ commit }, round) {
     eventService.postRound(round)
     .then(round => {
@@ -106,12 +105,14 @@ const actions = {
       commit('delRound', attr)
     })
   },
-
   getParticipant({ commit }, pId) {
     eventService.fetchParticipant(pId)
     .then(participant => {
       commit('updateParticipant', participant)
     })
+  },
+  clearParticipants({ commit }) {
+    commit('clearParticipants')
   },
   getParticipantOpts({ commit }) {
     eventService.optsParticipant()
@@ -158,7 +159,6 @@ const actions = {
       console.log(error.response.data)
     })
   },
-
   getScoreCards({ commit }, attr) {
     return eventService.fetchScoreCards(attr)
     .then(scorecards => {
@@ -168,7 +168,6 @@ const actions = {
   resetScoreCards({ commit }) {
     commit('setScoreCards', [])
   },
-
   putArrow({ dispatch, commit }, attr) {
     // commit to be submitted arrow to local store
     commit('updateArrow', {scId: attr.scId, arrow: attr.arrow})
@@ -201,7 +200,6 @@ const mutations = {
   delEvent(state, eId) {
     state.events = state.events.filter(obj => obj.id !== eId)
   },
-
   updateRound(state, round) {
     const ei = state.events.findIndex(obj => obj.id === round.event)
     if (ei !== -1) {
@@ -222,7 +220,6 @@ const mutations = {
       }
     }
   },
-
   updateParticipant(state, participant) {
     const index = state.participants.findIndex(obj => obj.id === participant.id);
     if (index !== -1) {
@@ -231,11 +228,12 @@ const mutations = {
       state.participants.push(participant)
     }
   },
-
+  clearParticipants(state) {
+    state.participants = []
+  },
   setParticipantModel(state, model) {
     state.participantModel = model
   },
-
   setScoreCards(state, scorecards) {
     state.scorecards = scorecards
   },

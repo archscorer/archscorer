@@ -9,7 +9,7 @@
             or show would be most wolcome.</p>
         </v-card-text>
       </v-card>
-      <UserPastEvents v-if="user.id !== null"/>
+      <ArcherPastEvents v-if="user.id !== null"/>
       <Records/>
     </v-layout>
   </v-container>
@@ -18,13 +18,13 @@
 <script>
   import { mapState } from 'vuex'
 
-  import UserPastEvents from '@/components/statistics/UserPastEvents.vue'
+  import ArcherPastEvents from '@/components/statistics/ArcherPastEvents.vue'
   import Records from '@/components/statistics/Records.vue'
 
   export default {
     name: 'Statistics',
     components: {
-      UserPastEvents,
+      ArcherPastEvents,
       Records,
     },
     data: () => ({

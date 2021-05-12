@@ -162,7 +162,7 @@
       ...mapState({
         user: state => state.user.user,
         courses: state => state.courses.courses,
-        records: state => state.statistics.records,
+        // records: state => state.statistics.records,
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))

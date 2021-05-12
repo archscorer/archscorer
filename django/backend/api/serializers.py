@@ -91,11 +91,11 @@ class ParticipantArcherSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name', 'gender', 'club_details', 'user', 'contact']
 
     def get_contact(self, obj):
-        if (isinstance(self.root.instance, Event) and
-            isinstance(self.context['request'].user, User) and
-            self.context['request'].user.email == self.root.instance.creator.email):
-            return obj.email + '; ' + obj.phone
-        else:
+        try:
+            # NOTE this assumes that root.instance is Event object
+            if self.context['request'].user.email == self.root.instance.creator.email:
+                return obj.email + '; ' + obj.phone
+        except (AttributeError, KeyError):
             return None
 
     def get_club_details(self, obj):
@@ -109,7 +109,7 @@ class ParticipantSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class StageParticipantSerializer(serializers.ModelSerializer):
-    archer = ArcherSerializer(read_only=True)
+    archer = ParticipantArcherSerializer(read_only=True)
     scorecards = ParticipantScoreCardSerializer(many=True, read_only=True)
     class Meta:
         model = Participant
