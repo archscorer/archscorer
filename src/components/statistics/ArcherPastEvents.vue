@@ -91,6 +91,9 @@
                     units.splice(ui, 1)
                   }
                 }
+                if (!score) {
+                  continue
+                }
                 p_table.push({
                   'eId': e.id,
                   'event': e.name,

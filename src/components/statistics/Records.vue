@@ -50,9 +50,9 @@
       r_table_header() {
         return [
           { text: 'Format', value: 'format' },
-          { text: 'Class', value: 'class' },
+          { text: 'Class', value: 'class', width: '100px' },
           { text: 'Score', value: 'score' },
-          { text: 'Archer', value: 'archer'},
+          { text: 'Archer', value: 'archer', width: '175px' },
           { text: 'Event', value: 'event' },
           { text: 'national/EU/W', value: 'scope' },
           { text: 'Date', value: 'date', width: '120px'},
