@@ -64,5 +64,14 @@ export default {
       return p.age_group + '_' + p.style
     }
     return p.age_group + p.archer.gender + p.style
+  },
+  longestPrefix(arr) {
+    let ref = arr[0]
+    for (let i = 1; i < ref.length; i++) {
+      if (arr.every(v => v.substring(0,i) === ref.substring(0,i)) === false) {
+        return ref.substring(0,i-1)
+      }
+    }
+    return ref
   }
 }

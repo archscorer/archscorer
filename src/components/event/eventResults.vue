@@ -123,12 +123,12 @@
 
   function getScore(r, p) {
     let r_sc = p.scorecards.find(sc => sc.round === r.id)
-    return r_sc ?  r_sc.arrows.map(a => a.score) : [null]
+    return r_sc ?  r_sc.arrows.map(a => a.score) : []
   }
 
   function getSpots(r, p) {
     let r_sc = p.scorecards.find(sc => sc.round === r.id)
-    return r_sc ?  r_sc.arrows.map(a => a.x ? 1 : 0) : [null]
+    return r_sc ?  r_sc.arrows.map(a => a.x ? 1 : 0) : []
   }
 
   export default {
@@ -168,31 +168,66 @@
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
       },
       r_table() {
-        let r_table = {header: [{ text: 'Name', value: 'name' },
-                                { text: 'Class', value: 'class' },
-                                { text: 'Round', value: 'round'}],
-                       data: []}
+        let r_table = {header: [
+            { text: 'Place', value: 'place', width: '1%' },
+            { text: 'Name', value: 'name' },
+            { text: 'Club', value: 'club' },
+            { text: 'Class', value: 'class' },
+            { text: 'Round', value: 1 },
+            { text: 'Sum', value: 'sum' }
+          ],
+          data: []
+        }
         if (this.event) {
+          // reorganise event rounds
+          let rounds = [], so = null
+          for (let r of this.event.rounds) {
+            if (r.course_details.type == 's') {
+              so = r
+            }
+            if (r.course_details.type == 'r') {
+              rounds.push(r)
+            }
+            if (r.course_details.type == 'u') {
+              let ui = rounds.findIndex(obj => obj.course == r.course)
+              if (ui === -1) {
+                rounds.push(r)
+              } else {
+                rounds.splice(ui, 1, [rounds[ui], r])
+              }
+            }
+          }
+
           r_table.header = [
             { text: 'Place', value: 'place', width: '1%' },
             { text: 'Name', value: 'name' },
             { text: 'Club', value: 'club' },
             { text: 'Class', value: 'class' },
           ]
-          r_table.header.push(...this.event.rounds.filter(r => r.course_details.type !== 's').map(function(r) {
-            return { text: r.ord.toString() + '. ' + r.label,
-                    value: r.ord.toString(),
-                    class: 'round-header'}
+          r_table.header.push(...rounds.map(function(r) {
+            if (Array.isArray(r)) {
+              // we have units that are combined into a round
+              let label = rankingService.longestPrefix(r.map(obj => obj.label))
+              return { text: '(' + r.map(obj => obj.ord).join('+') + ') ' + label,
+                      value: r.map(obj => obj.ord).join('_'),
+                      class: 'round-header'}
+            } else {
+              // we have round object
+              return { text: r.ord.toString() + '. ' + r.label,
+                      value: r.ord.toString(),
+                      class: 'round-header'}
+            }
           }))
           if (this.rounds_have_x()) {
             r_table.header.push({ text: 'x', value: 'x', width: '1%' })
           }
           r_table.header.push({ text: 'Sum', value: 'sum', width: '1%' })
-          r_table.header.push(...this.event.rounds.filter(r => r.course_details.type === 's').map(function(r) {
-            return { text: r.label,
-                    value: r.ord.toString(),
-                    class: 'round-header'}
-          }))
+          if (so) {
+            r_table.header.push({
+              text: so.label,
+              value: so.ord.toString(),
+              class: 'round-header'})
+          }
           if (Array.isArray(this.event.participants)) {
             r_table.data = this.event.participants.map(p => {
               let row = {
@@ -200,45 +235,29 @@
                 name: p.archer.full_name,
                 class: rankingService.getClass(p, this.event.ignore_gender),
                 club: p.archer.club_details.name_short,
-                rounds: [],
+                // rounds: [],
               }
-              let sums = this.event.rounds.map(function(r) {
-                if (r.course_details.type === 's') {
-                  let so_arrows = getScore(r, p)
-                  let so_sum = rankingService.sum( so_arrows )
-                  if (so_sum !== null) {
-                    row.shootoff = so_sum
-                    let last_arrow = so_arrows[so_arrows.length - 1]
-                    if (last_arrow !== null) {
-                      // we have last arrow
-                      row[r.ord] = so_sum - last_arrow + '<sup>' + -last_arrow + '</sup>'
-                    } else {
-                      row[r.ord] = so_sum
-                    }
-                  }
-                  return 0
+              let sums = rounds.map(function(r) {
+                let r_ord = null, arrows = null, open = false
+                if (Array.isArray(r)) {
+                  // we have units that are combined into a round
+                  r_ord = r.map(obj => obj.ord).join('_')
+                  arrows = r.map(v => getScore(v, p)).flat()
+                  open = r.some(v => v.is_open === true)
+                } else {
+                  // we have round object
+                  r_ord = r.ord
+                  arrows = getScore(r, p)
+                  open = r.is_open
                 }
-                let sc_score = rankingService.sum( getScore(r, p) )
-                if (r.course_details.format !== '') {
-                  if (r.course_details.type === 'r') {
-                    row.rounds.push({ format: r.course_details.format, score: sc_score })
-                  }
-                  if (r.course_details.type === 'u') {
-                    let ui = this.findIndex(obj => obj.unit === r.course)
-                    if (ui === -1) {
-                      this.push({unit: r.course, sc_score: sc_score})
-                    } else {
-                      row.rounds.push({ format: r.course_details.format, score: sc_score + this[ui].sc_score })
-                      this.splice(ui, 1)
-                    }
-                  }
+                row[r_ord] = rankingService.sum( arrows )
+                if (open === true && arrows.length) {
+                  row['pr' + r_ord] = Math.round((arrows.filter(a => a !== null).length / arrows.length) * 100)
                 }
-                // add scorecard score to results table
-                row[r.ord] = sc_score
-                // return score as part of scores array to calculate sum
-                return sc_score
-              }, []) // anonymus array for unit to round score transform
+                return row[r_ord]
+              })
               row.sum = sums.length ? rankingService.sum( sums ) : 0
+
               let spots = this.event.rounds.map(function(r) {
                 if (r.course_details.type === 's') {
                   return 0
@@ -246,12 +265,21 @@
                 return rankingService.sum( getSpots(r, p) )
               })
               row.x = spots.length ? rankingService.sum( spots ) : 0
-              this.event.rounds.map(function (r) {
-                if (r.is_open) {
-                  let arrows = getScore(r, p)
-                  row['pr' + r.ord] = Math.round((arrows.filter(a => a !== null).length / arrows.length) * 100)
+
+              if (so) {
+                let so_arrows = getScore(so, p)
+                let so_sum = rankingService.sum( so_arrows )
+                if (so_sum !== null) {
+                  row.shootoff = so_sum
+                  let last_arrow = so_arrows[so_arrows.length - 1]
+                  if (last_arrow !== null) {
+                    // we have last arrow
+                    row[so.ord] = so_sum - last_arrow + '<sup>' + -last_arrow + '</sup>'
+                  } else {
+                    row[so.ord] = so_sum
+                  }
                 }
-              })
+              }
               // // NOTE here **no club** ID has been hardcoded
               // if (this.event.records && p.archer.club_details.id !== 1) {
               //   let records = []

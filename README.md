@@ -1,7 +1,7 @@
 # archscorer
 
-Brief overview of the development enviroment. I use vanilla debian docker images
-to build my development enviroment. You'll need:
+Brief overview of the development environment. I use vanilla debian docker images
+to build my development environment. You'll need:
 
 ### Run container
 ```
