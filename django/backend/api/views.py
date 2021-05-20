@@ -11,7 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import (User, Club, Course, Archer, Series, Event, Round, Participant, ScoreCard, Arrow, Record)
 from .serializers import (UserSerializer, ClubSerializer, ClubsSerializerList, CourseSerializer,
                           ArcherSerializer, SeriesSerializer, EventSerializer, EventSerializerList,
-                          RoundSerializer, ParticipantArcherSerializer, ParticipantSerializer,
+                          RoundSerializer, ParticipantSerializer,
                           ScoreCardSerializer, ArrowSerializer, SeriesSerializerList,
                           RecordSerializer)
 

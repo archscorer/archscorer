@@ -35,13 +35,13 @@ TYPE_CHOICES = [('private', 'Private'),
                 ('club', 'Club'),
                 ('open', 'Open')]
 
-AGEGROUP_CHOICES = [('C', 'Cub/Cadet'),
+AGEGROUP_CHOICES = [('T', 'Tidet'),
+                    ('C', 'Cub'),
+                    ('CA', 'Cadet'),
                     ('J', 'Junior'),
-                    ('Y', 'Young Adult'),
+                    ('YA', 'Young Adult'),
                     ('A', 'Adult'),
-                    ('V', 'Veteran'),
-                    ('S', 'Senior'),
-                    ('M', 'Master')]
+                    ('V', 'Veteran')]
 
 STYLE_CHOICES = [
     ('BB-C', 'Barebow Compound'),
@@ -59,8 +59,8 @@ STYLE_CHOICES = [
     ('**', 'Variable'),
     ('R', 'Recurve'),
     ('C', 'Compound'),
-    ('L', 'Longbow'),
-    ('I', 'Instinctive')]
+    ('I', 'Instinctive'),
+    ('L', 'Longbow')]
 
 LEVEL_CHOICES = [('A', 'A'),
                  ('B', 'B'),
@@ -119,7 +119,7 @@ class LevelClass(models.Model):
     # this is intended for level classes for archers (A, B, C, *)
     archer = models.ForeignKey(Archer, related_name='level_classes', on_delete=models.CASCADE)
     level = models.CharField('Level', max_length=1, blank=False, choices=LEVEL_CHOICES)
-    age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
+    age_group = models.CharField('age group', max_length=2, blank=False, choices=AGEGROUP_CHOICES)
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     date = models.DateField('Date of achievement', blank=True, null=True)
 
@@ -161,7 +161,7 @@ class End(models.Model):
 class Record(models.Model):
     archer = models.CharField('Archer name', max_length=255, blank=False)
     date = models.DateField('Date of achievement', blank=True, null=True)
-    age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
+    age_group = models.CharField('age group', max_length=2, blank=False, choices=AGEGROUP_CHOICES)
     gender = models.CharField('gender', max_length=1, blank=False, choices=[('M', 'Male'), ('F', 'Female')])
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     format = models.CharField('Format', max_length=255, blank=False, choices=RECORD_CHOICES)
@@ -246,7 +246,7 @@ class Participant(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     archer = models.ForeignKey(Archer, related_name='events', on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name='participants', on_delete=models.CASCADE)
-    age_group = models.CharField('age group', max_length=1, blank=False, choices=AGEGROUP_CHOICES)
+    age_group = models.CharField('age group', max_length=2, blank=False, choices=AGEGROUP_CHOICES)
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     food = models.BooleanField(default=False)
     food_choices = models.CharField(max_length=255, blank=True)

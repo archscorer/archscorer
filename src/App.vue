@@ -3,10 +3,12 @@
     <v-app-bar app dark color="primary">
       <v-toolbar-title class="headline text-uppercase">
         <router-link
-          to="/"
-          tag="span"
-          style="cursor: pointer">
-          arch[scor]er
+          :to="'/'"
+          style="cursor: pointer"
+          custom v-slot="{ navigate }">
+            <span @click="navigate" @keypress.enter="navigate" role="link">
+              arch[scor]er
+            </span>
         </router-link>
       </v-toolbar-title>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"

@@ -260,7 +260,7 @@
       p_table() {
         let p_table = {header: [{ text: 'Name',
                                   value: 'name',
-                                  width: '148px' }],
+                                  width: '175px' }],
                        data: []}
         // populate table header
         if (this.event.use_level_class) {

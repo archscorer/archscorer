@@ -1,7 +1,7 @@
 # archscorer
 
-Brief overview of the development enviroment. I use vanilla debian docker images
-to build my development enviroment. You'll need:
+Brief overview of the development environment. I use vanilla debian docker images
+to build my development environment. You'll need:
 
 ### Run container
 ```
@@ -12,7 +12,7 @@ docker run -ti --name Archer -v ${PWD}:/opt/Archery:rw -p 8000-8100:8000-8100 de
 ```
 apt-get update
 apt-get upgrade
-apt-get install -y git-core curl build-essential openssl libssl-dev fish procps python3-pip mariadb-server-10.3 libmariadb-dev
+apt-get install -y git-core curl build-essential openssl libssl-dev libffi-dev fish procps python3-pip mariadb-server-10.3 libmariadb-dev
 curl -sL https://deb.nodesource.com/setup_14.x | bash -
 apt-get install -y nodejs
 npm install -g @vue/cli

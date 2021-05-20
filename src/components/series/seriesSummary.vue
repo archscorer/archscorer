@@ -81,7 +81,7 @@
           let header = [
             { text: 'Class', value: 'class' },
             { text: 'Place', value: 'place', width: '1%' },
-            { text: 'Name', value: 'name', width: '148px' },
+            { text: 'Name', value: 'name', width: '175px' },
             { text: 'Club', value: 'club' },
             { text: 'Points', value: 'points'},
             { text: 'Sum', value: 'sum' },
@@ -129,7 +129,7 @@
                 name: p.archer.full_name,
                 class: rankingService.getClass(p, this.s.ignore_gender),
                 id: p.archer.id + p.age_group + p.style,
-                club: p.archer.club,
+                club: p.archer.club_details.name_short,
                 sum: rankingService.sum(p.scorecards.filter(obj => obj.round !== so).map(sc => sc.score)),
                 x: rankingService.sum(p.scorecards.filter(obj => obj.round !== so).map(sc => sc.spots)),
                 shootoff: so ? rankingService.sum(p.scorecards.filter(obj => obj.round === so).map(sc => sc.score)) : null,
