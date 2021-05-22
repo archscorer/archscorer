@@ -33,14 +33,14 @@
           <tr v-for="row in props.items" :key="row.id">
             <td v-for="col in props.headers" :key="col.text">
               <template v-if="col.value === 'name'">
-                <!-- <v-btn v-if="row.records" icon @click="participant_records(row.records)" small>
-                  <v-icon size="16" color="primary">mdi-star</v-icon>
-                </v-btn> -->
                 <v-btn icon @click="participant_sc(row.id)" small>
                   <v-icon size="16">mdi-book-open-outline</v-icon>
                 </v-btn>
               </template>
               <span :class="col.value === 'sum' ? 'font-weight-medium' : ''" v-html="row[col.value]"/>
+              <template v-if="'rec'+col.value in row">
+                <newRecord :record="row['rec'+col.value]"/>
+              </template>
               <template v-if="'pr'+col.value in row && event.archive === false">
                 <v-progress-circular
                   v-model="row['pr'+col.value]"
@@ -87,20 +87,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- <v-dialog v-model="records_dialog" max-width="650px">
-      <v-card>
-        <v-card-title>New records</v-card-title>
-        <v-card-text>
-          <v-row v-for="(rec, i) in new_records" :key="'rec_' + i">
-            <v-col v-for="(attr, j) in ['archer','format','class','score','scope']" :key="'rec_' + i + '_' + j">{{ rec[attr] }}</v-col>
-          </v-row>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer/>
-          <v-btn text @click="records_dialog = false">Close</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
     <v-btn v-if="scroll_loop"
       @click="scroll_loop = false"
       color="error"
@@ -117,6 +103,7 @@
   import { mapState } from 'vuex'
 
   import eventParticipantScorecards from '@/components/event/eventParticipantScorecards.vue'
+  import newRecord from '@/components/statistics/newRecord.vue'
   import rankingService from '@/services/rankingService'
   import pdfService from '@/services/pdfService'
 
@@ -134,20 +121,14 @@
   export default {
     components: {
       eventParticipantScorecards,
+      newRecord,
     },
     data: () => ({
       r_search: '',
       sc_dialog: false,
-      // records_dialog: false,
       loading: false,
       participant: null,
-      // new_records: [],
       scroll_loop: false,
-      // scope_nat: {
-      //   FAAE: 'EE',
-      //   // TODO when more clubs with different associations appear add here
-      //   // or add it to the database with relevant getter
-      // },
     }),
     watch: {
       scroll_loop: {
@@ -162,7 +143,7 @@
       ...mapState({
         user: state => state.user.user,
         courses: state => state.courses.courses,
-        // records: state => state.statistics.records,
+        records: state => state.statistics.records,
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
@@ -230,29 +211,59 @@
           }
           if (Array.isArray(this.event.participants)) {
             r_table.data = this.event.participants.map(p => {
+              let p_style_records = null
+              if (this.event.records && p.archer.club_details.association != '') {
+                p_style_records = this.records.filter(rec => {
+                  if (rec.age_group === p.age_group &&
+                      rec.gender === p.archer.gender &&
+                      rec.style === p.style &&
+                      rec.scope === p.archer.club_details.association) {
+                    return true
+                  }
+                  return false
+                })
+              }
               let row = {
                 id: p.id,
                 name: p.archer.full_name,
                 class: rankingService.getClass(p, this.event.ignore_gender),
                 club: p.archer.club_details.name_short,
-                // rounds: [],
               }
               let sums = rounds.map(function(r) {
                 let r_ord = null, arrows = null, open = false
+                let format = null
                 if (Array.isArray(r)) {
                   // we have units that are combined into a round
                   r_ord = r.map(obj => obj.ord).join('_')
                   arrows = r.map(v => getScore(v, p)).flat()
                   open = r.some(v => v.is_open === true)
+                  format = r[0].course_details.format
                 } else {
                   // we have round object
                   r_ord = r.ord
                   arrows = getScore(r, p)
                   open = r.is_open
+                  format = r.course_details.format
                 }
                 row[r_ord] = rankingService.sum( arrows )
                 if (open === true && arrows.length) {
                   row['pr' + r_ord] = Math.round((arrows.filter(a => a !== null).length / arrows.length) * 100)
+                }
+                if (p_style_records !== null) {
+                  let seen_scope = null // NOTE this might still fail in some conditions
+                  p_style_records.filter(v => v.format === format).map(function(rec) {
+                    if (rec.score < row[r_ord] && seen_scope !== rec.scope) {
+                      row['rec' + r_ord] = {
+                        format: format,
+                        archer: row.name,
+                        class: row.class,
+                        score: row[r_ord],
+                        scope: p.archer.club_details.association,
+                        current: rec
+                      }
+                    }
+                    seen_scope = rec.scope
+                  })
                 }
                 return row[r_ord]
               })
@@ -280,49 +291,6 @@
                   }
                 }
               }
-              // // NOTE here **no club** ID has been hardcoded
-              // if (this.event.records && p.archer.club_details.id !== 1) {
-              //   let records = []
-              //   let row_class = p.age_group + p.archer.gender + p.style
-              //   for (let r of row.rounds) {
-              //     let current_record = this.records.filter(record => {
-              //       let rec_class = record.age_group + record.gender + record.style
-              //       // build scope here
-              //       let scope = this.event.records
-              //       if (scope === 'nat') {
-              //         scope = this.scope_nat[p.archer.club_details.association]
-              //       } else {
-              //         // NOTE scope order is important here - 'nat/EU/W'
-              //         // the combinations are still tricky and might not work
-              //         scope = this.scope_nat[p.archer.club_details.association] + '/' + scope
-              //       }
-              //       if ( rec_class === row_class &&
-              //           record.format === r.format &&
-              //           record.scope.includes(scope)) {
-              //         //  && record.scope.includes(this.event.records) - this is not entirely accurate
-              //         // as it needs to be cleared -- event record score should be one of 'nat', 'EU', 'W'
-              //         // this is hierary, not sure about if 'W' can be shot at 'EU' turnament, 'nat' can be
-              //         // shot on either
-              //         return true
-              //       }
-              //       return false
-              //     })
-              //     if (r.score && r.score > Math.max(...current_record.map(record => record.score))) {
-              //       records.push({
-              //         scope: this.event.records,
-              //         event: this.event.name,
-              //         date: this.event.date_start,
-              //         format: r.format,
-              //         archer: row.name,
-              //         class: row_class,
-              //         score: r.score
-              //       })
-              //     }
-              //   }
-              //   if (records.length) {
-              //     row.records = records
-              //   }
-              // }
               return row
             })
             rankingService.participantRank(r_table.data)
@@ -343,10 +311,6 @@
         this.participant['class'] = rankingService.getClass(this.participant, this.event.ignore_gender)
         this.sc_dialog = true
       },
-      // participant_records(records) {
-      //   this.new_records = records
-      //   this.records_dialog = true
-      // },
       sc_edit() {
         return [this.event.creator, ...this.event.admins].includes(this.user.email) && !this.event.archive
       },
