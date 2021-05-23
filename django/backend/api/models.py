@@ -67,6 +67,7 @@ LEVEL_CHOICES = [('A', 'A'),
                  ('C', 'C'),
                  ('*', '*')]
 
+# NOTE also update src/statistics/Records.vue if changing these
 RECORD_CHOICES = [
     ('flint', 'IFAA Flint'),
     ('indoor', 'IFAA Indoor'),

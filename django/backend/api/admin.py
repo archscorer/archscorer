@@ -53,7 +53,7 @@ class myArcherInline(admin.TabularInline):
 @admin.register(Club)
 class myClubAdmin(admin.ModelAdmin):
     list_display = ('name',)
-    inlines = (myArcherInline,)
+    # inlines = (myArcherInline,)
 
 class myEndInline(admin.TabularInline):
     model = End
@@ -82,7 +82,8 @@ class myParticipantAdmin(admin.ModelAdmin):
 @admin.register(Event)
 class myEventAdmin(admin.ModelAdmin):
     raw_id_fields = ('series',)
-    list_display = ('name', 'creator')
+    list_display = ('name', 'creator', 'archive')
+    search_fields = ('name', 'creator')
 
 @admin.register(Series)
 class mySeriesAdmin(admin.ModelAdmin):
@@ -96,6 +97,7 @@ class myLevelClassAdmin(admin.ModelAdmin):
 @admin.register(Record)
 class myRecordAdmin(admin.ModelAdmin):
     list_display = ('scope', 'format', 'style', 'gender', 'age_group', 'score', 'archer', 'updated_by', 'updated_at')
+    search_fields = ('scope', 'format', 'style', 'age_group')
 
 @admin.register(Round)
 class myRoundAdmin(admin.ModelAdmin):

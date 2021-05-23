@@ -19,9 +19,23 @@ Scorecard editing capability. Event creator or admin should be able to create sc
  As well there should be 'checked' flag on ScoreCard that event admin can click while checking scores
  on paper vs virtual. This click would also trigger class_level and record check!
 
-To better manage archers profiles, add archer club also directly to participant
-model. This will enable club changes, but participant club will stay safe.
-This will also make past events safer.
+Make archer-club relation many to many. Same archer can have several clubs. It will
+be a bit more confusing when registration happens. When registering to an event archer
+needs to select club that they represent on given competition. Club will then remain
+tied to participant object.
+  Many to many and changeable relation between archer and clubs will allow to eliminate
+all double archer profiles.
 
-Issue might be, when some clubs continue to exist, but step out of FAAE. I have
-no good solution for that. This affects series. 
+Another issue is when a club steps out of FAAE or EEA. What will happen with old
+series, that relay on club affiliation. There is no feasible idea to that atm.
+Not even a bad one.
+
+For participants, groups, ends and positions might need per round approach. So pools
+or groupings would be reserved for previous round as well. This would also lay ground-
+work for one possible duel system generation.
+  Might need to think of another totally separate duel system (in separate tab on the
+event page?).
+
+Records update EE -> FAAE
+
+UPDATE api_record SET scope = REPLACE(scope, 'EE', 'FAAE') WHERE scope LIKE '%EE%';
