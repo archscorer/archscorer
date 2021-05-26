@@ -82,7 +82,7 @@
       max-width="650px"
       v-model="edit_dialog"
     >
-      <v-card>
+      <v-card class="pb-16">
         <v-card-title v-if="edit_round">
           {{ edit_round.ord }}. {{ edit_round.label }}
         </v-card-title>

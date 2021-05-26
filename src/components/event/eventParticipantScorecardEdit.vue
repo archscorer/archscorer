@@ -12,20 +12,22 @@
           </thead>
           <tbody>
             <tr v-for="end in half" :key="end.id">
-              <td class="end-ord">
+              <td class="end-ord" @click.prevent="currentFocus = null">
                 {{ end.ord }}
               </td>
               <td class="end-arrow" v-for="(a, ai) in sc.arrows.filter(obj => obj.end == end.id)" :key="a.id">
                 <v-text-field
                   :value="a.x ? 'X' : a.score == 0 ? 'M': a.score"
                   :loading="a.loading"
+                  :color="a.color"
                   :background-color="a.x ? '#FFC300' : a.score === 0 ? '#9E9E9E': ''"
                   ref="arrow"
                   readonly outlined dense
-                  @focus="handle_focus(end, a, ai)">
+                  @focus="handle_focus(end, a, ai)"
+                  @keyup="enter_score_numpad($event)">
                 </v-text-field>
               </td>
-              <td class="end-sums text-right">
+              <td class="end-sums text-right" @click.prevent="currentFocus = null">
                 {{ end_score(sc.arrows.filter(obj => obj.end == end.id)) }}
               </td>
             </tr>
@@ -36,10 +38,7 @@
     <v-sheet v-else class="text-center py-10">
       <v-progress-circular indeterminate size="64" color="secondary"></v-progress-circular>
     </v-sheet>
-    <v-bottom-sheet v-model="sc_entering"
-      overlay-opacity="0"
-      inset
-      :retain-focus="false">
+    <v-sheet class="sc-entering">
       <v-row v-if="currentFocus" dense justify="center">
         <template v-for="score in sc_eval(currentFocus.end.scoring, currentFocus.end.x)">
           <v-btn :key="'score' + currentFocus.end.id + '_' + score.text"
@@ -47,7 +46,7 @@
           @click.prevent="enter_score(score)">{{ score.text }}</v-btn>
         </template>
       </v-row>
-    </v-bottom-sheet>
+    </v-sheet>
   </v-card-text>
 </template>
 
@@ -59,7 +58,6 @@
     },
     data: () => ({
       currentFocus: null,
-      sc_entering: false,
       arrow_inc: 0,
     }),
     watch: {
@@ -76,8 +74,6 @@
       handle_focus(end, a, ai) {
         this.currentFocus = {end: end, aId: a.id}
         this.arrow_inc = end.aOrd + ai
-        this.sc_entering = true
-
       },
       sc_eval(arr, x) {
         let scores_choices = eval(arr).map(function(v) {
@@ -101,8 +97,7 @@
         this.arrow_inc++
         if (this.arrow_inc >= this.$refs.arrow.length) {
           // so that no scores would be changed if clicked again
-          this.currentFocus = false
-          this.sc_entering = false
+          this.currentFocus = null
         } else {
           this.$nextTick(() => {
             let next_arrow = this.$refs.arrow[this.arrow_inc]
@@ -111,8 +106,45 @@
           })
         }
       },
+      enter_score_numpad(e) {
+        if (this.currentFocus) {
+          let score_ops = eval(this.currentFocus.end.scoring)
+          let arrow = this.sc.arrows.find(obj => obj.id === this.currentFocus.aId)
+          if (e.key === 'Backspace') {
+            if (arrow.score) {
+              arrow.x = false
+              if (arrow.score > 9) {
+                arrow.score = Math.floor(arrow.score / 10)
+              } else {
+                arrow.score = null
+              }
+              arrow.color = 'warning'
+            }
+          } else if (e.key === 'Enter') {
+            if (arrow.score === 'x' && this.currentFocus.end.x) {
+              this.enter_score({'text': 'X', 'value': score_ops[0]})
+            } else if (score_ops.includes(parseInt(arrow.score))) {
+              this.enter_score({'text': arrow.score, 'value': parseInt(arrow.score)})
+            } else if (arrow.score === '0' || arrow.score === 'm') {
+              this.enter_score({'text': 'M', 'value': 0})
+            } else {
+              arrow.color = 'error'
+              /* should also rise error or snackbar to notify of the issue */
+            }
+          } else if (e.key === 'Tab') {
+            /* do nothing, tab is for */
+          } else {
+            if (arrow.score) {
+              arrow.score += e.key
+            } else {
+              arrow.score = e.key
+            }
+            arrow.color = 'warning'
+          }
+        }
+      },
       end_score(arrows) {
-        return rankingService.sum(arrows.map(a => a.score))
+        return rankingService.sum(arrows.map(a => a.score ? parseInt(a.score) : null))
       }
     },
   }
@@ -153,5 +185,12 @@
   }
   th {
     padding: 0 5px;
+  }
+  .sc-entering {
+    position: fixed;
+    bottom: 0;
+    width: 70%;
+    margin: auto;
+    z-index: 99;
   }
 </style>

@@ -83,7 +83,7 @@ class myParticipantAdmin(admin.ModelAdmin):
 class myEventAdmin(admin.ModelAdmin):
     raw_id_fields = ('series',)
     list_display = ('name', 'creator', 'archive')
-    search_fields = ('name', 'creator')
+    search_fields = ('name', 'tags')
 
 @admin.register(Series)
 class mySeriesAdmin(admin.ModelAdmin):
