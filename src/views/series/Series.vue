@@ -1,13 +1,12 @@
 <template>
   <v-container v-if="s">
     <v-layout
-      text-center
       wrap
     >
       <v-card>
         <v-card-title v-text="s.name"></v-card-title>
         <v-card-text>
-          <p v-text="s.description"></p>
+          <p v-html="series_desciption"></p>
         </v-card-text>
         <seriesSummary/>
       </v-card>
@@ -33,6 +32,10 @@
       ...mapState({
         user: state => state.user.user,
       }),
+      series_desciption() {
+        // TODO this is probably temp fix. See event description for additional details
+        return this.s.description.split('\n\n').join('</p><p>').split('\n').join('<br/>')
+      },
       s() {
         return this.$store.getters['series/seriesById'](parseInt(this.$route.params.id))
       },
