@@ -27,6 +27,8 @@
 
   import archerSearch from '@/components/archer/archerSearch.vue'
 
+  import rankingService from '@/services/rankingService'
+
   export default {
     components: {
       archerSearch
@@ -59,6 +61,7 @@
         return [
           { text: 'Event', value: 'event' },
           { text: 'Date', value: 'date', width: '120px'},
+          { text: 'Class', value: 'class'},
           { text: 'Course', value: 'course'},
           { text: 'Score', value: 'score' }
         ]
@@ -95,6 +98,7 @@
                   'eId': e.id,
                   'event': e.name,
                   'date': e.date_start,
+                  'class': rankingService.getClass(p, e.ignore_gender),
                   'course': c_name.replace(/ (Round|Unit)( (Unm|M)arked Distances)? \(.*?\)/, '$2'),
                   'score': score
                 })

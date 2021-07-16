@@ -189,8 +189,10 @@
   .sc-entering {
     position: fixed;
     bottom: 0;
-    width: 70%;
-    margin: auto;
+    left: 0;
+    right: 0;
+    max-width: 450px;
+    margin: 0 auto;
     z-index: 99;
   }
 </style>

@@ -41,7 +41,8 @@ AGEGROUP_CHOICES = [('T', 'Tidet'),
                     ('J', 'Junior'),
                     ('YA', 'Young Adult'),
                     ('A', 'Adult'),
-                    ('V', 'Veteran')]
+                    ('V', 'Veteran'),
+                    ('O', 'Open')]
 
 STYLE_CHOICES = [
     ('BB-C', 'Barebow Compound'),
@@ -214,6 +215,8 @@ class Event(models.Model):
     archive = models.BooleanField(default=False)
 
     name = models.CharField(max_length=150, default='Unnamed event', blank=False)
+    location = models.CharField(max_length=150, default='', blank=True)
+    organizer = models.CharField(max_length=150, default='', blank=True)
     description = models.TextField(blank=True)
     catering = models.BooleanField('Provide catering', default=False)
     catering_choices = models.CharField(max_length=255, blank=True)
