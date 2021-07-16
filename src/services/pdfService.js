@@ -76,7 +76,7 @@ export default {
   },
   results2pdf(event, r_table, url ) {
     let docDefinition = {
-      pageOrientation: event.rounds.length > 2 ? 'landscape' : 'portrait',
+      // pageOrientation: event.rounds.length > 2 ? 'landscape' : 'portrait',
       footer: {
         columns: [
           { text: window.location.origin + '/#' + url, style: 'footer' },
@@ -89,7 +89,7 @@ export default {
           layout: 'lightHorizontalLines',
           table: {
             headerRows: 2,
-            widths: [30, 125, 30, ...Array(r_table.header.length - 4).fill('*')],
+            widths: [30, 125, 30, ...Array(r_table.header.length - 4).fill('auto')],
             body: [
               [{text: cls, colSpan: r_table.header.length - 1, style: 'styleheader' },
                ...Array(r_table.header.length - 2).fill('')],

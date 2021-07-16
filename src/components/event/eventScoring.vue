@@ -139,7 +139,11 @@
         this.course = this.courses.find(obj => obj.id === cId)
         this.halves = this.course.halves
         this.end_view = 0
-        if (this.user_group.group_target < this.course.ends.length && this.course.name.indexOf('Indoor') === -1) {
+        // NOTE: formats that start scoring from first target, note here
+        if (this.user_group.group_target < this.course.ends.length &&
+            this.course.name.indexOf('Indoor') === -1 &&
+            this.course.name.indexOf('WA Target') === -1 &&
+            this.course.name.indexOf('WA 1440') === -1) {
           this.end_view = this.user_group.group_target - 1
         }
       },

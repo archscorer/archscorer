@@ -34,9 +34,12 @@
         <v-switch
           v-if="catering"
           v-model="participant.food"
-          :label="participant.food ? 'I will eat' : 'I will not eat'"
           color="primary"
-        ></v-switch>
+        >
+          <template v-slot:label>
+            <v-icon large dense color="primary">mdi-silverware-fork-knife</v-icon>
+          </template>
+        </v-switch>
       </v-col>
       <v-col v-if="level_class" cols="3">
         <v-select

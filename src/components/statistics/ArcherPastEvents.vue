@@ -27,6 +27,8 @@
 
   import archerSearch from '@/components/archer/archerSearch.vue'
 
+  import rankingService from '@/services/rankingService'
+
   export default {
     components: {
       archerSearch
@@ -59,7 +61,7 @@
         return [
           { text: 'Event', value: 'event' },
           { text: 'Date', value: 'date', width: '120px'},
-          { text: 'Round', value: 'round' },
+          { text: 'Class', value: 'class'},
           { text: 'Course', value: 'course'},
           { text: 'Score', value: 'score' }
         ]
@@ -75,18 +77,16 @@
                 let r = e.rounds.find(obj => obj.id === sc.round)
                 let c = this.courses.find(obj => obj.id === r.course)
                 let score = sc.score
-                let [r_label, c_name] = [r.label, c.name]
+                let c_name =  c.name
                 if (c.type === 's') {
                   continue
                 }
                 if (c.type === 'u') {
                   let ui = units.findIndex(obj => obj.id === c.id)
                   if (ui === -1) {
-                    units.push({id: c.id, score: score, round: r_label})
+                    units.push({id: c.id, score: score})
                     continue
                   } else {
-                    r_label = units[ui].round + ' + ' + r_label
-                    c_name = '2 x ' + c_name
                     score = units[ui].score + score
                     units.splice(ui, 1)
                   }
@@ -98,8 +98,8 @@
                   'eId': e.id,
                   'event': e.name,
                   'date': e.date_start,
-                  'round': r_label,
-                  'course': c_name,
+                  'class': rankingService.getClass(p, e.ignore_gender),
+                  'course': c_name.replace(/ (Round|Unit)( (Unm|M)arked Distances)? \(.*?\)/, '$2'),
                   'score': score
                 })
               }

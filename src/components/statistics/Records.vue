@@ -11,6 +11,18 @@
       ></v-text-field>
     </v-card-title>
     <v-card-text>
+      <v-row>
+        <v-col>
+          <v-select
+            v-model="group_by"
+            dense
+            :items="[{ text: '--disabled--', value: null },
+                    { text: 'Format', value: 'format'},
+                    { text: 'Class', value: 'class'}]"
+            label="organise archers by">
+          </v-select>
+        </v-col>
+      </v-row>
       <v-data-table
         dense
         :mobile-breakpoint="300"
@@ -18,7 +30,7 @@
         :search="r_search"
         :items="r_table"
         :items-per-page="50"
-        group-by="format"
+        :group-by="group_by"
         multi-sort
       >
       </v-data-table>
@@ -41,7 +53,8 @@
         'animal': 'IFAA Animal (Marked distances)',
         'flint': 'IFAA Flint Indoor',
         'indoor': 'IFAA Indoor'
-      }
+      },
+      group_by: 'format'
     }),
     computed: {
       ...mapState({
@@ -73,3 +86,9 @@
     }
   }
 </script>
+
+<style scoped>
+  .v-select {
+    max-width: 120px;
+  }
+</style>
