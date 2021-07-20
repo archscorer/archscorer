@@ -302,6 +302,7 @@
         catering: false,
         catering_choices: [""],
         age_style_used: [""],
+        admins: [],
       },
 
       event_type_choices: [

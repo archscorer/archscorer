@@ -319,7 +319,7 @@
       putEventProxy(e) {
         this.putEvent({eId: e.id, event: Object.assign({}, e, {
           age_style_used: e.age_style_used.join(','),
-          admins: e.admins.split(',')
+          admins: e.admins.split(/,\s*/)
         })})
       },
       e_edit() {
@@ -328,6 +328,7 @@
         this.event = Object.assign({}, this.p_event,
           {
             age_style_used: this.p_event.age_style_used.split(','),
+            admins: this.p_event.admins.join(', '),
             rounds: [...this.p_event.rounds]
           })
       },
