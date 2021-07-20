@@ -134,6 +134,13 @@ class ObjAdminSerializer(serializers.RelatedField):
     def to_representation(self, obj):
         return obj.email
 
+    def to_internal_value(self, data):
+        try:
+            return User.objects.get(email=data)
+        except User.DoesNotExist:
+            return None
+            # raise serializers.ValidationError('Invalid Email or no user with given Email.')
+
 class ClubsSerializerList(serializers.ModelSerializer):
     members = serializers.SerializerMethodField()
 
@@ -166,7 +173,8 @@ class EventSerializerList(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     creator = serializers.ReadOnlyField(source='creator.email')
-    admins = ObjAdminSerializer(many=True, read_only=True)
+    admins = ObjAdminSerializer(many=True, queryset=User.objects.all())
+    series = serializers.SlugRelatedField(read_only=True, slug_field='name')
     participants = ParticipantSerializer(many=True, read_only=True)
     rounds = RoundSerializer(many=True, read_only=True)
     class Meta:

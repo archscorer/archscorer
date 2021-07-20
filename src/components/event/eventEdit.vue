@@ -61,6 +61,19 @@
               </v-menu>
             </v-col>
           </v-row><v-row>
+            <v-col cols="4">
+              <v-text-field
+                v-model="event.location"
+                hint="Location of the event, used in pdf report"
+                label="Event location"></v-text-field>
+            </v-col><v-col cols="4">
+              <v-text-field
+                v-model="event.organizer"
+                hint="Who is organizing the event, used in pdf report"
+                label="Event organizer"></v-text-field>
+            </v-col><v-col cols="4">
+            </v-col>
+          </v-row><v-row>
             <v-col cols="12">
               <v-textarea
                 outlined
@@ -113,6 +126,49 @@
           <v-btn color="primary"
                  @click="putEventProxy(event)">Save Changes</v-btn>
         </v-card-actions>
+      </v-card>
+      <v-card class="ma-5">
+        <v-card-title>Advanced options</v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col cols="4">
+              <v-text-field
+                v-model="event.ignore_gender"
+                hint="age_style to merge gender (A_TR, V_TR)"
+                label="Ignore gender for age_style"></v-text-field>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                v-model="event.records"
+                disabled
+                hint="Currently managed by Arch[scor]er admins only"
+                label="Record category (nat/EM/MM)"></v-text-field>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                v-model="event.tags"
+                disabled
+                hint="Currently managed by Arch[scor]er admins only"
+                label="Event tags"></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+          <v-col cols="8">
+            <v-text-field
+              v-model="event.admins"
+              hint="email addresses of users, comma separated, no spaces!"
+              label="Event admins"></v-text-field>
+          </v-col>
+          <v-col cols="4">
+            <v-text-field
+              v-model="event.series"
+              disabled
+              hint="Currently managed by Arch[scor]er admins only"
+              label="Competition series, this event belongs to"></v-text-field>
+          </v-col>
+        </v-row>
+        <p class='text-caption'>Here, to change disabled options, please contact info@archscorer.faae.ee</p>
+        </v-card-text>
       </v-card>
       <v-card class="ma-5" v-if="!event.archive">
         <v-card-title>Manage Rounds</v-card-title>
@@ -261,7 +317,10 @@
         }
       },
       putEventProxy(e) {
-        this.putEvent({eId: e.id, event: Object.assign({}, e, {age_style_used: e.age_style_used.join(',')})})
+        this.putEvent({eId: e.id, event: Object.assign({}, e, {
+          age_style_used: e.age_style_used.join(','),
+          admins: e.admins.split(',')
+        })})
       },
       e_edit() {
         // for edit dialog create clone of stored event, so closing wihtout saving would
