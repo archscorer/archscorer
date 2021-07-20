@@ -264,7 +264,7 @@
                        data: []}
         // populate table header
         if (this.event.use_level_class) {
-          p_table.header.push({ text: 'Classification', value: 'classification'})
+          p_table.header.push({ text: 'Classif.', value: 'classification'})
         }
         p_table.header.push(...[
           { text: 'Class', value: 'class' },
@@ -370,6 +370,7 @@
           return {
             Class: rankingService.getClass(p, this.event.ignore_gender),
             Name: p.archer.full_name,
+            Cassification: p.level_class,
             Club: p.archer.club_details.name_short,
             Group: p.group,
             End: p.group_target,

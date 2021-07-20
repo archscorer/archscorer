@@ -21,6 +21,12 @@ export default {
         return 1;
       }
     }
+    if (a.progress > b.progress) {
+        return -1;
+    }
+    if (a.progress < b.progress) {
+        return 1;
+    }
     if ( a.sum > b.sum ){
       return -1;
     }
@@ -52,7 +58,7 @@ export default {
       } else if (p.x < place.x && place.place > 3) {
         place.place = place.ord
       }
-      p['place'] = place.place
+      p['place'] = p.progress ? place.place : null
       place.x = p.x
       place.sum = p.sum
       place.ord += 1

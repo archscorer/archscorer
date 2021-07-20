@@ -178,13 +178,23 @@
               }
             }
           }
-
+          // NOTE: this can be used to add other information to the pdfService
+          // that needs to be calculated
+          r_table.meta = {
+            rounds: rounds.length,
+            so: so ? true : false,
+            url: this.$route.path,
+          }
           r_table.header = [
-            { text: 'Place', value: 'place', width: '1%' },
+            { text: 'Place', value: 'place', width: '1%' }
+          ]
+          if (this.event.use_level_class) {
+            r_table.header.push({ text: 'Classif.', value: 'classification', width: '1%' })
+          }
+          r_table.header.push(
             { text: 'Name', value: 'name' },
             { text: 'Club', value: 'club' },
-            { text: 'Class', value: 'class' },
-          ]
+            { text: 'Class', value: 'class' })
           r_table.header.push(...rounds.map(function(r) {
             if (Array.isArray(r)) {
               // we have units that are combined into a round
@@ -201,6 +211,8 @@
           }))
           if (this.rounds_have_x()) {
             r_table.header.push({ text: 'x', value: 'x', width: '1%' })
+            // NOTE: this should be changed if we're going to include X, X+10, 10, 10+9 exeptions
+            r_table.meta.spots = 1
           }
           r_table.header.push({ text: 'Sum', value: 'sum', width: '1%' })
           if (so) {
@@ -225,6 +237,7 @@
               }
               let row = {
                 id: p.id,
+                classification: p.level_class,
                 name: p.archer.full_name,
                 class: rankingService.getClass(p, this.event.ignore_gender),
                 club: p.archer.club_details.name_short,
@@ -276,6 +289,7 @@
                 return rankingService.sum( getSpots(r, p) )
               })
               row.x = spots.length ? rankingService.sum( spots ) : 0
+              row.progress = sums.some(v => v !== null)
 
               if (so) {
                 let so_arrows = getScore(so, p)
@@ -344,7 +358,7 @@
         })
       },
       results2pdfProxy() {
-        pdfService.results2pdf(this.event, this.r_table, this.$route.path)
+        pdfService.results2pdf(this.event, this.r_table)
       }
     },
   }
