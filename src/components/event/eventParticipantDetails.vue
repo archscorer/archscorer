@@ -37,7 +37,7 @@
           color="primary"
         >
           <template v-slot:label>
-            <v-icon large dense color="primary">mdi-silverware-fork-knife</v-icon>
+            <v-icon large dense :color="participant.food ? 'primary' : ''">mdi-silverware-fork-knife</v-icon>
           </template>
         </v-switch>
       </v-col>

@@ -60,7 +60,11 @@
       <v-col>
         <p class='text-caption'>
           <template v-if="[this.event.creator, ...this.event.admins].includes(this.user.email) || this.event.archive">
-            Export results to <v-btn x-small color="primary" @click="results2pdfProxy()">PDF</v-btn>
+            Export results to <v-btn x-small color="primary" @click="results2pdfProxy()" class="mr-3">PDF</v-btn>
+            <v-btn x-small color="primary"
+              v-for="(r, ri) in r_table.meta.rounds"
+              @click="roundResults2pdfProxy(r)"
+              :key="'rb_' + ri">R{{ ri+1 }}</v-btn>
           </template>
           <template v-if="[this.event.creator, ...this.event.admins].includes(this.user.email)">
             <br />Infinite scroll loop
@@ -181,7 +185,7 @@
           // NOTE: this can be used to add other information to the pdfService
           // that needs to be calculated
           r_table.meta = {
-            rounds: rounds.length,
+            rounds: rounds,
             so: so ? true : false,
             url: this.$route.path,
           }
@@ -359,6 +363,118 @@
       },
       results2pdfProxy() {
         pdfService.results2pdf(this.event, this.r_table)
+      },
+      roundResults2pdfProxy(r) {
+        let round_table = {
+          header: [{ text: 'Place', value: 'place', pdf_width: 'auto' }],
+          data: [],
+          meta: {
+            url: this.$route.path,
+            ends: 0,
+          }
+        }
+        if (this.event.use_level_class) {
+          round_table.header.push({ text: 'Classif.', value: 'classification', pdf_width: 'auto' })
+        }
+        round_table.header.push(
+          { text: 'Name', value: 'name', pdf_width: 98 },
+          { text: 'Club', value: 'club', pdf_width: 28 },
+          { text: 'Class', value: 'class' },
+          { text: 'Total', value: 'sum', pdf_width: 22},
+        )
+        // exract ends from round.course object
+        // we can have different representations here:
+        // single unit or round will be an event.round object
+        // 2 units of the same type will be an array of two event.round objects
+        // rounds can have halves or not. these we need to split up here?
+        let spots = false
+        if (Array.isArray(r)) {
+          // we have units that are combined into a round
+          round_table.meta.round_label = '(' + r.map(obj => obj.ord).join('+') + ') ' + rankingService.longestPrefix(r.map(obj => obj.label))
+          for (let h of r) {
+            let c = this.courses.find(obj => obj.id === h.course)
+            for (let e of c.ends) {
+              round_table.header.push({ text: e.ord, value: h.ord + '_' + e.ord, pdf_width: '*'})
+              round_table.meta.ends += 1
+              if (e.x) {
+                spots = true
+              }
+            }
+            round_table.header.push({ text: 'Sum', value: h.ord + '_sum', pdf_width: 20})
+          }
+        } else {
+          // we have round object, it can have halves or if not a single unit or smth special
+          round_table.meta.round_label = r.ord + '. ' + r.label
+          let c = this.courses.find(obj => obj.id === r.course)
+          for (let e of c.ends) {
+            round_table.header.push({ text: e.ord, value: r.ord + '_' + e.ord, pdf_width: '*'})
+            round_table.meta.ends += 1
+            if (c.halves && e.ord === c.ends.length / 2) {
+              round_table.header.push({ text: 'Sum', value: r.ord + '_1_sum', pdf_width: 20})
+            }
+            if (e.x) {
+              spots = true
+            }
+          }
+          round_table.header.push({ text: 'Sum', value: r.ord + '_2_sum', pdf_width: 20})
+        }
+        if (spots) {
+          round_table.header.push({ text: 'x', value: 'spots', pdf_width: 14})
+        }
+        if (Array.isArray(this.event.participants)) {
+          round_table.data = this.event.participants.map(p => {
+            let row = {
+              classification: p.level_class,
+              name: p.archer.full_name,
+              club: p.archer.club_details.name_short,
+              class: rankingService.getClass(p, this.event.ignore_gender),
+              progress: false,
+              sum: 0,
+            }
+            let spots = 0
+            if (Array.isArray(r)) {
+              // we have units that are combined into a round
+              for (let h of r) {
+                let c = this.courses.find(obj => obj.id === h.course)
+                let sc = p.scorecards.find(obj => obj.round === h.id)
+                let sum = 0
+                if (sc) {
+                  row.progress = true
+                  for (let e of c.ends) {
+                    spots += rankingService.sum(sc.arrows.filter(a => a.end === e.id).map(a => a.x ? 1 : 0))
+                    row[h.ord + '_' + e.ord] = rankingService.sum(sc.arrows.filter(a => a.end === e.id).map(a => a.score))
+                    sum += row[h.ord + '_' + e.ord]
+                    row.sum += row[h.ord + '_' + e.ord]
+                  }
+                  row[h.ord + '_sum'] = sum
+                }
+              }
+            } else {
+              // we have round object, it can have halves or if not a single unit or smth special
+              let c = this.courses.find(obj => obj.id === r.course)
+              let sc = p.scorecards.find(obj => obj.round === r.id)
+              let sum = 0
+              if (sc) {
+                row.progress = true
+                for (let e of c.ends) {
+                  spots += rankingService.sum(sc.arrows.filter(a => a.end === e.id).map(a => a.x ? 1 : 0))
+                  row[r.ord + '_' + e.ord] = rankingService.sum(sc.arrows.filter(a => a.end === e.id).map(a => a.score))
+                  sum += row[r.ord + '_' + e.ord]
+                  row.sum += row[r.ord + '_' + e.ord]
+                  if (c.halves && e.ord === c.ends.length / 2) {
+                    row[r.ord + '_1_sum'] = sum
+                    sum = 0
+                  }
+                }
+                row[r.ord + '_2_sum'] = sum
+              }
+            }
+            row.spots = spots
+            return row
+          })
+          rankingService.participantRank(round_table.data)
+        }
+        pdfService.roundResults2pdf(this.event, round_table)
       }
     },
   }

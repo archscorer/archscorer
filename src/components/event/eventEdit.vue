@@ -72,6 +72,10 @@
                 hint="Who is organizing the event, used in pdf report"
                 label="Event organizer"></v-text-field>
             </v-col><v-col cols="4">
+              <v-text-field
+                v-model="event.judges"
+                hint="Used in pdf report"
+                label="Judges/Referees"></v-text-field>
             </v-col>
           </v-row><v-row>
             <v-col cols="12">
@@ -156,7 +160,7 @@
           <v-col cols="8">
             <v-text-field
               v-model="event.admins"
-              hint="email addresses of users, comma separated, no spaces!"
+              hint="email addresses of users, comma separated"
               label="Event admins"></v-text-field>
           </v-col>
           <v-col cols="4">
@@ -221,7 +225,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="error" @click="deleteR()" >Remove last</v-btn>
+          <v-btn color="error" @click="deleteR" v-if="event.rounds.length">Remove last</v-btn>
           <v-btn color="primary" @click="newRound">Add new</v-btn>
         </v-card-actions>
       </v-card>
@@ -248,7 +252,7 @@
         { text: 'Club - visible to all members', value: 'club' },
         { text: 'Open - visible to all', value: 'open' }
       ],
-      event: {},
+      event: {rounds: []},
     }),
     watch: {
       p_event: {

@@ -270,7 +270,7 @@
           { text: 'Class', value: 'class' },
           { text: 'Club', value: 'club' },
           { text: 'Group', value: 'group' },
-          { text: 'End', value: 'end' },
+          { text: 'End', value: 'end' }, // change this to Target
           { text: 'Position', value: 'pos' },
         ])
         if (!this.event.archive && this.user.id) {
