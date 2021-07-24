@@ -3,12 +3,14 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
+// page numbers
+
 let styles = {
   header: {
     fontSize: 18,
     bold: true,
     alignment: 'center',
-    margin: [0, 15, 0, 5]
+    margin: [0, 10, 0, 5]
   },
   subheader: {
     fontSize: 12,
@@ -17,10 +19,10 @@ let styles = {
     margin: [0, 5, 0, 5]
   },
   styleheader: {
-    fontSize: 14,
+    fontSize: 12,
     bold: true,
     alignment: 'left',
-    margin: [0, 15, 0, 5],
+    margin: [0, 4, 0, 1],
   },
   footer: {
     fontSize: 8,
@@ -81,7 +83,7 @@ export default {
     if (event.use_level_class) {
       widths.push('auto')
     }
-    widths.push(...[98, 28, ...Array(r_table.meta.rounds).fill('*')])
+    widths.push(...[98, 28, ...Array(r_table.meta.rounds.length).fill('*')])
     if (r_table.meta.spots) {
       widths.push(...Array(r_table.meta.spots).fill(18))
     }
@@ -91,11 +93,15 @@ export default {
     }
 
     let docDefinition = {
-      footer: {
-        columns: [
-          { text: window.location.origin + '/#' + r_table.meta.url, style: 'footer' },
-          { text: new Date().toLocaleString(), alignment: 'right', style: 'footer' }
-        ]
+      pageSize: 'A4',
+      footer: function(currentPage, pageCount) {
+        return {
+          columns: [
+            { text: window.location.origin + '/#' + r_table.meta.url, style: 'footer' },
+            { text: currentPage + ' of ' + pageCount, alignment: 'center'},
+            { text: new Date().toLocaleString(), alignment: 'right', style: 'footer' }
+          ],
+        }
       },
       content: [
         {text: event.name, style: 'header'},
@@ -103,11 +109,10 @@ export default {
           layout: 'noBorders',
           table: {
             headerRows: 0,
-            widths: ['auto', 'auto'],
+            widths: ['auto', 'auto', '*', 'auto', 'auto'],
             body: [
-              [{text: 'Location'}, {text: event.location}],
-              [{text: 'Organizer'}, {text: event.organizer}],
-              [{text: 'Date'}, {text: event.date_start + (event.date_start !== event.date_end ? ' -- ' + event.date_end : '')}]
+              [{text: 'Location'}, {text: event.location}, {}, {text: 'Organizer'}, {text: event.organizer}],
+              [{text: 'Referees'}, {text: event.judges}, {}, {text: 'Date'}, {text: event.date_start + (event.date_start !== event.date_end ? ' -- ' + event.date_end : '')}]
             ]
           }
         },
@@ -136,6 +141,77 @@ export default {
                         {text: m[1], width: 'auto'},
                         {text: m[2], fontSize: 6}
                       ]}
+                    }
+                    return h.value === 'sum' ? {text: r[h.value], bold: true} : r[h.value]
+                  })
+                })
+              ]
+            }
+          }
+        })
+      ],
+      styles: Object.assign({
+        tableheader: {
+          fontSize: 9,
+          bold: true,
+          margin: [0, 0, 0, 0]
+        }
+      }, styles),
+      defaultStyle: {
+        fontSize: 9,
+        alignment: 'right',
+      }
+    }
+    pdfMake.createPdf(docDefinition).open()
+  },
+  roundResults2pdf(event, round_table) {
+    let docDefinition = {
+      pageSize: {
+        // width: 842,
+        width: 475 + 28 * round_table.meta.ends,
+        height: 595,
+      },
+      footer: function(currentPage, pageCount) {
+        return {
+          columns: [
+            { text: window.location.origin + '/#' + round_table.meta.url, style: 'footer' },
+            { text: currentPage + ' of ' + pageCount, alignment: 'center'},
+            { text: new Date().toLocaleString(), alignment: 'right', style: 'footer' }
+          ],
+        }
+      },
+      content: [
+        {text: event.name, style: 'styleheader'},
+        {text: round_table.meta.round_label, alignment: 'left', fontSize: 12},
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: ['auto', 'auto', 'auto', 'auto'],
+            body: [
+              [{text: 'Location'}, {text: event.location}, {text: 'Organizer'}, {text: event.organizer}],
+              [{text: 'Referees'}, {text: event.judges}, {text: 'Date'}, {text: event.date_start + (event.date_start !== event.date_end ? ' -- ' + event.date_end : '')}]
+            ]
+          }
+        },
+        Array.from(new Set(round_table.data.map(r => r.class))).map(cls => {
+          return {
+            layout: 'lightHorizontalLines',
+            table: {
+              headerRows: 2,
+              widths: round_table.header.filter(h => h.value !== 'class').map(h => h.pdf_width),
+              body: [
+                [{text: cls, colSpan: round_table.header.length - 1, style: 'styleheader' },
+                 ...Array(round_table.header.length - 2).fill('')],
+
+                round_table.header.filter(h => h.value !== 'class').map(h => {
+                  return {text: h.text, style: 'tableheader'}
+                }),
+
+                ...round_table.data.filter(r => r.class === cls).map(r => {
+                  return round_table.header.filter(h => h.value !== 'class').map(h => {
+                    if (typeof(r[h.value]) === 'undefined') {
+                      return ''
                     }
                     return h.value === 'sum' ? {text: r[h.value], bold: true} : r[h.value]
                   })
