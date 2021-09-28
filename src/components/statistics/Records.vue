@@ -18,7 +18,8 @@
             dense
             :items="[{ text: '--disabled--', value: null },
                     { text: 'Format', value: 'format'},
-                    { text: 'Class', value: 'class'}]"
+                    { text: 'Class', value: 'class'},
+                    { text: 'Archer', value: 'archer'}]"
             label="organise archers by">
           </v-select>
         </v-col>
