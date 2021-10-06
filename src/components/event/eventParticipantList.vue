@@ -73,8 +73,7 @@
         ></v-text-field>
       </v-card-title>
       <v-card-text>
-        <v-row dense
-          v-if="[event.creator, ...event.admins].includes(user.email)">
+        <v-row dense>
           <v-col>
             <v-select
               v-model="group_by"
@@ -84,8 +83,9 @@
                       { text: 'End', value: 'end'}]"
               label="organise archers by">
             </v-select>
-            <p>Export end assignments to <v-btn x-small color="primary" @click="endAssignments2pdfProxy()">PDF</v-btn><br/>
-            Export all participant data to <v-btn x-small color="green" dark @click="export2excel()">EXCEL</v-btn></p>
+            <p v-if="[event.creator, ...event.admins].includes(user.email)">
+              Export end assignments to <v-btn x-small color="primary" @click="endAssignments2pdfProxy()">PDF</v-btn><br/>
+              Export all participant data to <v-btn x-small color="green" dark @click="export2excel()">EXCEL</v-btn></p>
           </v-col>
         </v-row>
         <v-data-table
