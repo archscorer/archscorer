@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from .models import (User, Club, Archer, Course, End,
-                     Participant, Series, Event, Round,
-                     Record, LevelClass, Arrow, ScoreCard)
+                     Participant, Series, Event, EventDescription,
+                     Round, Record, LevelClass, Arrow, ScoreCard)
 
 # Register your models here.
 @admin.register(User)
@@ -84,6 +84,10 @@ class myEventAdmin(admin.ModelAdmin):
     raw_id_fields = ('series',)
     list_display = ('name', 'creator', 'archive')
     search_fields = ('name', 'tags')
+
+@admin.register(EventDescription)
+class myEventDescriptionAdmin(admin.ModelAdmin):
+    raw_id_fields = ('event',)
 
 @admin.register(Series)
 class mySeriesAdmin(admin.ModelAdmin):

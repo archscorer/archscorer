@@ -9,7 +9,22 @@
       <v-tab-item>
         <v-sheet class="py-5">
           <h1 v-text="event.name"></h1>
-          <p v-html="event_desciption"></p>
+          <v-subheader>Event details</v-subheader>
+            <template>
+              <v-tabs v-model="description">
+                <v-tab v-for="description in event.descriptions">
+                  {{ description.language }}
+                </v-tab>
+              </v-tabs>
+            </template>
+          <v-tabs-items v-model="description" touchless>
+            <v-tab-item v-for="description in event.descriptions">
+              <div class="ma-5">{{ description.description }}</div>
+              <v-card flat>
+                <v-card-text></v-card-text>
+              </v-card>
+            </v-tab-item>
+          </v-tabs-items>
         </v-sheet>
         <v-list dense>
           <v-subheader>Rounds</v-subheader>
@@ -52,6 +67,7 @@
     },
     data: () => ({
       tab: null,
+      description: []
     }),
     watch: {
       tab: {

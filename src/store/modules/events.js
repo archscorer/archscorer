@@ -48,6 +48,7 @@ const actions = {
   },
   addEvent({ commit }, event) {
     let rounds = event.rounds
+    let descriptions = event.descriptions
     eventService.postEvent(event)
     .then(event => {
       // because of async api the commit wont wait on rounds addition
@@ -68,6 +69,10 @@ const actions = {
         }).catch(error => {
           console.log(error.response.data)
         })
+      })
+      descriptions.forEach(function (description, i) {
+        description.event = event.id;
+        this.addDescription(description)
       })
     })
   },
@@ -103,6 +108,29 @@ const actions = {
     eventService.delRound(attr.rId)
     .then(() => {
       commit('delRound', attr)
+    })
+  },
+  addDescription({ commit }, description) {
+    eventService.postDescription(description)
+        .then(() => {
+          eventService.fetchEvents(event.id)
+          .then(event => {
+            commit('updateEvent', event)
+          })
+        }).catch(error => {
+          console.log(error.response.data)
+        })
+  },
+  putDescription({ commit }, description) {
+    eventService.putDescription(description.id, description)
+    .then(description => {
+      commit('updateDescription', description)
+    })
+  },
+  delDescription({ commit}, attr) {
+    eventService.delDescription(attr.dId)
+    .then(() => {
+      commit('deleteDescription', attr)
     })
   },
   getParticipant({ commit }, pId) {
@@ -217,6 +245,26 @@ const mutations = {
       const ri = state.events[ei].rounds.findIndex(obj => obj.id === attr.rId)
       if (ri !== -1) {
         state.events[ei].rounds.splice(ri, 1)
+      }
+    }
+  },
+  updateDescription(state, description) {
+    const ei = state.events.findIndex(obj => obj.id === description.event)
+    if (ei !== -1) {
+      const index = state.events[ei].descriptions.findIndex(obj => obj.id === description.id);
+      if (index !== -1) {
+        state.events[ei].descriptions.splice(index, 1, description)
+      } else {
+        state.events[ei].descriptions.push(description)
+      }
+    }
+  },
+  deleteDescription(state, attr) {
+    const ei = state.events.findIndex(obj => obj.id === attr.dId)
+    if (ei !== -1) {
+      const descr = state.events[ei].descriptions.findIndex(obj => obj.id === attr.dId)
+      if (descr !== -1) {
+        state.events[ei].descriptions.splice(descr, 1)
       }
     }
   },

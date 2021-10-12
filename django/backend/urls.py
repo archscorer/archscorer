@@ -27,6 +27,7 @@ router.register(r'series', views.SeriesViewSet)
 router.register(r'records', views.RecordViewSet)
 router.register(r'events', views.EventViewSet, basename='events')
 router.register(r'events/rounds', views.RoundViewSet)
+router.register(r'events/descriptions', views.EventDescriptionViewSet)
 router.register(r'events/participants', views.ParticipantViewSet)
 router.register(r'events/participants/arrows', views.ArrowViewSet)
 

@@ -94,14 +94,29 @@
                     </v-menu>
                   </v-col>
                 </v-row>
-                <v-row dense>
-                  <v-col cols="12">
-                    <v-textarea
-                      outlined
-                      v-model="event.description"
-                      label="Event details"
-                    ></v-textarea>
-                  </v-col>
+                <div dense v-for="(description, index) in event.descriptions" :key="index">
+                  <v-row >
+                    <v-col cols="5">
+                      <v-autocomplete
+                        v-model="event.descriptions[index].language"
+                        autocomplete
+                        :items="language"
+                        label="Description language"
+                      ></v-autocomplete>
+                    </v-col>
+                  </v-row>
+                  <v-row dense>
+                    <v-col cols="12">
+                      <v-textarea
+                        outlined
+                        v-model="event.descriptions[index].description"
+                        label="Event details"
+                      ></v-textarea>
+                    </v-col>
+                  </v-row>
+                  </div>
+                <v-row>
+                  <v-btn text color="primary" @click="addDescription">Add description</v-btn>
                 </v-row>
               </v-form>
             </v-card-text>
@@ -290,12 +305,15 @@
     data: () => ({
       dialog: false,
       e1: 1,
+      language: [{ text: 'LV', value: 'LV' },
+        { text: 'EE', value: 'EE' },
+        { text: 'EN', value: 'EN' }],
 
       event: {
         name: '',
         date_start: new Date().toISOString().substr(0, 10),
         date_end: '',
-        description: '',
+        descriptions: [{language: '', description: ''}],
         type: 'private',
         is_open: false,
         rounds: [{label: '', course: null, is_open: true}],
@@ -336,6 +354,9 @@
       })
     },
     methods: {
+      addDescription() {
+        this.event.descriptions.push({language: '', description: ''})
+      },
       addRound() {
         this.event.rounds.push({label: '', course: null, is_open: true})
       },

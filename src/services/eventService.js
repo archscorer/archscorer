@@ -61,5 +61,17 @@ export default {
   putArrow(aId, payload) {
     return api.put(`events/participants/arrows/${aId}/`, payload)
               .then(response => response.data)
+  },
+  postDescription(payload) {
+    return api.post(`events/descriptions/add/`, payload)
+              .then(response => response.data)
+  },
+  putDescription(dId, payload) {
+    return api.put(`events/descriptions/${dId}/`, payload)
+              .then(response => response.data)
+  },
+  delDescription(dId) {
+    return api.delete(`events/descriptions/${dId}/`)
+              .then(response => response.data)
   }
 }

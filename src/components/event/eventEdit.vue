@@ -78,15 +78,6 @@
                 label="Judges/Referees"></v-text-field>
             </v-col>
           </v-row><v-row>
-            <v-col cols="12">
-              <v-textarea
-                outlined
-                v-model="event.description"
-                label="Event details"
-                auto-grow
-              ></v-textarea>
-            </v-col>
-          </v-row><v-row>
             <v-col cols="6">
               <v-autocomplete
                 v-model="event.type"
@@ -174,6 +165,61 @@
         <p class='text-caption'>Here, to change disabled options, please contact info@archscorer.faae.ee</p>
         </v-card-text>
       </v-card>
+      <v-card class="ma-5">
+        <v-form v-model="valid_description">
+            <v-card-title>Manage Descriptions</v-card-title>
+            <v-card-text>
+              <div dense v-for="(description, index) in event.descriptions" :key="index">
+                <v-row>
+                  <v-col cols="3">
+                    <v-select autofocus
+                            v-model="event.descriptions[index].language"
+                            :items="language"
+                            label="Description language"
+                            :rules="[ v => !!v || 'Language is required' ]"
+                            @input="event.descriptions[index].is_changed = true"
+                    ></v-select>
+                  </v-col>
+                  <v-col class="text-right">
+                    <template v-if="!event.descriptions[index].id">
+                      <v-btn :disabled="!valid_description"
+                             class="lowered ma-5"
+                             color="success"
+                             @click="saveDescription(event.descriptions[index])">SAVE
+                      </v-btn>
+                    </template>
+                    <template v-if="event.descriptions[index].id">
+                      <v-btn v-if="event.descriptions[index].is_changed"
+                             class="lowered ma-5"
+                             color="primary"
+                             @click="putDescription(event.descriptions[index])"><v-icon>mdi-refresh</v-icon>
+                      </v-btn>
+                    </template>
+                    <template v-if="event.descriptions[index].id">
+                      <v-btn color="error"
+                             class="lowered ma-5"
+                             @click="deleteD(event.descriptions[index])"><v-icon>mdi-delete</v-icon></v-btn>
+                    </template>
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col cols="12">
+                    <v-textarea
+                            outlined
+                            v-model="event.descriptions[index].description"
+                            label="Event details"
+                            @input="event.descriptions[index].is_changed = true"
+                    ></v-textarea>
+                  </v-col>
+                </v-row>
+              </div>
+              <v-divider class="py-3"></v-divider>
+              <v-row>
+                <v-btn text color="primary" class="ma-5" @click="newDescription">Add description</v-btn>
+              </v-row>
+            </v-card-text>
+          </v-form>
+      </v-card>
       <v-card class="ma-5" v-if="!event.archive">
         <v-card-title>Manage Rounds</v-card-title>
         <v-card-text>
@@ -252,7 +298,14 @@
         { text: 'Club - visible to all members', value: 'club' },
         { text: 'Open - visible to all', value: 'open' }
       ],
-      event: {rounds: []},
+      event: {
+        rounds: [],
+        descriptions: [{language: '', description: ''}]
+      },
+      language: [{ text: 'LV', value: 'LV' },
+        { text: 'EE', value: 'EE' },
+        { text: 'EN', value: 'EN' }],
+      valid_description: false
     }),
     watch: {
       p_event: {
@@ -283,6 +336,9 @@
         'addRound',
         'delRound',
         'putRound',
+        'putDescription',
+        'delDescription',
+        'addDescription',
       ]),
       newRound() {
         let lastCourse = null
@@ -297,6 +353,19 @@
           }
         }
         this.event.rounds.push({label: lastLabel, course: lastCourse, is_open: true, scorecards: []})
+      },
+      newDescription() {
+        this.event.descriptions.push({language: '', description: ''})
+      },
+      saveDescription(description) {
+        description.event = this.event.id
+        this.addDescription(description)
+        this.e_update()
+      },
+      deleteD(description) {
+        confirm('This description will be completely lost. Are you sure to delete it?') &&
+        this.delDescription({eId: this.event.id, dId: description.id}) &&
+        this.e_update()
       },
       deleteE(eId) {
         confirm('Event "' + this.event.name + '" will be removed permanently') &&
@@ -333,7 +402,8 @@
           {
             age_style_used: this.p_event.age_style_used.split(','),
             admins: this.p_event.admins.join(', '),
-            rounds: [...this.p_event.rounds]
+            rounds: [...this.p_event.rounds],
+            descriptions: [...this.p_event.descriptions]
           })
       },
       e_update() {

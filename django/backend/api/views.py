@@ -8,10 +8,10 @@ from django.middleware.csrf import get_token
 from django.db.models import Q
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
-from .models import (User, Club, Course, Archer, Series, Event, Round, Participant, ScoreCard, Arrow, Record)
+from .models import (User, Club, Course, Archer, Series, Event, EventDescription, Round, Participant, ScoreCard, Arrow, Record)
 from .serializers import (UserSerializer, ClubSerializer, ClubsSerializerList, CourseSerializer,
                           ArcherSerializer, SeriesSerializer, EventSerializer, EventSerializerList,
-                          RoundSerializer, ParticipantSerializer,
+                          RoundSerializer, ParticipantSerializer, EventDescriptionSerializer,
                           ScoreCardSerializer, ArrowSerializer, SeriesSerializerList,
                           RecordSerializer)
 
@@ -155,6 +155,19 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
+
+class EventDescriptionViewSet(viewsets.ModelViewSet):
+
+    permission_classes = [permissions.IsAuthenticated & ActiveEvent]
+    serializer_class = EventDescriptionSerializer
+    queryset = EventDescription.objects.all()
+
+    @action(detail=False, methods=['POST'])
+    def add(self, request, *args, **kwargs):
+        if Event.objects.get(pk=request.data.get('event')).archive:
+            return Response({'details': 'No new rounds on archived event.'},
+                            status=status.HTTP_403_FORBIDDEN)
+        return self.create(request, *args, **kwargs)
 
 class RoundViewSet(viewsets.ModelViewSet):
     """

@@ -76,6 +76,11 @@ RECORD_CHOICES = [
     ('field', 'IFAA Field'),
     ('hunter', 'IFAA Hunter')]
 
+LANGUAGE_CHOICES = [
+    ('EE', 'EE'),
+    ('LV', 'LV'),
+    ('EN', 'EN')]
+
 class User(AbstractUser):
     username = models.CharField('username', max_length=30, blank=True)
     email = models.EmailField('email address', unique=True)
@@ -234,6 +239,14 @@ class Event(models.Model):
 
     class Meta:
         ordering = ['-date_start']
+
+class EventDescription(models.Model):
+    language = models.CharField('language', max_length=20, choices=LANGUAGE_CHOICES)
+    description = models.TextField(blank=True)
+    event = models.ForeignKey(Event, related_name='descriptions', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['event']
 
 class Round(models.Model):
     ord = models.IntegerField('Round order', blank=False)
