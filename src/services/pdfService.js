@@ -64,10 +64,10 @@ export default {
               layout: 'noBorders',
               table: {
                 headerRows: 0,
-                widths: [125, '*', '*', '*'],
+                widths: [125, '*', '*', '*', '*'],
                 body: [
                   ...groupGrp.filter(p => p.end === end).sort(function (a, b) {return a.pos < b.pos ? -1 : a.pos > b.pos ? 1 : 0}).map(p => {
-                    return [p.name, p.class, p.pos, p.sum > 0 ? p.sum : '']
+                    return [p.name, p.club, p.class, p.pos, p.sum > 0 ? p.sum : '']
                   })
                 ]
               }
