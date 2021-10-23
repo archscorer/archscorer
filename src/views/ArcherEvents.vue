@@ -10,7 +10,6 @@
         </v-card-text>
       </v-card>
       <ArcherPastEvents v-if="user.id !== null"/>
-      <Records/>
     </v-layout>
   </v-container>
 </template>
@@ -19,13 +18,11 @@
   import { mapState } from 'vuex'
 
   import ArcherPastEvents from '@/components/statistics/ArcherPastEvents.vue'
-  import Records from '@/components/statistics/Records.vue'
 
   export default {
-    name: 'Statistics',
+    name: 'ArcherEvents',
     components: {
       ArcherPastEvents,
-      Records,
     },
     data: () => ({
       //
