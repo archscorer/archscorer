@@ -87,7 +87,7 @@ export default {
     if (r_table.meta.spots) {
       widths.push(...Array(r_table.meta.spots).fill(18))
     }
-    widths.push('auto')
+    widths.push(24)
     if (r_table.meta.so) {
       widths.push('auto')
     }
@@ -139,7 +139,7 @@ export default {
                       let m = r[h.value].match(/(\d+)<sup>(\d)<\/sup>/)
                       return {columns: [
                         {text: m[1], width: 'auto'},
-                        {text: m[2], fontSize: 6}
+                        {text: m[2], fontSize: 6, 'alignment': 'left'}
                       ]}
                     }
                     return h.value === 'sum' ? {text: r[h.value], bold: true} : r[h.value]
