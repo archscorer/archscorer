@@ -18,7 +18,7 @@
     },
     "devDependencies": {
         "@vue/cli-service": "^4.5.13",
-        "axios": "^0.21.1",
+        "axios": "^0.21.2",
         "babel-eslint": "^10.1.0",
         "eslint-plugin-vue": "^7.13.0",
         "sass": "~1.32.12",
