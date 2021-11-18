@@ -35,9 +35,9 @@ const routes = [
     component: () => import('@/views/series/Series.vue')
   },
   {
-    path: '/statistics/archer/events',
-    name: 'archerevents',
-    component: () => import('@/views/ArcherEvents.vue')
+    path: '/statistics/archer/rounds',
+    name: 'past_rounds',
+    component: () => import('@/views/ArcherRounds.vue')
   },
   {
     path: '/statistics/records',

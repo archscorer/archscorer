@@ -25,18 +25,17 @@
         </v-btn>
         <v-menu
              open-on-hover offset-y
-             :close-on-content-click="true"
-             transition="scale-transition"
+             close-on-content-click
              min-width="auto"
              rounded="0"
         >
           <template v-slot:activator="{ on, attrs }">
             <v-btn text v-bind="attrs" v-on="on">Statistics</v-btn>
           </template>
-            <v-list>
+            <v-list dark nav dense class="text-uppercase" color="primary">
               <v-list-item
-                      link to="/statistics/archer/events">
-                  Archer past events
+                      link to="/statistics/archer/rounds">
+                  Archer Rounds
               </v-list-item>
               <v-list-item
                       link to="/statistics/records">
@@ -78,8 +77,8 @@
         <template v-slot:activator>
           <v-list-item-title>Statistics</v-list-item-title>
         </template>
-        <v-list-item to="/statistics/archer/events">
-          <v-list-item-title>Archer past events</v-list-item-title>
+        <v-list-item to="/statistics/archer/rounds">
+          <v-list-item-title>Archer Rounds</v-list-item-title>
         </v-list-item>
           <v-list-item to="/statistics/records">
           <v-list-item-title>Records</v-list-item-title>

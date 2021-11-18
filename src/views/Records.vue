@@ -9,8 +9,6 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
-
   import Records from '@/components/statistics/Records.vue'
 
   export default {
@@ -21,10 +19,5 @@
     data: () => ({
       //
     }),
-    computed: {
-      ...mapState({
-        user: state => state.user.user,
-      }),
-    },
   };
 </script>
