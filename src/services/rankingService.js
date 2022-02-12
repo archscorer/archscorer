@@ -66,7 +66,7 @@ export default {
   },
   getClass(p, ops) {
     // p is participant
-    if (ops && ops.includes(p.age_group + '_' + p.style)) {
+    if (ops && ops.includes(p.age_group + '_' + p.style) || ops === 'all') {
       return p.age_group + '_' + p.style
     }
     return p.age_group + p.archer.gender + p.style
