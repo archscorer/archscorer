@@ -80,7 +80,7 @@
               dense
               :items="[{ text: '--disabled--', value: null },
                       { text: 'Class', value: 'class'},
-                      { text: 'End', value: 'end'}]"
+                      { text: 'End/Target', value: 'end'}]"
               label="organise archers by">
             </v-select>
             <p v-if="[event.creator, ...event.admins].includes(user.email)">
@@ -269,9 +269,9 @@
         p_table.header.push(...[
           { text: 'Class', value: 'class' },
           { text: 'Club', value: 'club' },
-          { text: 'Group', value: 'group' },
-          { text: 'End', value: 'end' }, // change this to Target
-          { text: 'Position', value: 'pos' },
+          { text: 'Group/Session', value: 'group' },
+          { text: 'End/Target', value: 'end' }, // change this to Target
+          { text: 'Position/Index', value: 'pos' },
         ])
         if (!this.event.archive && this.user.id) {
           if (this.event.is_open || [this.event.creator, ...this.event.admins].includes(this.user.email)) {
