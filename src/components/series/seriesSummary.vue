@@ -126,7 +126,7 @@
             so = so ? so.id : null
             let p_table = stage.participants.map(p => {
               return {
-                name: p.archer.full_name,
+                name: p.full_name,
                 class: rankingService.getClass(p, this.s.ignore_gender),
                 id: p.archer.id + p.age_group + p.style,
                 club: p.archer.club_details.name_short,

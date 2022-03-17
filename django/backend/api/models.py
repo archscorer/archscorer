@@ -35,14 +35,18 @@ TYPE_CHOICES = [('private', 'Private'),
                 ('club', 'Club'),
                 ('open', 'Open')]
 
-AGEGROUP_CHOICES = [('T', 'Tidet'),
-                    ('C', 'Cub'),
-                    ('CA', 'Cadet'),
+AGEGROUP_CHOICES = [('C', 'Cub'),
                     ('J', 'Junior'),
                     ('YA', 'Young Adult'),
                     ('A', 'Adult'),
                     ('V', 'Veteran'),
-                    ('O', 'Open')]
+                    ('S', 'Senior'),
+                    ('O', 'Open'),
+                    ('U13', 'Under 13'),
+                    ('U15', 'Under 15'),
+                    ('U18', 'Under 18'),
+                    ('U21', 'Under 21'),
+                    ('50+', '50+')]
 
 STYLE_CHOICES = [
     ('BB-C', 'Barebow Compound'),
@@ -60,7 +64,8 @@ STYLE_CHOICES = [
     ('**', 'Variable'),
     ('R', 'Recurve'),
     ('C', 'Compound'),
-    ('I', 'Instinctive'),
+    ('B', 'Barebow'),
+    ('T', 'Traditional'),
     ('L', 'Longbow')]
 
 LEVEL_CHOICES = [('A', 'A'),
@@ -88,11 +93,22 @@ class User(AbstractUser):
     class Meta:
         ordering = ['-date_joined']
 
+class Association(models.Model):
+    creator = models.ForeignKey(User, related_name='associations_created', null=True, on_delete=models.SET_NULL)
+    name = models.CharField('Organisation name', max_length=150, blank=False, default='Unnamed archery association')
+    name_short = models.CharField('Organisation name short', max_length=10, blank=True, default='***')
+    contact = models.TextField('Contact Information')
+    description = models.TextField()
+    admins = models.ManyToManyField(User, related_name='admin_association', blank=True)
+
+    class Meta:
+        ordering = ['name']
+
 class Club(models.Model):
     creator = models.ForeignKey(User, related_name='clubs_created', null=True, on_delete=models.SET_NULL)
     name = models.CharField('Club name', max_length=150, blank=False, default='Unnamed archery club')
     name_short = models.CharField('Club name short', max_length=10, blank=True, default='***')
-    association = models.CharField('Association name (FAAE - in estonia)', max_length=255, blank=True, default='***')
+    association = models.ManyToManyField(Association, related_name='clubs', blank=True)
     contact = models.TextField('Contact Information')
     description = models.TextField()
     admins = models.ManyToManyField(User, related_name='admin_clubs', blank=True)
@@ -121,7 +137,7 @@ class LevelClass(models.Model):
     # this is intended for level classes for archers (A, B, C, *)
     archer = models.ForeignKey(Archer, related_name='level_classes', on_delete=models.CASCADE)
     level = models.CharField('Level', max_length=1, blank=False, choices=LEVEL_CHOICES)
-    age_group = models.CharField('age group', max_length=2, blank=False, choices=AGEGROUP_CHOICES)
+    age_group = models.CharField('age group', max_length=3, blank=False, choices=AGEGROUP_CHOICES)
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     date = models.DateField('Date of achievement', blank=True, null=True)
 
@@ -163,7 +179,7 @@ class End(models.Model):
 class Record(models.Model):
     archer = models.CharField('Archer name', max_length=255, blank=False)
     date = models.DateField('Date of achievement', blank=True, null=True)
-    age_group = models.CharField('age group', max_length=2, blank=False, choices=AGEGROUP_CHOICES)
+    age_group = models.CharField('age group', max_length=3, blank=False, choices=AGEGROUP_CHOICES)
     gender = models.CharField('gender', max_length=1, blank=False, choices=[('M', 'Male'), ('F', 'Female')])
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     format = models.CharField('Format', max_length=255, blank=False, choices=RECORD_CHOICES)
@@ -222,6 +238,7 @@ class Event(models.Model):
     catering = models.BooleanField('Provide catering', default=False)
     catering_choices = models.CharField(max_length=255, blank=True)
     type = models.CharField('event type', max_length=10, default='private', choices=TYPE_CHOICES)
+    association = models.ForeignKey(Association, related_name='events', null=True, blank=True, on_delete=models.SET_NULL)
     tags = models.CharField('event tags', max_length=255, blank=True)
     admins = models.ManyToManyField(User, related_name='admin_events', blank=True)
     # TODO: recrords could also be joice, default beeing 'Training' -- no records
@@ -231,6 +248,7 @@ class Event(models.Model):
     age_style_used = models.TextField('age_style classes used in the event', blank=True)
 
     series = models.ForeignKey(Series, related_name='stages', null=True, blank=True, on_delete=models.SET_NULL)
+
 
     class Meta:
         ordering = ['-date_start']
@@ -249,15 +267,22 @@ class Round(models.Model):
 
 class Participant(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    archer = models.ForeignKey(Archer, related_name='events', on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name='participants', on_delete=models.CASCADE)
-    age_group = models.CharField('age group', max_length=2, blank=False, choices=AGEGROUP_CHOICES)
+    # archer here now is only for scoring in the event, after the envent it can be safely removed from the database without
+    # affecting past events, although currently it is still protected.
+    archer = models.ForeignKey(Archer, related_name='events', on_delete=models.PROTECT)
+    archer_rep = models.CharField('archer representation in a form "club_short|association_short"', max_length=20, default='|')
+    gender = models.CharField('gender', max_length=1, default='U', choices=[('M', 'Male'),
+                                                                            ('F', 'Female'),
+                                                                            ('U', 'Unisex')]) # from archer
+    full_name = models.CharField('Full Name', max_length=150, blank=False, default='Unnamed archer') # from archer
+    age_group = models.CharField('age group', max_length=3, blank=False, choices=AGEGROUP_CHOICES)
     style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
     food = models.BooleanField(default=False)
     food_choices = models.CharField(max_length=255, blank=True)
     comments = models.CharField('Comments to organiser', max_length=255, blank=True)
-    group_target = models.IntegerField('Target nr', default=1)
-    group = models.CharField('Group', max_length=10, blank=True, default='')
+    session = models.CharField('Session', max_length=10, blank=True, default='')
+    group = models.IntegerField('Group nr', default=1)
     group_pos = models.CharField('Archer position', max_length=1, blank=True, default='')
     level_class = models.CharField('Level class', max_length=1, blank=True, default='')
 

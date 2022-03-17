@@ -26,10 +26,6 @@ tied to participant object.
   Many to many and changeable relation between archer and clubs will allow to eliminate
 all double archer profiles.
 
-Another issue is when a club steps out of FAAE or EEA. What will happen with old
-series, that relay on club affiliation. There is no feasible idea to that atm.
-Not even a bad one.
-
 For participants, groups, ends and positions might need per round approach. So pools
 or groupings would be reserved for previous round as well. This would also lay ground-
 work for one possible duel system generation.
@@ -39,3 +35,19 @@ event page?).
 Records update EE -> FAAE
 
 UPDATE api_record SET scope = REPLACE(scope, 'EE', 'FAAE') WHERE scope LIKE '%EE%';
+
+* write update database to fill new particiant gender, full_name and archer_rep
+* club associations need to be redone, due to schema change
+
+before release:
+* participant full_name from participant model, not archer. fill in in participant registration
+ -> update api_participant p inner join api_archer a on p.archer_id = a.id set p.full_name = a.full_name;
+* participant gender from participant model, not archer. fill in in participant registration
+ -> update api_participant p inner join api_archer a on p.archer_id = a.id set p.gender = a.gender;
+* participant club short --> particiant archer_rep. fill in in participant registration -- this
+  is more clomplicated as might need selections by user.
+  Probably one dropdown to choose club
+* add association also to the event - this will allow to filter competitions per association.
+
+* Add rule system for competitions, basically either WA or IFAA. It will change how bow
+styles and classes are displayed in results page, that shuold be all in the first iteration

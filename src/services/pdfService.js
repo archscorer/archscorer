@@ -51,9 +51,9 @@ export default {
         }
       }, styles)
     }
-    for (let group of Array.from(new Set(p_table.data.map(p => p.group)))) {
-      docDefinition.content.push({text: group, style: 'styleheader'})
-      let groupGrp = p_table.data.filter(p => p.group === group)
+    for (let session of Array.from(new Set(p_table.data.map(p => p.session)))) {
+      docDefinition.content.push({text: session, style: 'styleheader'})
+      let groupGrp = p_table.data.filter(p => p.session === session)
       docDefinition.content.push({
         table: {
           headerRows: 0,

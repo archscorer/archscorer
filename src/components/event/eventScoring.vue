@@ -140,11 +140,11 @@
         this.halves = this.course.halves
         this.end_view = 0
         // NOTE: formats that start scoring from first target, note here
-        if (this.user_group.group_target < this.course.ends.length &&
+        if (this.user_group.group < this.course.ends.length &&
             this.course.name.indexOf('Indoor') === -1 &&
             this.course.name.indexOf('WA Target') === -1 &&
             this.course.name.indexOf('WA 1440') === -1) {
-          this.end_view = this.user_group.group_target - 1
+          this.end_view = this.user_group.group - 1
         }
       },
       get_scorecards(eId, rId) {
@@ -161,8 +161,8 @@
                        rId: rId,
                        pId: this.user_group.id }
         if ([this.event.creator, ...this.event.admins].includes(this.user.email)) {
-          Object.assign(request, {group: this.user_group.group,
-                                  group_target: this.user_group.group_target})
+          Object.assign(request, {session: this.user_group.session,
+                                  group: this.user_group.group})
         }
         this.getScoreCards(request)
         .then(() => {
