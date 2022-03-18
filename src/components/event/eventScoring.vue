@@ -14,7 +14,7 @@
         Round <v-spacer/>
         <v-select
           v-if="p_user.length > 1"
-          label="Select your group to score."
+          label="Select your target to score."
           v-model="user_group"
           :items="p_user"
           return-object
@@ -140,11 +140,11 @@
         this.halves = this.course.halves
         this.end_view = 0
         // NOTE: formats that start scoring from first target, note here
-        if (this.user_group.group < this.course.ends.length &&
+        if (this.user_group.target < this.course.ends.length &&
             this.course.name.indexOf('Indoor') === -1 &&
             this.course.name.indexOf('WA Target') === -1 &&
             this.course.name.indexOf('WA 1440') === -1) {
-          this.end_view = this.user_group.group - 1
+          this.end_view = this.user_group.target - 1
         }
       },
       get_scorecards(eId, rId) {
@@ -162,7 +162,7 @@
                        pId: this.user_group.id }
         if ([this.event.creator, ...this.event.admins].includes(this.user.email)) {
           Object.assign(request, {session: this.user_group.session,
-                                  group: this.user_group.group})
+                                  target: this.user_group.target})
         }
         this.getScoreCards(request)
         .then(() => {

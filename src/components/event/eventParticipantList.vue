@@ -125,7 +125,7 @@
             <v-edit-dialog
               :return-value="props.item.target"
               :key="props.item.id"
-              @save="save(props.item.id, {group: props.item.target})"
+              @save="save(props.item.id, {target: props.item.target})"
               @cancel="cancel"
               large
               persistent
@@ -146,7 +146,7 @@
             <v-edit-dialog v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive"
               :return-value="props.item.pos"
               :key="props.item.id"
-              @save="save(props.item.id, {group_pos: props.item.pos})"
+              @save="save(props.item.id, {target_pos: props.item.pos})"
               @cancel="cancel"
               large
               persistent
@@ -301,8 +301,8 @@
               class: rankingService.getClass(p, this.event.ignore_gender),
               club: p.archer.club_details.name_short,
               session: p.session,
-              target: p.group,
-              pos: p.group_pos,
+              target: p.target,
+              pos: p.target_pos,
               has_account: p.archer.user,
               sum: ([this.event.creator, ...this.event.admins].includes(this.user.email) && !this.event.archive ? rankingService.participantScore(p, so) : null),
               food: (p.food ? p.food_choices.split('|').join('; ') : 'No'),
@@ -375,8 +375,8 @@
             Cassification: p.level_class,
             Club: p.archer.club_details.name_short,
             Session: p.session,
-            Target: p.group,
-            'Position': p.group_pos,
+            Target: p.target,
+            'Position': p.target_pos,
             'Has Account': p.archer.user,
             Score: rankingService.participantScore(p, so),
             Food: (p.food ? p.food_choices.split('|').join('; ') : 'No'),

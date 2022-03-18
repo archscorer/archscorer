@@ -229,7 +229,7 @@
           this.getScoreCards({eId: this.participant.event,
                                    rId: r.id,
                                    session: this.participant.session,
-                                   group: this.participant.group})
+                                   target: this.participant.target})
         }
         this.edit_dialog = true
       },
@@ -237,7 +237,7 @@
         this.getScoreCards({eId: this.participant.event,
                                  rId: rId,
                                  session: this.participant.session,
-                                 group: this.participant.group})
+                                 target: this.participant.target})
                    .then(() => {
                      this.updateEvent(this.participant.event)
                    })

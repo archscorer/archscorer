@@ -282,8 +282,8 @@ class Participant(models.Model):
     food_choices = models.CharField(max_length=255, blank=True)
     comments = models.CharField('Comments to organiser', max_length=255, blank=True)
     session = models.CharField('Session', max_length=10, blank=True, default='')
-    group = models.IntegerField('Group nr', default=1)
-    group_pos = models.CharField('Archer position', max_length=1, blank=True, default='')
+    target = models.IntegerField('Target nr', default=1)
+    target_pos = models.CharField('Archer position', max_length=1, blank=True, default='')
     level_class = models.CharField('Level class', max_length=1, blank=True, default='')
 
     class Meta:
@@ -297,7 +297,7 @@ class ScoreCard(models.Model):
     spots = models.IntegerField('nr of "x" or equivalent', default=None, null=True)
 
     class Meta:
-        ordering = ['participant__group_pos']
+        ordering = ['participant__target_pos']
         unique_together = ['participant', 'round']
 
 class Arrow(models.Model):

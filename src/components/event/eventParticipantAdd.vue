@@ -96,7 +96,7 @@
         handler() {
           // this is prompted by archer watcher after getParticipant has returned
           // data
-          if (this.participant.archer) {
+          if (this.participant.archer && this.participant.archer.events) {
             let events = this.participant.archer.events
             let pId = events[events.length - 1]
             let p = this.participants.find(p => p.id === pId)

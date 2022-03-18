@@ -82,7 +82,7 @@
             p_user = this.event.participants.filter(obj => obj.archer.id === this.user.archer.id)
           }
           p_user = p_user.map(p => {
-            return Object.assign(p, {text: p.group + (p.session ? ' ('+ p.session +')' : '') })
+            return Object.assign(p, {text: p.target + (p.session ? ' ('+ p.session +')' : '') })
           })
         }
         return p_user ? p_user : null

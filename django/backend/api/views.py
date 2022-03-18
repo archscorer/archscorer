@@ -212,20 +212,20 @@ class ParticipantViewSet(viewsets.ModelViewSet):
 
         if (request.user in [event.creator, *event.admins.all()] and
             'session' in request.data and
-            'group' in request.data):
+            'target' in request.data):
             session = request.data['session']
-            group = request.data['group']
+            target = request.data['target']
         else:
             user_participant = event.participants.filter(
                archer__id=request.user.archer.id).get(
                pk=request.data['pId'])
             session = user_participant.session
-            group = user_participant.group
+            target = user_participant.target
 
         # get or create scorecards for given round in start session
         for participant in event.participants.order_by():
             if (participant.session == session and
-                participant.group == group):
+                participant.target == target):
                 sc, created = ScoreCard.objects.get_or_create(participant=participant, round=round)
                 if created:
                     # fill in arrows, so we would have valid model always
@@ -236,7 +236,7 @@ class ParticipantViewSet(viewsets.ModelViewSet):
         scorecards = ScoreCard.objects.filter(
                                             participant__event__pk=event.id).filter(
                                             participant__session=session).filter(
-                                            participant__group=group).filter(
+                                            participant__target=target).filter(
                                             round=round)
 
         # return scorecards
