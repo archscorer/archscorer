@@ -297,7 +297,7 @@ class ScoreCard(models.Model):
     spots = models.IntegerField('nr of "x" or equivalent', default=None, null=True)
 
     class Meta:
-        ordering = ['participant__target_pos']
+        ordering = ['round__ord', 'participant__target_pos']
         unique_together = ['participant', 'round']
 
 class Arrow(models.Model):
