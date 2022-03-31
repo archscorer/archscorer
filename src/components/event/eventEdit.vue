@@ -136,10 +136,23 @@
         <v-card-text>
           <v-row>
             <v-col cols="4">
-              <v-text-field
-                v-model="event.ignore_gender"
-                hint="age_style to merge gender (A_TR, V_TR)"
-                label="Ignore gender for age_style"></v-text-field>
+              <v-row>
+                <v-col cols="2">
+                  <v-checkbox
+                    v-model="ignore_all"
+                    hint="All styles ignored gender."
+                    label="All"
+                  />
+                </v-col>
+                <v-col cols="10">
+                  <v-text-field
+                    v-model="event.ignore_gender"
+                    :disabled="ignore_all"
+                    hint="age_style to merge gender (A_TR, V_TR)"
+                    label="Ignore gender for age_style">
+                  </v-text-field>
+                </v-col>
+              </v-row>
             </v-col>
             <v-col cols="4">
               <v-text-field
@@ -247,6 +260,7 @@
       dialog: false,
       date_start_menu: false,
       date_end_menu: false,
+      ignore_all: false,
       event_type_choices: [
         { text: 'Private', value: 'private' },
         { text: 'Club - visible to all members', value: 'club' },
@@ -264,6 +278,13 @@
       'event.archive': function(val) {
         if (val) {
           this.event.is_open = false
+        }
+      },
+       'ignore_all': function(val) {
+        if (val) {
+          this.event.ignore_gender = 'all'
+        } else {
+          this.event.ignore_gender = ''
         }
       }
     },
