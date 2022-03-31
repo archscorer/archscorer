@@ -1,4 +1,5 @@
 from .models import (User,
+                     Association,
                      Club,
                      Archer,
                      LevelClass,
@@ -12,6 +13,11 @@ from .models import (User,
                      ScoreCard,
                      Arrow)
 from rest_framework import serializers
+
+class AssociationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Association
+        fields = ['name', 'name_short']
 
 class EndSerializer(serializers.ModelSerializer):
     class Meta:
@@ -70,6 +76,7 @@ class ScoreCardSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ClubDetailsSerializer(serializers.ModelSerializer):
+    association = AssociationSerializer(many=True, read_only=True)
     class Meta:
         model = Club
         fields = ['id', 'name', 'name_short', 'association']
@@ -143,6 +150,7 @@ class ObjAdminSerializer(serializers.RelatedField):
 
 class ClubsSerializerList(serializers.ModelSerializer):
     members = serializers.SerializerMethodField()
+    association = AssociationSerializer(many=True, read_only=True)
 
     class Meta:
         model = Club

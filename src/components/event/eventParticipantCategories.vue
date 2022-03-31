@@ -13,8 +13,8 @@
           :text="arrayEquals(event.age_style_used, age_style_choices.IFAA)"
           @click="event.age_style_used=age_style_choices.IFAA">IFAA</v-btn> - for IFAA competitions (Book of Rules, 2019)</p>
         <p><v-btn small
-          :text="arrayEquals(event.age_style_used, age_style_choices.EAA)"
-          @click="event.age_style_used=age_style_choices.EAA">EAA</v-btn> - for Estonian Archery Association. See table <a href="http://www.vibuliit.ee/uus/wp-content/uploads/2021/02/vanuseklassid.pdf" target="_blank">here</a></p>
+          :text="arrayEquals(event.age_style_used, age_style_choices.EAF)"
+          @click="event.age_style_used=age_style_choices.EAF">EAF</v-btn> - for Estonian Archery Federation. See table <a href="http://www.vibuliit.ee/uus/wp-content/uploads/2021/02/vanuseklassid.pdf" target="_blank">here</a></p>
       </v-col>
       <v-col>
       <v-treeview
@@ -50,13 +50,13 @@
           'A|BB-C', 'A|BB-R', 'A|BH-C', 'A|BH-R', 'A|BL', 'A|BU', 'A|FS-C', 'A|FS-R', 'A|FU', 'A|HB', 'A|LB', 'A|TR', 'A|**',
           'V|BB-C', 'V|BB-R', 'V|BH-C', 'V|BH-R', 'V|BL', 'V|BU', 'V|FS-C', 'V|FS-R', 'V|FU', 'V|LB', 'V|TR',
         ],
-        'EAA': [
-          'T|L', 'T|I', 'T|R', 'T|C',
-          'C|L', 'C|I', 'C|R', 'C|C',
-          'CA|L', 'CA|I', 'CA|R', 'CA|C',
-          'J|L', 'J|I', 'J|R', 'J|C',
-          'A|L', 'A|I', 'A|R', 'A|C',
-          'V|L', 'V|I', 'V|R', 'V|C',
+        'EAF': [
+          'U13|R', 'U13|C', 'U13|B', 'U13|L',
+          'U15|R', 'U15|C', 'U15|B', 'U15|L',
+          'U18|R', 'U18|C', 'U18|B', 'U18|L',
+          'U21|R', 'U21|C', 'U21|B', 'U21|L',
+          'A|R', 'A|C', 'A|B', 'A|L',
+          '50+|R', '50+|C', '50+|B', '50+|L',
         ],
       },
     }),

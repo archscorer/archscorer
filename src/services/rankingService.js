@@ -69,7 +69,7 @@ export default {
     if (ops && ops.includes(p.age_group + '_' + p.style)) {
       return p.age_group + '_' + p.style
     }
-    return p.age_group + p.archer.gender + p.style
+    return p.age_group + p.gender + p.style
   },
   longestPrefix(arr) {
     let ref = arr[0]

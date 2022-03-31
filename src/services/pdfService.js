@@ -51,22 +51,22 @@ export default {
         }
       }, styles)
     }
-    for (let group of Array.from(new Set(p_table.data.map(p => p.group)))) {
-      docDefinition.content.push({text: group, style: 'styleheader'})
-      let groupGrp = p_table.data.filter(p => p.group === group)
+    for (let session of Array.from(new Set(p_table.data.map(p => p.session)))) {
+      docDefinition.content.push({text: session, style: 'styleheader'})
+      let targetGrp = p_table.data.filter(p => p.session === session)
       docDefinition.content.push({
         table: {
           headerRows: 0,
           widths: [75, '*'],
           dontBreakRows: true,
-          body: Array.from(new Set(groupGrp.map(p => p.end))).sort( function(a, b) {return a - b}).map(end => {
+          body: Array.from(new Set(targetGrp.map(p => p.target))).sort( function(a, b) {return a - b}).map(end => {
             return [{text: end, style: 'endTitle'}, {
               layout: 'noBorders',
               table: {
                 headerRows: 0,
                 widths: [125, '*', '*', '*', '*'],
                 body: [
-                  ...groupGrp.filter(p => p.end === end).sort(function (a, b) {return a.pos < b.pos ? -1 : a.pos > b.pos ? 1 : 0}).map(p => {
+                  ...targetGrp.filter(p => p.target === end).sort(function (a, b) {return a.pos < b.pos ? -1 : a.pos > b.pos ? 1 : 0}).map(p => {
                     return [p.name, p.club, p.class, p.pos, p.sum > 0 ? p.sum : '']
                   })
                 ]

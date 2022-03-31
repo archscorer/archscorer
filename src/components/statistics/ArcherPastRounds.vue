@@ -6,6 +6,16 @@
       <archerSearch v-model="archer" />
     </v-card-title>
     <v-card-text>
+      <v-row dense>
+        <v-col>
+          <p>
+            <v-switch
+              v-model="filter_official"
+              color="primary"
+              label="show only official rounds"/>
+          </p>
+        </v-col>
+      </v-row>
       <v-data-table
         dense
         :mobile-breakpoint="300"
@@ -15,7 +25,7 @@
         multi-sort
       >
       <template v-slot:item.event="props">
-        {{ props.item.event }} (<router-link :to="{ name: 'event', params: { 'id': props.item.eId }}">link</router-link>)
+        <router-link :to="{ name: 'event', params: { 'id': props.item.eId }}">{{ props.item.event }}</router-link>
       </template>
       </v-data-table>
     </v-card-text>
@@ -36,6 +46,7 @@
     data: () => ({
       archer: null,
       target_name: '',
+      filter_official: null,
     }),
     watch: {
       archer: function(current_archer) {
@@ -63,7 +74,13 @@
           { text: 'Date', value: 'date', width: '120px'},
           { text: 'Class', value: 'class'},
           { text: 'Course', value: 'course'},
-          { text: 'Score', value: 'score' }
+          { text: 'Score', value: 'score'},
+          { text: 'Official', value: 'official', align: ' d-none',
+            filter: value => {
+              if (!this.filter_official) return true
+              return value
+            },
+          }
         ]
       },
       p_table() {
@@ -100,7 +117,8 @@
                   'date': e.date_start,
                   'class': rankingService.getClass(p, e.ignore_gender),
                   'course': c_name.replace(/ (Round|Unit)( (Unm|M)arked Distances)? \(.*?\)/, '$2'),
-                  'score': score
+                  'score': score,
+                  'official': e.records ? true : false
                 })
               }
             }

@@ -96,13 +96,14 @@
         handler() {
           // this is prompted by archer watcher after getParticipant has returned
           // data
-          if (this.participant.archer) {
+          if (this.participant.archer && this.participant.archer.events) {
             let events = this.participant.archer.events
             let pId = events[events.length - 1]
             let p = this.participants.find(p => p.id === pId)
             if (p) {
               this.participant.age_group = p.age_group
               this.participant.style = p.style
+              this.participant.archer_rep = p.archer_rep
             }
           }
         }

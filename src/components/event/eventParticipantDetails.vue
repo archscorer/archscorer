@@ -41,7 +41,17 @@
           </template>
         </v-switch>
       </v-col>
-      <v-col v-if="level_class" cols="3">
+      <v-col v-if="archer_affilitions.length > 1" cols="4">
+        <v-select
+          v-model="participant.archer_rep"
+          :items="archer_affilitions"
+          label="Affiliation*"
+          :rules="[v => !!v || 'You need to choose which association you represent',
+                   v => !!archer_affilitions.find(s => s.value === v) || 'Invalid choice']"
+          dense
+        ></v-select>
+      </v-col>
+      <v-col v-if="level_class" cols="4">
         <v-select
           v-model="participant.level_class"
           :items="classification_classes"
@@ -91,7 +101,7 @@
         {text: 'B', value: 'B'},
         {text: 'C', value: 'C'},
         {text: '*', value: '*'},
-      ]
+      ],
     }),
     watch: {
       participant: {
@@ -112,6 +122,7 @@
     computed: {
       ...mapState({
         pModel: state => state.events.participantModel,
+        clubs: state => state.clubs.clubs,
       }),
       age_group_choices() {
         let choices = this.pModel.age_group.choices.filter(a => {
@@ -132,6 +143,26 @@
         } else {
           return this.pModel.style.choices
         }
+      },
+      archer_affilitions() {
+        let affiliations = []
+        let clubs = []
+        // TODO this to be changed once archer can have multiple clubs
+        if (this.participant.archer) {
+          if (this.participant.archer.club) {
+            clubs = this.clubs.filter(obj => obj.id === this.participant.archer.club)
+          }
+          if (this.participant.archer.club_details) {
+            clubs = [this.participant.archer.club_details]
+          }
+        }
+        for (let club of clubs) {
+          for (let association of club.association) {
+            let rep = club.name_short + '|' + association.name_short
+            affiliations.push({ text: association.name, value: rep })
+          }
+        }
+        return affiliations
       }
     },
     created() {

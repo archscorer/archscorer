@@ -231,7 +231,7 @@
               if (this.event.records && p.archer.club_details.association != '') {
                 p_style_records = this.records.filter(rec => {
                   if (rec.age_group === p.age_group &&
-                      rec.gender === p.archer.gender &&
+                      rec.gender === p.gender &&
                       rec.style === p.style &&
                       rec.scope === p.archer.club_details.association) {
                     return true
@@ -242,7 +242,7 @@
               let row = {
                 id: p.id,
                 classification: p.level_class,
-                name: p.archer.full_name,
+                name: p.full_name,
                 class: rankingService.getClass(p, this.event.ignore_gender),
                 club: p.archer.club_details.name_short,
               }
@@ -425,7 +425,7 @@
           round_table.data = this.event.participants.map(p => {
             let row = {
               classification: p.level_class,
-              name: p.archer.full_name,
+              name: p.full_name,
               club: p.archer.club_details.name_short,
               class: rankingService.getClass(p, this.event.ignore_gender),
               progress: false,

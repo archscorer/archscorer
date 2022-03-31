@@ -211,21 +211,21 @@ class ParticipantViewSet(viewsets.ModelViewSet):
         round = Round.objects.get(pk=request.data['rId'])
 
         if (request.user in [event.creator, *event.admins.all()] and
-            'group' in request.data and
-            'group_target' in request.data):
-            group = request.data['group']
-            group_target = request.data['group_target']
+            'session' in request.data and
+            'target' in request.data):
+            session = request.data['session']
+            target = request.data['target']
         else:
             user_participant = event.participants.filter(
                archer__id=request.user.archer.id).get(
                pk=request.data['pId'])
-            group = user_participant.group
-            group_target = user_participant.group_target
+            session = user_participant.session
+            target = user_participant.target
 
-        # get or create scorecards for given round in start group
+        # get or create scorecards for given round in start session
         for participant in event.participants.order_by():
-            if (participant.group == group and
-                participant.group_target == group_target):
+            if (participant.session == session and
+                participant.target == target):
                 sc, created = ScoreCard.objects.get_or_create(participant=participant, round=round)
                 if created:
                     # fill in arrows, so we would have valid model always
@@ -235,8 +235,8 @@ class ParticipantViewSet(viewsets.ModelViewSet):
 
         scorecards = ScoreCard.objects.filter(
                                             participant__event__pk=event.id).filter(
-                                            participant__group=group).filter(
-                                            participant__group_target=group_target).filter(
+                                            participant__session=session).filter(
+                                            participant__target=target).filter(
                                             round=round)
 
         # return scorecards
@@ -276,6 +276,8 @@ class ParticipantViewSet(viewsets.ModelViewSet):
 
         req_participant = request.data
         req_participant['archer'] = archer
+        req_participant['gender'] = archer.gender
+        req_participant['full_name'] = archer.full_name
         participant_serialized = ParticipantSerializer(data=req_participant)
         if participant_serialized.is_valid():
             try:

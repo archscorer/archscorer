@@ -228,16 +228,16 @@
         if (!sc) {
           this.getScoreCards({eId: this.participant.event,
                                    rId: r.id,
-                                   group: this.participant.group,
-                                   group_target: this.participant.group_target})
+                                   session: this.participant.session,
+                                   target: this.participant.target})
         }
         this.edit_dialog = true
       },
       get_scorecards(rId) {
         this.getScoreCards({eId: this.participant.event,
                                  rId: rId,
-                                 group: this.participant.group,
-                                 group_target: this.participant.group_target})
+                                 session: this.participant.session,
+                                 target: this.participant.target})
                    .then(() => {
                      this.updateEvent(this.participant.event)
                    })

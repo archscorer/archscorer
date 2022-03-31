@@ -80,11 +80,11 @@
               dense
               :items="[{ text: '--disabled--', value: null },
                       { text: 'Class', value: 'class'},
-                      { text: 'End', value: 'end'}]"
+                      { text: 'Target', value: 'target'}]"
               label="organise archers by">
             </v-select>
             <p v-if="[event.creator, ...event.admins].includes(user.email)">
-              Export end assignments to <v-btn x-small color="primary" @click="endAssignments2pdfProxy()">PDF</v-btn><br/>
+              Export target assignments to <v-btn x-small color="primary" @click="endAssignments2pdfProxy()">PDF</v-btn><br/>
               Export all participant data to <v-btn x-small color="green" dark @click="export2excel()">EXCEL</v-btn></p>
           </v-col>
         </v-row>
@@ -99,19 +99,19 @@
           :items-per-page="4 * 28"
           multi-sort
         >
-          <template v-slot:item.group="props"
+          <template v-slot:item.session="props"
             v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive">
             <v-edit-dialog
-              :return-value="props.item.group"
+              :return-value="props.item.session"
               :key="props.item.id"
-              @save="save(props.item.id, {group: props.item.group})"
+              @save="save(props.item.id, {session: props.item.session})"
               @cancel="cancel"
               large
               persistent
-            > {{ props.item.group }}
+            > {{ props.item.session }}
               <template v-slot:input>
                 <v-text-field
-                  v-model="props.item.group"
+                  v-model="props.item.session"
                   counter="10"
                   single-line
                   autofocus
@@ -120,19 +120,19 @@
               </template>
             </v-edit-dialog>
           </template>
-          <template v-slot:item.end="props"
+          <template v-slot:item.target="props"
             v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive">
             <v-edit-dialog
-              :return-value="props.item.end"
+              :return-value="props.item.target"
               :key="props.item.id"
-              @save="save(props.item.id, {group_target: props.item.end})"
+              @save="save(props.item.id, {target: props.item.target})"
               @cancel="cancel"
               large
               persistent
-            > {{ props.item.end }}
+            > {{ props.item.target }}
               <template v-slot:input>
                 <v-text-field
-                  v-model="props.item.end"
+                  v-model="props.item.target"
                   :rules="[v => !!v || 'Target nr for the participant.']"
                   type="number"
                   single-line
@@ -146,7 +146,7 @@
             <v-edit-dialog v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive"
               :return-value="props.item.pos"
               :key="props.item.id"
-              @save="save(props.item.id, {group_pos: props.item.pos})"
+              @save="save(props.item.id, {target_pos: props.item.pos})"
               @cancel="cancel"
               large
               persistent
@@ -269,8 +269,8 @@
         p_table.header.push(...[
           { text: 'Class', value: 'class' },
           { text: 'Club', value: 'club' },
-          { text: 'Group', value: 'group' },
-          { text: 'End', value: 'end' }, // change this to Target
+          { text: 'Session', value: 'session' },
+          { text: 'Target', value: 'target' }, // change this to Target
           { text: 'Position', value: 'pos' },
         ])
         if (!this.event.archive && this.user.id) {
@@ -296,13 +296,13 @@
             return {
               id: p.id,
               aId: p.archer.id,
-              name: p.archer.full_name,
+              name: p.full_name,
               classification: p.level_class,
               class: rankingService.getClass(p, this.event.ignore_gender),
               club: p.archer.club_details.name_short,
-              group: p.group,
-              end: p.group_target,
-              pos: p.group_pos,
+              session: p.session,
+              target: p.target,
+              pos: p.target_pos,
               has_account: p.archer.user,
               sum: ([this.event.creator, ...this.event.admins].includes(this.user.email) && !this.event.archive ? rankingService.participantScore(p, so) : null),
               food: (p.food ? p.food_choices.split('|').join('; ') : 'No'),
@@ -346,8 +346,10 @@
       },
       editP(pId) {
         let p = this.event.participants.find(obj => obj.id === pId)
-        this.p_meta = {id: p.id, name: p.archer.full_name}
+        this.p_meta = {id: p.id, name: p.full_name}
         this.p_edit = {
+          archer: p.archer,
+          archer_rep: p.archer_rep,
           age_group: p.age_group,
           style: p.style,
           level_class: p.level_class,
@@ -359,7 +361,7 @@
       },
       deleteP(pId) {
         let p = this.event.participants.find(obj => obj.id === pId)
-        confirm(p.archer.full_name + ' will be removed from participant list' +
+        confirm(p.full_name + ' will be removed from participant list' +
         ' (and their scorecards will be lost)') &&
         this.delParticipant({pId: p.id, eId: p.event})
       },
@@ -369,12 +371,12 @@
         let data = this.event.participants.map(p => {
           return {
             Class: rankingService.getClass(p, this.event.ignore_gender),
-            Name: p.archer.full_name,
+            Name: p.full_name,
             Cassification: p.level_class,
             Club: p.archer.club_details.name_short,
-            Group: p.group,
-            End: p.group_target,
-            'Position': p.group_pos,
+            Session: p.session,
+            Target: p.target,
+            'Position': p.target_pos,
             'Has Account': p.archer.user,
             Score: rankingService.participantScore(p, so),
             Food: (p.food ? p.food_choices.split('|').join('; ') : 'No'),
