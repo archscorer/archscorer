@@ -64,3 +64,17 @@ def read_clubs():
     # import_archers(club='Kagu Vibuklubi', file='kagu_vibuklubi.tsv')
     # import_archers(club='Tartu Vibuklubi', file='tartu_vibuklubi.tsv')
     pass
+
+
+for p in models.Participant.objects.all():
+    print(p.archer.club.association.get(id=1)
+
+for p in models.Participant.objects.all():
+    if p.archer_rep == '|':
+        try:
+            a = p.archer.club.association.get(id=1)
+            p.archer_rep = p.archer.club.name_short + '|' + a.name_short
+            print(p.archer.club.name_short + '|' + a.name_short)
+            p.save()
+        except:
+            print(p.archer.club.name_short)
