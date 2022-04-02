@@ -6,11 +6,37 @@
     <v-card>
       <v-card-title>Exceeding current {{ record['scope'] }} record</v-card-title>
       <v-card-text>
-        <v-row v-for="(attr, i) in ['event', 'date','archer','format','age_group','gender','style','score', 'scope']"
-          :key="'rec_' + i"
+        <v-row v-for="(attr, i) in ['event','date','archer']"
+          :key="'rec_s' + i"
           dense>
-          <v-col class="text-uppercase text-end">{{ attr }}:</v-col>
-          <v-col>{{ record[attr] }}</v-col>
+          <v-col class="text-uppercase text-end lowered">{{ attr }}:</v-col>
+          <v-col>
+            <v-text-field v-model="record[attr]"
+              :append-icon="edit[attr] ? 'mdi-pencil-outline' : 'mdi-pencil-off-outline'"
+              :readonly="!edit[attr]"
+              @click:append="edit[attr] = !edit[attr]"
+              dense/>
+            </v-col>
+        </v-row>
+        <v-row dense>
+          <v-col class="text-uppercase text-end lowered">class:</v-col>
+          <v-col v-for="(attr, i) in ['age_group','gender','style']"
+            :key="'rec_class' + i" cols="2">
+            <v-text-field v-model="record[attr]"
+              :append-icon="edit[attr] ? 'mdi-pencil-outline' : 'mdi-pencil-off-outline'"
+              :readonly="!edit[attr]"
+              @click:append="edit[attr] = !edit[attr]"
+              dense/>
+          </v-col>
+        </v-row>
+        <v-row v-for="(attr, i) in ['score','scope','format']"
+          :key="'rec_e' + i"
+          dense>
+          <v-col class="text-uppercase text-end lowered">{{ attr }}:</v-col>
+          <v-col><v-text-field v-model="record[attr]"
+            readonly
+            dense/>
+          </v-col>
         </v-row>
         <v-row>
           <v-col>
@@ -41,6 +67,17 @@
     },
     data: () => ({
       rec_dialog: false,
+      edit: {
+        'event': false,
+        'date': false,
+        'archer': false,
+        'format': false,
+        'age_group': false,
+        'gender': false,
+        'style': false,
+        'score': false,
+        'scope': false
+      }
     }),
     computed: {
       ...mapState({
@@ -58,5 +95,8 @@
 <style scoped>
   sup {
     cursor: pointer;
+  }
+  .lowered {
+    margin-top: 0.5rem;
   }
 </style>
