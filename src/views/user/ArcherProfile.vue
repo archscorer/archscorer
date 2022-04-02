@@ -51,8 +51,5 @@
         'putArcher'
       ]),
     },
-    created() {
-      this.$store.dispatch('clubs/getClubs')
-    }
   }
 </script>

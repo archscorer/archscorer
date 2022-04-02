@@ -1,14 +1,6 @@
 <template>
   <v-card class="mt-5">
     <v-card-title>Records
-      <v-spacer />
-      <v-text-field
-        v-model="r_search"
-        append-icon="mdi-magnify"
-        label="Search"
-        single-line
-        hide-details
-      ></v-text-field>
     </v-card-title>
     <v-card-text>
       <v-row>
@@ -27,7 +19,6 @@
         dense
         :mobile-breakpoint="300"
         :headers="r_table_header"
-        :search="r_search"
         :items="r_table"
         :items-per-page="50"
         :group-by="group_by"
@@ -35,167 +26,102 @@
       >
         <template v-slot:header.class="{ header }">
           {{ header.text }}
-          <v-menu offset-y :close-on-content-click="false">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn icon v-bind="attrs" v-on="on">
-                <v-icon small :color="classs ? 'primary' : ''">
-                  mdi-filter
-                </v-icon>
-              </v-btn>
-            </template>
-            <div style="background-color: white; width: 280px">
-              <v-text-field v-model="classs" class="pa-4" type="text" label="Enter the class"></v-text-field>
-              <v-btn @click="classs = ''" small text color="primary" class="ml-2 mb-2">Clean</v-btn>
-            </div>
-          </v-menu>
+          <filterRecord v-bind:filter.sync="filters.class"/>
         </template>
         <template v-slot:header.score="{ header }">
           {{ header.text }}
-          <v-menu offset-y :close-on-content-click="false">
+          <v-menu top :close-on-content-click="false" v-model="menu_score">
             <template v-slot:activator="{ on, attrs }">
               <v-btn icon v-bind="attrs" v-on="on">
-                <v-icon small :color="scoreFrom ? 'primary' : ''">
+                <v-icon small :color="filters.score.some(el => el !== '') ? 'primary' : ''">
                   mdi-filter
                 </v-icon>
               </v-btn>
             </template>
-            <div style="background-color: white; width: 280px">
-              <v-menu
-                v-model="start_score"
-                :close-on-content-click="false"
-                :nudge-right="40"
-                transition="scale-transition"
-                offset-y
-                min-width="auto"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field v-model="scoreFrom" class="pa-4" type="number" label="Enter the min score"></v-text-field>
-                </template>
-              </v-menu>
-              <v-menu
-                v-model="end_score"
-                :close-on-content-click="false"
-                :nudge-right="40"
-                transition="scale-transition"
-                offset-y
-                min-width="auto"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field v-model="scoreTo" class="pa-4" type="number" label="Enter the max score"></v-text-field>
-                </template>
-              </v-menu>
-              <v-btn @click="scoreFrom = 0, scoreTo = 10000" small text color="primary" class="ml-2 mb-2">Clean</v-btn>
-            </div>
+            <v-card>
+              <v-card-text>
+                <v-text-field autofocus v-model="filters.score[0]"
+                  type="number"
+                  label="Scores from"/>
+              </v-card-text>
+              <v-card-text>
+                <v-text-field v-model="filters.score[1]"
+                  type="number"
+                  label="Scores to"/>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn @click="filters.score = ['', '']" small text color="primary">Clean</v-btn>
+                <v-spacer/>
+                <v-btn @click="menu_score = false" small text color="secondary">Close</v-btn>
+              </v-card-actions>
+            </v-card>
           </v-menu>
         </template>
         <template v-slot:header.archer="{ header }">
           {{ header.text }}
-          <v-menu offset-y :close-on-content-click="false">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn icon v-bind="attrs" v-on="on">
-                <v-icon small :color="archer ? 'primary' : ''">
-                  mdi-filter
-                </v-icon>
-              </v-btn>
-            </template>
-            <div style="background-color: white; width: 280px">
-              <v-text-field v-model="archer" class="pa-4" type="text" label="Enter the archer name"></v-text-field>
-              <v-btn @click="archer = ''" small text color="primary" class="ml-2 mb-2">Clean</v-btn>
-            </div>
-          </v-menu>
+          <filterRecord v-bind:filter.sync="filters.archer"/>
         </template>
         <template v-slot:header.event="{ header }">
           {{ header.text }}
-          <v-menu offset-y v-model="event_dialog" :close-on-content-click="false">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn icon v-bind="attrs" v-on="on">
-                <v-icon small :color="event ? 'primary' : ''">
-                  mdi-filter
-                </v-icon>
-              </v-btn>
-            </template>
-            <div style="background-color: white; width: 280px">
-              <v-text-field v-model="event" class="pa-4" type="text" label="Enter the event name"></v-text-field>
-              <v-btn @click="event = ''" small text color="primary" class="ml-2 mb-2">Clean</v-btn>
-              <v-btn text small color="primary" class="ml-2 mb-2" @click="event_dialog = false">Close</v-btn>
-            </div>
-          </v-menu>
+          <filterRecord v-bind:filter.sync="filters.event"/>
         </template>
         <template v-slot:header.scope="{ header }">
           {{ header.text }}
-          <v-menu offset-y :close-on-content-click="false">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn icon v-bind="attrs" v-on="on">
-                <v-icon small :color="scope ? 'primary' : ''">
-                  mdi-filter
-                </v-icon>
-              </v-btn>
-            </template>
-            <div style="background-color: white; width: 280px">
-              <v-text-field v-model="scope" class="pa-4" label="Enter the date from"></v-text-field>
-              <v-btn @click="scope = ''" small text color="primary" class="ml-2 mb-2">Clean</v-btn>
-            </div>
-          </v-menu>
+          <filterRecord v-bind:filter.sync="filters.scope"/>
         </template>
         <template v-slot:header.date="{ header }">
           {{ header.text }}
-          <v-menu v-model="date_menu" offset-y :close-on-content-click="false">
+          <v-menu top :close-on-content-click="false" v-model="menu_date">
             <template v-slot:activator="{ on, attrs }">
               <v-btn icon v-bind="attrs" v-on="on">
-                <v-icon small :color="date ? 'primary' : ''">
+                <v-icon small :color="filters.date.some(el => el !== '') ? 'primary' : ''">
                   mdi-filter
                 </v-icon>
               </v-btn>
             </template>
-            <div style="background-color: white" class="pa-5">
-              <v-menu
-                v-model="start_date"
-                :close-on-content-click="false"
-                :nudge-right="40"
-                transition="scale-transition"
-                offset-y
-                min-width="auto"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="from_date"
-                    label="From date"
-                    prepend-icon="mdi-calendar"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker
-                  v-model="from_date"
-                  @input="start_date = false"
-                ></v-date-picker>
-              </v-menu>
-              <v-menu
-                v-model="end_date"
-                :close-on-content-click="false"
-                :nudge-right="40"
-                transition="scale-transition"
-                offset-y
-                min-width="auto"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="to_date"
-                    label="To date"
-                    prepend-icon="mdi-calendar"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker
-                  v-model="to_date"
-                  @input="end_date = false"
-                ></v-date-picker>
-              </v-menu>
-              <v-btn text small color="primary" class="ml-2 mb-2" @click="date_menu = false">OK</v-btn>
-            </div>
+            <v-card>
+              <v-card-text>
+                <v-menu
+                  v-model="menu_date_from"
+                  :close-on-content-click="false"
+                  top
+                  min-width="270px"
+                >
+                  <template v-slot:activator="{ on }">
+                    <v-text-field
+                      v-model="filters.date[0]"
+                      label="Date from"
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker v-model="filters.date[0]" @input="menu_date_from = false"></v-date-picker>
+                </v-menu>
+                <v-menu
+                  v-model="menu_date_to"
+                  :close-on-content-click="false"
+                  top
+                  min-width="270px"
+                >
+                  <template v-slot:activator="{ on }">
+                    <v-text-field
+                      v-model="filters.date[1]"
+                      label="Date to"
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker v-model="filters.date[1]" @input="menu_date_to = false"></v-date-picker>
+                </v-menu>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn @click="filters.date = ['', ''];" small text color="primary">Clean</v-btn>
+                <v-spacer/>
+                <v-btn @click="menu_date = false" small text color="secondary">Close</v-btn>
+              </v-card-actions>
+            </v-card>
           </v-menu>
         </template>
       </v-data-table>
@@ -204,27 +130,25 @@
 </template>
 
 <script>
+  import filterRecord from '@/components/statistics/filterRecord.vue'
   import { mapState } from 'vuex'
 
   export default {
     // name: 'Series',
     components: {
+      filterRecord,
     },
     data: () => ({
-      r_search: '',
-      classs: '',
-      scoreFrom: 0,
-      scoreTo: 100000,
-      start_score: false,
-      end_score: false,
-      archer: '',
-      event: '',
-      scope: '',
-      date_menu: false,
-      start_date: false,
-      end_date: false,
-      from_date: (new Date( '01 02 1900')).toISOString().substr(0, 10),
-      to_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      filters: {class: '',
+                archer: '',
+                event: '',
+                scope: '',
+                score: ['', ''],
+                date: ['', '']},
+      menu_score: false,
+      menu_date: false,
+      menu_date_from: false,
+      menu_date_to:false,
       format: {
         'hunter': 'IFAA Hunter',
         'field': 'IFAA Field',
@@ -244,45 +168,63 @@
           { text: 'Class', value: 'class',
             filter: value => {
               return value != null &&
-                      this.classs != null &&
-                      value.toString().toLowerCase().indexOf(this.classs.toLowerCase()) !== -1
+                      this.filters.class != null &&
+                      value.toString().toLowerCase().indexOf(this.filters.class.toLowerCase()) !== -1
             },
             width: '100px' },
           { text: 'Score', value: 'score',
             filter: value => {
-              return value != null &&
-                      this.scoreFrom != null &&
-                      this.scoreTo != null &&
-                      value > parseInt(this.scoreFrom) && value <= parseInt(this.scoreTo)
+              if (this.filters.score.some(el => el !== '')) {
+                if (this.filters.score[0] !== '' && this.filters.score[1] === '') {
+                  return value >= parseInt(this.filters.score[0])
+                }
+                if (this.filters.score[1] !== '' && this.filters.score[0] === '') {
+                  return value <= parseInt(this.filters.score[1])
+                }
+                if (this.filters.score.every(el => el !== '')) {
+                  return parseInt(this.filters.score[0]) <= value &&
+                          value <= parseInt(this.filters.score[1])
+                }
+              }
+              return value != null
             }
           },
           { text: 'Archer', value: 'archer',
             filter: value => {
               return value != null &&
-                      this.archer != null &&
-                      value.toString().toLowerCase().indexOf(this.archer.toLowerCase()) !== -1
+                      this.filters.archer != null &&
+                      value.toString().toLowerCase().indexOf(this.filters.archer.toLowerCase()) !== -1
             },
             width: '175px' },
           { text: 'Event', value: 'event',
             filter: value => {
               return value != null &&
-                      this.event != null &&
-                      value.toString().toLowerCase().indexOf(this.event.toLowerCase()) !== -1
+                      this.filters.event != null &&
+                      value.toString().toLowerCase().indexOf(this.filters.event.toLowerCase()) !== -1
             }
           },
           { text: 'national/EU/W', value: 'scope',
             filter: value => {
               return value != null &&
-                      this.scope != null &&
-                      value.toString().toLowerCase().indexOf(this.scope.toLowerCase()) !== -1
+                      this.filters.scope != null &&
+                      value.toString().toLowerCase().indexOf(this.filters.scope.toLowerCase()) !== -1
             }
           },
           { text: 'Date', value: 'date',
             filter: value => {
-              return value != null &&
-                      this.from_date != null &&
-                      this.to_date != null &&
-                      value > this.from_date && value < this.to_date
+              if (this.filters.date.some(el => el !== '')) {
+                if (this.filters.date[0] !== '' && this.filters.date[1] === '') {
+                  return value >= this.filters.date[0]
+                }
+                if (this.filters.date[1] !== '' && this.filters.date[0] === '') {
+                  return value <= this.filters.date[1]
+                }
+                if (this.filters.date.every(el => el !== '')) {
+                  return this.filters.date[0] <= value &&
+                          value <= this.filters.date[1]
+                }
+              }
+              return value != null
             },
             width: '120px'},
         ]

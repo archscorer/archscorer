@@ -154,8 +154,5 @@
         this.dialog = false
       },
     },
-    created() {
-      this.$store.dispatch('clubs/getClubs')
-    }
   }
 </script>

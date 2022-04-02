@@ -228,12 +228,12 @@
           if (Array.isArray(this.event.participants)) {
             r_table.data = this.event.participants.map(p => {
               let p_style_records = null
-              if (this.event.records && p.archer.club_details.association != '') {
+              if (this.event.records && p.archer_rep.split('|')[1] !== '') {
                 p_style_records = this.records.filter(rec => {
                   if (rec.age_group === p.age_group &&
                       rec.gender === p.gender &&
                       rec.style === p.style &&
-                      rec.scope === p.archer.club_details.association) {
+                      rec.scope === p.archer_rep.split('|')[1]) {
                     return true
                   }
                   return false
@@ -271,19 +271,23 @@
                   p_style_records.filter(v => v.format === format).map(function(rec) {
                     if (rec.score < row[r_ord] && seen_scope !== rec.scope) {
                       row['rec' + r_ord] = {
+                        event: this.event.name,
+                        date: this.event.date_end,
                         format: format,
-                        archer: row.name,
-                        class: row.class,
+                        archer: p.full_name,
+                        age_group: p.age_group,
+                        gender: p.gender,
+                        style: p.style,
                         score: row[r_ord],
-                        scope: p.archer.club_details.association,
+                        scope: p.archer_rep.split('|')[1],
                         current: rec
                       }
                     }
                     seen_scope = rec.scope
-                  })
+                  }, this)
                 }
                 return row[r_ord]
-              })
+              }, this)
               row.sum = sums.length ? rankingService.sum( sums ) : 0
 
               let spots = this.event.rounds.map(function(r) {

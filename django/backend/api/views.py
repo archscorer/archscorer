@@ -328,10 +328,19 @@ class ArrowViewSet(mixins.UpdateModelMixin,
                 args['spots'] = spots
             ScoreCard.objects.filter(pk = sc.id).update(**args)
 
-class RecordViewSet(viewsets.ReadOnlyModelViewSet):
+class RecordViewSet(mixins.ListModelMixin,
+                    mixins.CreateModelMixin,
+                    mixins.UpdateModelMixin,
+                    viewsets.GenericViewSet):
     """
     List all records. Only list them, no update nor create currently implemented
     """
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
     serializer_class = RecordSerializer
     queryset = Record.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(updated_by=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(updated_by=self.request.user)

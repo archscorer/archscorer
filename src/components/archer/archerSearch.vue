@@ -61,8 +61,5 @@
         'clearSearch',
       ]),
     },
-    created() {
-      this.$store.dispatch('clubs/getClubs')
-    }
   }
 </script>

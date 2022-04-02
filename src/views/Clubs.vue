@@ -1,12 +1,11 @@
 <template>
   <v-container v-if="clubs">
-    <v-card width="100%" v-for="ass in association" :key="ass.name_short"
-      class="ma-5">
-      <v-card-title>{{ ass.name }} ({{ ass.name_short }})</v-card-title>
-      <v-card-text>
-        <v-list dense>
+    <v-card>
+      <v-card-text class="pt-8 mt-5">
+        <v-list subheader dense v-for="ass in association" :key="ass.name_short">
+          <v-subheader class="text-overline font-weight-black">{{ ass.name }} ({{ ass.name_short }})</v-subheader>
           <v-list-item v-for="club in association_clubs(ass.name_short)"
-            :key="ass.name_short + '_' + club.id" class="ma-5"
+            :key="ass.name_short + '_' + club.id"
             :to="{ name: 'club', params: { 'id': club.id}}">
             <v-list-item-content>
               <v-list-item-title>{{ club.name }}</v-list-item-title>
@@ -56,8 +55,5 @@
         return this.clubs.filter(obj => obj.association.some(obj => obj.name_short === ass_short))
       },
     },
-    created() {
-      this.$store.dispatch('clubs/getClubs')
-    }
   }
 </script>

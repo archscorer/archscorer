@@ -125,13 +125,19 @@ class StageParticipantSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     archer = ArcherSerializer()
     csrftoken = serializers.SerializerMethodField()
+    perms = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id', 'email', 'archer', 'csrftoken']
+        fields = ['id', 'email', 'archer', 'csrftoken', 'perms']
 
     def get_csrftoken(self, obj):
         if hasattr(obj, 'csrftoken'):
             return obj.csrftoken
+        return None
+
+    def get_perms(self, obj):
+        if obj.id and obj.has_perm('api.add_record'):
+            return ['record']
         return None
 
 class ObjAdminSerializer(serializers.RelatedField):
