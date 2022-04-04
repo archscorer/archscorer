@@ -323,7 +323,7 @@
               has_account: p.archer.user,
               sum: ([this.event.creator, ...this.event.admins].includes(this.user.email) && !this.event.archive ? rankingService.participantScore(p, so) : null),
               food: (p.food ? p.food_choices.split('|').join('; ') : 'No'),
-              contact: (p.archer.contact || ''),
+              contact: (p.contact || ''),
               comments: p.comments,
             }
           })
@@ -403,7 +403,7 @@
             'Has Account': p.archer.user,
             Score: rankingService.participantScore(p, so),
             Food: (p.food ? p.food_choices.split('|').join('; ') : 'No'),
-            Contact: (p.archer.contact || ''),
+            Contact: (p.contact || ''),
             Comments: p.comments,
           }
         })
