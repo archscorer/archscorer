@@ -244,7 +244,7 @@
                 classification: p.level_class,
                 name: p.full_name,
                 class: rankingService.getClass(p, this.event.ignore_gender),
-                club: p.archer.club_details.name_short,
+                club: p.archer_rep.split('|')[0],
               }
               let sums = rounds.map(function(r) {
                 let r_ord = null, arrows = null, open = false
@@ -430,7 +430,7 @@
             let row = {
               classification: p.level_class,
               name: p.full_name,
-              club: p.archer.club_details.name_short,
+              club: p.archer_rep.split('|')[0],
               class: rankingService.getClass(p, this.event.ignore_gender),
               progress: false,
               sum: 0,

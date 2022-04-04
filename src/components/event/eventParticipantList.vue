@@ -85,13 +85,17 @@
             </v-select>
             <p v-if="[event.creator, ...event.admins].includes(user.email)">
               Export target assignments to <v-btn x-small color="primary" @click="endAssignments2pdfProxy()">PDF</v-btn><br/>
-              Export all participant data to <v-btn x-small color="green" dark @click="export2excel()">EXCEL</v-btn></p>
+              Export all participant data to <v-btn x-small color="green" dark @click="export2excel()">EXCEL</v-btn>
+              <a @click="hide_extra_columns = !hide_extra_columns" class="float-right">{{
+                hide_extra_columns ? "show all" : "hide extra"
+              }} columns</a>
+            </p>
           </v-col>
         </v-row>
         <v-data-table
           dense
           :mobile-breakpoint="300"
-          :headers="p_table.header"
+          :headers="p_table_shown_columns"
           :items="p_table.data"
           :search="p_search"
           :loading="loading"
@@ -99,6 +103,10 @@
           :items-per-page="4 * 28"
           multi-sort
         >
+          <template v-slot:header.session="{ header }">
+            {{ header.text }}
+            <tableColumnFilter v-bind:filter.sync="filters.session"/>
+          </template>
           <template v-slot:item.session="props"
             v-if="[event.creator, ...event.admins].includes(user.email) && !event.archive">
             <v-edit-dialog
@@ -214,6 +222,7 @@
   import eventEdit from '@/components/event/eventEdit.vue'
   import eventParticipantDetails from '@/components/event/eventParticipantDetails.vue'
   import eventParticipantAdd from '@/components/event/eventParticipantAdd.vue'
+  import tableColumnFilter from '@/components/utils/tableColumnFilter.vue'
   import rankingService from '@/services/rankingService'
   import pdfService from '@/services/pdfService'
 
@@ -223,6 +232,7 @@
       eventEdit,
       eventParticipantDetails,
       eventParticipantAdd,
+      tableColumnFilter,
     },
     props: {
       p_user: Array,
@@ -240,9 +250,13 @@
         food: false,
         food_choices: []
       },
+      filters: {
+        session: ''
+      },
       group_by: 'class',
       dialog: false,
       creator_menu: false,
+      hide_extra_columns: false,
       snack: false,
       snackColor: '',
       snackText: '',
@@ -269,8 +283,11 @@
         p_table.header.push(...[
           { text: 'Class', value: 'class' },
           { text: 'Club', value: 'club' },
-          { text: 'Session', value: 'session' },
-          { text: 'Target', value: 'target' }, // change this to Target
+          { text: 'Session', value: 'session',
+            filter: value => {
+              return value != null &&
+                value.toString().toLowerCase().indexOf(this.filters.session.toLowerCase()) !== -1 }},
+          { text: 'Target', value: 'target' },
           { text: 'Position', value: 'pos' },
         ])
         if (!this.event.archive && this.user.id) {
@@ -299,7 +316,7 @@
               name: p.full_name,
               classification: p.level_class,
               class: rankingService.getClass(p, this.event.ignore_gender),
-              club: p.archer.club_details.name_short,
+              club: p.archer_rep.split('|')[0],
               session: p.session,
               target: p.target,
               pos: p.target_pos,
@@ -312,6 +329,12 @@
           })
         }
         return p_table
+      },
+      p_table_shown_columns() {
+        if (this.hide_extra_columns) {
+          return this.p_table.header.slice(0,this.event.catering ? -3 : -2)
+        }
+        return this.p_table.header
       },
       hint_archive() {
         if (this.event && [this.event.creator, ...this.event.admins].includes(this.user.email)) {
@@ -373,7 +396,7 @@
             Class: rankingService.getClass(p, this.event.ignore_gender),
             Name: p.full_name,
             Cassification: p.level_class,
-            Club: p.archer.club_details.name_short,
+            Club: p.archer_rep.split('|')[0],
             Session: p.session,
             Target: p.target,
             'Position': p.target_pos,

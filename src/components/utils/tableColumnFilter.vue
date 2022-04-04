@@ -31,6 +31,12 @@
       menu: false,
       query: '',
     }),
+    // In parent componenent you need to add following code to the table header corresponding column
+    // filter: value => {
+    //   return value != null &&
+    //           this.filter != null &&
+    //           value.toString().toLowerCase().indexOf(this.filter.toLowerCase()) !== -1
+    // }
   }
 
 </script>

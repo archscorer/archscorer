@@ -129,7 +129,7 @@
                 name: p.full_name,
                 class: rankingService.getClass(p, this.s.ignore_gender),
                 id: p.archer.id + p.age_group + p.style,
-                club: p.archer.club_details.name_short,
+                club: p.archer_rep.split('|')[0],
                 sum: rankingService.sum(p.scorecards.filter(obj => obj.round !== so).map(sc => sc.score)),
                 x: rankingService.sum(p.scorecards.filter(obj => obj.round !== so).map(sc => sc.spots)),
                 shootoff: so ? rankingService.sum(p.scorecards.filter(obj => obj.round === so).map(sc => sc.score)) : null,

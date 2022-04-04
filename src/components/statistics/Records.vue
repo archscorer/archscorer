@@ -26,7 +26,7 @@
       >
         <template v-slot:header.class="{ header }">
           {{ header.text }}
-          <filterRecord v-bind:filter.sync="filters.class"/>
+          <tableColumnFilter v-bind:filter.sync="filters.class"/>
         </template>
         <template v-slot:header.score="{ header }">
           {{ header.text }}
@@ -59,15 +59,15 @@
         </template>
         <template v-slot:header.archer="{ header }">
           {{ header.text }}
-          <filterRecord v-bind:filter.sync="filters.archer"/>
+          <tableColumnFilter v-bind:filter.sync="filters.archer"/>
         </template>
         <template v-slot:header.event="{ header }">
           {{ header.text }}
-          <filterRecord v-bind:filter.sync="filters.event"/>
+          <tableColumnFilter v-bind:filter.sync="filters.event"/>
         </template>
         <template v-slot:header.scope="{ header }">
           {{ header.text }}
-          <filterRecord v-bind:filter.sync="filters.scope"/>
+          <tableColumnFilter v-bind:filter.sync="filters.scope"/>
         </template>
         <template v-slot:header.date="{ header }">
           {{ header.text }}
@@ -130,13 +130,13 @@
 </template>
 
 <script>
-  import filterRecord from '@/components/statistics/filterRecord.vue'
+  import tableColumnFilter from '@/components/utils/tableColumnFilter.vue'
   import { mapState } from 'vuex'
 
   export default {
     // name: 'Series',
     components: {
-      filterRecord,
+      tableColumnFilter,
     },
     data: () => ({
       filters: {class: '',
