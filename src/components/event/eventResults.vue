@@ -77,7 +77,7 @@
     </v-card-actions>
     <v-dialog v-model="sc_dialog" max-width="650px">
       <v-card v-if="participant !== null">
-        <v-card-title>{{ participant.archer.full_name }} {{ participant.class}} {{ participant.archer.club_details.name_short }}</v-card-title>
+        <v-card-title>{{ participant.full_name }} {{ participant.class}} {{ participant.archer_rep.split('|')[0] }}</v-card-title>
         <v-card-subtitle>{{ event.name }}</v-card-subtitle>
         <v-card-text>
           <eventParticipantScorecards :pId="participant.id"

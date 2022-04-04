@@ -91,23 +91,9 @@ class ArcherSerializer(serializers.ModelSerializer):
 
 class ParticipantArcherSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.is_active')
-    # club_details = serializers.SerializerMethodField()
-    # contact = serializers.SerializerMethodField()
     class Meta:
         model = Archer
-        # fields = ['id', 'full_name', 'gender', 'club_details', 'user', 'contact']
         fields = ['id', 'user']
-
-    # def get_contact(self, obj):
-    #     try:
-    #         # NOTE this assumes that root.instance is Event object
-    #         if self.context['request'].user.email == self.root.instance.creator.email:
-    #             return obj.email + '; ' + obj.phone
-    #     except (AttributeError, KeyError):
-    #         return None
-    #
-    # def get_club_details(self, obj):
-    #     return ClubDetailsSerializer(instance=obj.club).data
 
 class ParticipantSerializer(serializers.ModelSerializer):
     archer = ParticipantArcherSerializer(read_only=True)
