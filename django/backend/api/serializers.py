@@ -75,12 +75,6 @@ class ScoreCardSerializer(serializers.ModelSerializer):
         model = ScoreCard
         fields = '__all__'
 
-class ClubDetailsSerializer(serializers.ModelSerializer):
-    association = AssociationSerializer(many=True, read_only=True)
-    class Meta:
-        model = Club
-        fields = ['id', 'name', 'name_short', 'association']
-
 class ArcherSerializer(serializers.ModelSerializer):
     events = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     user = serializers.ReadOnlyField(source='user.is_active')
