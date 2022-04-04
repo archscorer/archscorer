@@ -152,9 +152,8 @@
           if (this.participant.archer.club) {
             clubs = this.clubs.filter(obj => obj.id === this.participant.archer.club)
           }
-          if (this.participant.archer.club_details) {
-            clubs = [this.participant.archer.club_details]
-          }
+          // TODO here if edit participant association selection does not work
+          // it should be text field in this case, allowing direct edit (maybe by only admin / event organiser)
         }
         for (let club of clubs) {
           for (let association of club.association) {
