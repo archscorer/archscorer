@@ -44,7 +44,7 @@
               <template v-if="'pr'+col.value in row && event.archive === false">
                 <v-progress-circular
                   v-model="row['pr'+col.value]"
-                  :color="row['pr'+col.value] === 100 ? 'green' : 'error'"
+                  :color="row['pr'+col.value] === 100 ? 'orange' : 'error'"
                   width="1"
                   size="12"
                   class='progress-text'>

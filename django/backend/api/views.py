@@ -202,6 +202,24 @@ class ParticipantViewSet(viewsets.ModelViewSet):
     queryset = Participant.objects.all()
 
     @action(detail=False, methods=['POST'])
+    def scorecard_check(self, request):
+        """
+        Event owner and admins can mark scorecards as checked after shooting
+        """
+        event = Event.objects.get(pk=request.data['eId'])
+
+        if (request.user in [event.creator, *event.admins.all()] and
+            'scId' in request.data):
+            scorecard = ScoreCard.objects.get(pk=request.data['scId'])
+            scorecard.checked = True
+            scorecard.save()
+            return Response([{ 'header': 'scorecard with pk:' + str(scorecard.id) + ' marked as checked!'}],
+                            status=status.HTTP_200_OK)
+        return Response({'details': 'You probably don\'t have the permission to do this'},
+                        status=status.HTTP_403_FORBIDDEN)
+
+
+    @action(detail=False, methods=['POST'])
     def scorecards(self, request):
         """
         Retrieve user group scorecards for specified round
@@ -333,7 +351,7 @@ class RecordViewSet(mixins.ListModelMixin,
                     mixins.UpdateModelMixin,
                     viewsets.GenericViewSet):
     """
-    List all records. Only list them, no update nor create currently implemented
+    List all records. Users with model permissions can also create and update
     """
     permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
     serializer_class = RecordSerializer

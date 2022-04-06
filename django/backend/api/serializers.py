@@ -87,7 +87,7 @@ class ParticipantArcherSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.is_active')
     class Meta:
         model = Archer
-        fields = ['id', 'user']
+        fields = ['id', 'user', 'club']
 
 class ParticipantSerializer(serializers.ModelSerializer):
     archer = ParticipantArcherSerializer(read_only=True)
@@ -166,7 +166,7 @@ class ClubSerializer(serializers.ModelSerializer):
 
 class EventSerializerList(serializers.ModelSerializer):
     creator = serializers.ReadOnlyField(source='creator.email')
-    rounds = RoundSerializer(many=True, read_only=True)
+    # rounds = RoundSerializer(many=True, read_only=True)
     participants = serializers.SerializerMethodField()
     class Meta:
         model = Event

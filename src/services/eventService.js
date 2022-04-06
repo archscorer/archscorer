@@ -61,5 +61,9 @@ export default {
   putArrow(aId, payload) {
     return api.put(`events/participants/arrows/${aId}/`, payload)
               .then(response => response.data)
-  }
+  },
+  checkScoreCard(payload) {
+    return api.post(`events/participants/scorecard_check/`, payload)
+              .then(response => response.data)
+  },
 }

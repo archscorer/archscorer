@@ -179,6 +179,17 @@ const actions = {
       dispatch('putArrow', attr)
       console.log(error.response ? error.response.data : error)
     })
+  },
+  checkScoreCard({ commit }, attr) {
+    eventService.checkScoreCard(attr)
+    .then(response => {
+      eventService.fetchEvents(attr.eId)
+      .then(event => {
+        commit('updateEvent', event)
+      })
+    }).catch(error => {
+      console.log(error.response ? error.response.data : error)
+    })
   }
 }
 

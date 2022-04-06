@@ -67,6 +67,7 @@
         <v-card-actions v-if="edit">
           <v-spacer />
           <v-btn color="primary" text @click="edit_sc(round)">edit</v-btn>
+          <v-btn color="primary" v-if="!round.checked" @click="checkScoreCard({eId: eId, scId: round.sc})">mark checked</v-btn>
         </v-card-actions>
       </v-card>
       <template v-else>
@@ -146,6 +147,7 @@
     methods: {
       ...mapActions('events', [
         'getScoreCards',
+        'checkScoreCard',
         'updateEvent'
       ]),
       get_rounds() {
@@ -204,7 +206,7 @@
           }
           stats['%'] = (t !== 0 ? (h/t * 100).toFixed(1) : null)
           halves.push(sc_ends)
-          return Object.assign({}, r, {nr_of_arrows: aNr, halves: halves, sc: sc.id, stats: stats})
+          return Object.assign({}, r, {nr_of_arrows: aNr, halves: halves, sc: sc.id, checked: sc.checked, stats: stats})
         })
       },
       edit_sc(r) {
