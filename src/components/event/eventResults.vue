@@ -42,9 +42,11 @@
                 <newRecord :record="row['rec'+col.value]"/>
               </template>
               <template v-if="'pr'+col.value in row && event.archive === false">
+                <v-icon v-if="row['pr'+col.value] === 'checked'" color="green" size="12">mdi-check</v-icon>
                 <v-progress-circular
+                  v-else
                   v-model="row['pr'+col.value]"
-                  :color="row['pr'+col.value] === 100 ? 'green' : 'error'"
+                  :color="row['pr'+col.value] === 100 ? 'orange' : 'error'"
                   width="1"
                   size="12"
                   class='progress-text'>
@@ -77,7 +79,13 @@
     </v-card-actions>
     <v-dialog v-model="sc_dialog" max-width="650px">
       <v-card v-if="participant !== null">
-        <v-card-title>{{ participant.archer.full_name }} {{ participant.class}} {{ participant.archer.club_details.name_short }}</v-card-title>
+        <v-toolbar flat>
+          <v-toolbar-title>{{ participant.full_name }} {{ participant.class}}</v-toolbar-title>
+          <v-spacer />
+          <v-btn icon @click="sc_dialog = false">
+              <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <v-card-subtitle>{{ event.name }}</v-card-subtitle>
         <v-card-text>
           <eventParticipantScorecards :pId="participant.id"
@@ -120,6 +128,11 @@
   function getSpots(r, p) {
     let r_sc = p.scorecards.find(sc => sc.round === r.id)
     return r_sc ?  r_sc.arrows.map(a => a.x ? 1 : 0) : []
+  }
+
+  function getChecked(r, p) {
+    let r_sc = p.scorecards.find(sc => sc.round === r.id)
+    return r_sc ?  r_sc.checked : null
   }
 
   export default {
@@ -228,12 +241,12 @@
           if (Array.isArray(this.event.participants)) {
             r_table.data = this.event.participants.map(p => {
               let p_style_records = null
-              if (this.event.records && p.archer.club_details.association != '') {
+              if (this.event.records && p.archer_rep.split('|')[1] !== '') {
                 p_style_records = this.records.filter(rec => {
                   if (rec.age_group === p.age_group &&
                       rec.gender === p.gender &&
                       rec.style === p.style &&
-                      rec.scope === p.archer.club_details.association) {
+                      rec.scope === p.archer_rep.split('|')[1]) {
                     return true
                   }
                   return false
@@ -244,46 +257,56 @@
                 classification: p.level_class,
                 name: p.full_name,
                 class: rankingService.getClass(p, this.event.ignore_gender),
-                club: p.archer.club_details.name_short,
+                club: p.archer_rep.split('|')[0],
               }
               let sums = rounds.map(function(r) {
-                let r_ord = null, arrows = null, open = false
+                let r_ord = null, arrows = null, open = false, checked = false
                 let format = null
                 if (Array.isArray(r)) {
                   // we have units that are combined into a round
                   r_ord = r.map(obj => obj.ord).join('_')
-                  arrows = r.map(v => getScore(v, p)).flat()
-                  open = r.some(v => v.is_open === true)
+                  arrows = r.map(u => getScore(u, p)).flat()
+                  checked = r.every(u => getChecked(u, p) === true)
+                  open = r.some(u => u.is_open === true)
                   format = r[0].course_details.format
                 } else {
                   // we have round object
                   r_ord = r.ord
                   arrows = getScore(r, p)
+                  checked = getChecked(r, p)
                   open = r.is_open
                   format = r.course_details.format
                 }
                 row[r_ord] = rankingService.sum( arrows )
                 if (open === true && arrows.length) {
-                  row['pr' + r_ord] = Math.round((arrows.filter(a => a !== null).length / arrows.length) * 100)
+                  if (checked) {
+                    row['pr' + r_ord] = 'checked'
+                  } else {
+                    row['pr' + r_ord] = Math.round((arrows.filter(a => a !== null).length / arrows.length) * 100)
+                  }
                 }
                 if (p_style_records !== null) {
                   let seen_scope = null // NOTE this might still fail in some conditions
                   p_style_records.filter(v => v.format === format).map(function(rec) {
                     if (rec.score < row[r_ord] && seen_scope !== rec.scope) {
                       row['rec' + r_ord] = {
+                        event: this.event.name,
+                        date: this.event.date_end,
                         format: format,
-                        archer: row.name,
-                        class: row.class,
+                        archer: p.full_name,
+                        age_group: p.age_group,
+                        gender: p.gender,
+                        style: p.style,
                         score: row[r_ord],
-                        scope: p.archer.club_details.association,
+                        scope: p.archer_rep.split('|')[1],
                         current: rec
                       }
                     }
                     seen_scope = rec.scope
-                  })
+                  }, this)
                 }
                 return row[r_ord]
-              })
+              }, this)
               row.sum = sums.length ? rankingService.sum( sums ) : 0
 
               let spots = this.event.rounds.map(function(r) {
@@ -426,7 +449,7 @@
             let row = {
               classification: p.level_class,
               name: p.full_name,
-              club: p.archer.club_details.name_short,
+              club: p.archer_rep.split('|')[0],
               class: rankingService.getClass(p, this.event.ignore_gender),
               progress: false,
               sum: 0,

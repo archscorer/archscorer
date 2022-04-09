@@ -5,6 +5,7 @@ module.exports = {
   outputDir: 'django/frontend',
   assetsDir: 'static',
   devServer: {
+    public: 'localhost',
     proxy: {
       '^/api': {
         target: 'http://localhost:8008',

@@ -67,12 +67,13 @@
         <v-card-actions v-if="edit">
           <v-spacer />
           <v-btn color="primary" text @click="edit_sc(round)">edit</v-btn>
+          <v-btn color="green" text v-if="!round.checked" @click="checkScoreCard({eId: eId, scId: round.sc})">sign</v-btn>
         </v-card-actions>
       </v-card>
       <template v-else>
         <v-alert type="info" prominent v-if="edit">
           <v-row align="center">
-            <v-col class="grow">{{participant.archer.full_name}}({{ participant.class }}) has no scorecard for {{ round.ord }}. {{ round.label }} round!</v-col>
+            <v-col class="grow">{{participant.full_name}}({{ participant.class }}) has no scorecard for {{ round.ord }}. {{ round.label }} round!</v-col>
             <v-col class="shrink" ><v-btn @click="get_scorecards(round.id)">Add</v-btn></v-col>
           </v-row>
         </v-alert>
@@ -86,7 +87,7 @@
         <v-card-title v-if="edit_round">
           {{ edit_round.ord }}. {{ edit_round.label }}
         </v-card-title>
-        <v-card-subtitle>{{ participant.archer.full_name }}</v-card-subtitle>
+        <v-card-subtitle>{{ participant.full_name }}</v-card-subtitle>
         <eventParticipantScorecardEdit :round="edit_round"/>
         <v-card-actions>
           <v-spacer />
@@ -146,6 +147,7 @@
     methods: {
       ...mapActions('events', [
         'getScoreCards',
+        'checkScoreCard',
         'updateEvent'
       ]),
       get_rounds() {
@@ -204,7 +206,7 @@
           }
           stats['%'] = (t !== 0 ? (h/t * 100).toFixed(1) : null)
           halves.push(sc_ends)
-          return Object.assign({}, r, {nr_of_arrows: aNr, halves: halves, sc: sc.id, stats: stats})
+          return Object.assign({}, r, {nr_of_arrows: aNr, halves: halves, sc: sc.id, checked: sc.checked, stats: stats})
         })
       },
       edit_sc(r) {

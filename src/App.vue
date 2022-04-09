@@ -116,6 +116,7 @@
     created() {
       this.$store.dispatch('courses/getCourses')
       this.$store.dispatch('statistics/getRecords')
+      this.$store.dispatch('clubs/getClubs')
     }
   };
 </script>
@@ -126,6 +127,6 @@
   }
   a {
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 500;
   }
 </style>

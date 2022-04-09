@@ -8,7 +8,7 @@
     <v-row :class="{'oflow': $vuetify.breakpoint.xsOnly}" class="flex-nowrap" dense
       v-for="(sc, si) in scorecards"
       :key="'sc' + sc.id">
-      <v-col cols="2" class="text text-truncate">{{ get_participant(sc.participant).archer.full_name }}</v-col>
+      <v-col cols="2" class="text text-truncate">{{ get_participant(sc.participant).full_name }}</v-col>
       <v-col cols="1" class="score"
         v-for="(a, ai) in sc.arrows.filter(obj => obj.end == end.id)"
         :key="'a' + a.id"

@@ -186,7 +186,7 @@ class Record(models.Model):
     event = models.CharField('Event', max_length=255, blank=True)
     score = models.IntegerField('Record score', blank=False)
     # scope should be explained - country code (EE, LAT, etc) for national ones, EU, USA for unions, W for world
-    scope = models.CharField('record scope (EE/EU/W)', max_length=50, blank=False, default='EE')
+    scope = models.CharField('record scope (association_short(i.e FAAE)/EU/W)', max_length=50, blank=False, default='FAAE')
 
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.EmailField(blank=True, null=True)
@@ -209,13 +209,13 @@ class Series(models.Model):
     points_max = models.IntegerField('Maximum point score for the first place', default=10)
 
     # use None for no restriction. Otherwise archer__club__association should be used as limitation (i.e FAAE)
-    participant_restriction = models.CharField('i.e. "archer__club__association:FAAE"', max_length=255, blank=True, null=True, default=None)
+    participant_restriction = models.CharField('i.e. "archer_rep__contains:FAAE"', max_length=255, blank=True, null=True, default=None)
     participant_min = models.IntegerField('Minimum nr of events for final ranking', default=1)
     participant_max = models.IntegerField('Maximum nr of envets used for final ranking', default=None, null=True)
     # Aimed to accommodate club cup and comparing clubs
     club_ranking = models.BooleanField(default=False)
     club_ranking_max = models.IntegerField('Max nr of club members to contribute points to club per class', default=3)
-    ignore_gender = models.CharField('age_style to merge gender (A_TR, V_TR)', max_length=50, blank=True, default='')
+    ignore_gender = models.CharField('age_style to merge gender (A_TR, V_TR, all)', max_length=50, blank=True, default='')
 
     class Meta:
         ordering = ['-date_end']
@@ -244,7 +244,7 @@ class Event(models.Model):
     # TODO: recrords could also be joice, default beeing 'Training' -- no records
     records = models.CharField('record category (nat/EM/MM)', max_length=50, blank=True, default='')
     use_level_class = models.BooleanField('Use Level Classes', default=False)
-    ignore_gender = models.CharField('age_style to merge gender (A_TR, V_TR)', max_length=50, blank=True, default='')
+    ignore_gender = models.CharField('age_style to merge gender (A_TR, V_TR, all)', max_length=50, blank=True, default='')
     age_style_used = models.TextField('age_style classes used in the event', blank=True)
 
     series = models.ForeignKey(Series, related_name='stages', null=True, blank=True, on_delete=models.SET_NULL)
@@ -268,8 +268,9 @@ class Round(models.Model):
 class Participant(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     event = models.ForeignKey(Event, related_name='participants', on_delete=models.CASCADE)
-    # archer here now is only for scoring in the event, after the envent it can be safely removed from the database without
-    # affecting past events, although currently it is still protected.
+    # archer here now is only for scoring in the event, after the envent it can be
+    # safely removed from the database without affecting past events, although currently
+    # it is still protected.
     archer = models.ForeignKey(Archer, related_name='events', on_delete=models.PROTECT)
     archer_rep = models.CharField('archer representation in a form "club_short|association_short"', max_length=20, default='|')
     gender = models.CharField('gender', max_length=1, default='U', choices=[('M', 'Male'),
@@ -295,6 +296,7 @@ class ScoreCard(models.Model):
     round = models.ForeignKey(Round, related_name='scorecards', on_delete=models.CASCADE)
     score = models.IntegerField('Final score', default=None, null=True)
     spots = models.IntegerField('nr of "x" or equivalent', default=None, null=True)
+    checked = models.BooleanField('Scorecards has been checked by organizer', default=False)
 
     class Meta:
         ordering = ['round__ord', 'participant__target_pos']

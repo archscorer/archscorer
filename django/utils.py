@@ -40,6 +40,26 @@ def import_and_register(file=None, event_pk=None):
                                                      age_group=a.age_group)
 
 
+def generate_participants(event_pk=None, n=10):
+    import random
+    # we have more than thousand archers in database just use some random subset of those
+    event = models.Event.objects.get(pk = event_pk)
+    archers = random.sample(list(models.Archer.objects.all()), n)
+    for a in archers:
+        try:
+            archer_rep=a.club.name_short + '|' + a.club.association.first().name_short
+        except:
+            archer_rep=a.club.name_short + '|'
+        models.Participant.objects.get_or_create(archer=a,
+                                                 event=event,
+                                                 style=random.choice(models.STYLE_CHOICES[:11])[0],
+                                                 age_group=random.choice(models.AGEGROUP_CHOICES[:5])[0],
+                                                 gender=a.gender,
+                                                 full_name=a.full_name,
+                                                 archer_rep=archer_rep)
+        print(a.full_name)
+
+
 def register(file=None, event_pk=None):
     # participant fields
     # archer, event, age_group, style, food, comments, group, group_target, group_pos
@@ -66,15 +86,6 @@ def read_clubs():
     pass
 
 
-for p in models.Participant.objects.all():
-    print(p.archer.club.association.get(id=1)
-
-for p in models.Participant.objects.all():
-    if p.archer_rep == '|':
-        try:
-            a = p.archer.club.association.get(id=1)
-            p.archer_rep = p.archer.club.name_short + '|' + a.name_short
-            print(p.archer.club.name_short + '|' + a.name_short)
-            p.save()
-        except:
-            print(p.archer.club.name_short)
+# from backend.api import models, serializers
+# event = models.Event.objects.get(pk = 274)
+# cProfile.runctx('serializers.EventSerializer(event).data', None, locals(), sort='cumtime')

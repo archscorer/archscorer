@@ -54,7 +54,12 @@ class myArcherInline(admin.TabularInline):
 @admin.register(Club)
 class myClubAdmin(admin.ModelAdmin):
     raw_id_fields = ('association',)
-    list_display = ('name',)
+    readonly_fields = ('get_association',)
+    list_display = ('name','name_short','get_association')
+
+    def get_association(self, obj):
+        return [a.id for a in obj.association.all()]
+
 
 @admin.register(Association)
 class myAssociationAdmin(admin.ModelAdmin):

@@ -91,20 +91,25 @@ class SeriesViewSet(viewsets.ModelViewSet):
     Edit / create is privileged to registered users only.
     """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    serializer_class = SeriesSerializer
     queryset = Series.objects.all()
 
     def get_queryset(self):
         user = self.request.user
+        queryset = Series.objects.all()
         if isinstance(user, AnonymousUser):
             # not logged in users can see only 'open' type of events
-            return Series.objects.filter(Q(type = 'open'))
+            queryset = queryset.filter(Q(type = 'open'))
         else:
             # to list events that are associated with the user / archer
-            return Series.objects.filter(Q(creator__pk = user.id) |
-                                       (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
-                                        Q(stages__participants__in = user.archer.events.all()) |
-                                        Q(type = 'open')).distinct()
+            queryset = queryset.filter(Q(creator__pk = user.id) |
+                                      (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
+                                       Q(stages__participants__in = user.archer.events.all()) |
+                                       Q(type = 'open')).distinct()
+        if self.action == 'list':
+            return queryset
+        else:
+            return queryset.prefetch_related('stages__participants',
+                                             'stages__participants__scorecards')
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -123,30 +128,37 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        queryset = Event.objects.all()
         if self.action == 'list':
             if isinstance(user, AnonymousUser):
                 # not logged in users can see only 'open' type of events
-                return Event.objects.filter(Q(type = 'open'))
+                return queryset.filter(Q(type = 'open'))
             else:
                 # to list events that are associated with the user / archer
-                return Event.objects.filter(Q(creator__pk = user.id) |
-                                           (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
-                                            Q(participants__in = user.archer.events.all()) |
-                                            Q(admins__pk = user.id) |
-                                            Q(type = 'open')).distinct()
+                return queryset.filter(Q(creator__pk = user.id) |
+                                      (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
+                                       Q(participants__in = user.archer.events.all()) |
+                                       Q(admins__pk = user.id) |
+                                       Q(type = 'open')).distinct()
         else:
             if isinstance(user, AnonymousUser):
                 # not logged in users can discover 'open' and open for registration type of events
-                return Event.objects.filter(Q(type = 'open') | Q(is_open = True)).distinct()
+                queryset = queryset.filter(Q(type = 'open') | Q(is_open = True)).distinct()
             else:
                 # In addition to 'my' events allow to discover events that are open
                 # for registration
-                return Event.objects.filter(Q(creator__pk = user.id) |
-                                           (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
-                                            Q(participants__in = user.archer.events.all()) |
-                                            Q(type = 'open') |
-                                            Q(admins__pk = user.id) |
-                                            Q(is_open = True)).distinct()
+                queryset = queryset.filter(Q(creator__pk = user.id) |
+                                    (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
+                                     Q(participants__in = user.archer.events.all()) |
+                                     Q(type = 'open') |
+                                     Q(admins__pk = user.id) |
+                                     Q(is_open = True)).distinct()
+            return queryset.prefetch_related('participants',
+                                             'participants__scorecards',
+                                             'participants__scorecards__arrows',
+                                             'participants__archer',
+                                             'participants__archer__user',
+                                             'rounds')
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -200,6 +212,24 @@ class ParticipantViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated&ActiveEvent]
     serializer_class = ParticipantSerializer
     queryset = Participant.objects.all()
+
+    @action(detail=False, methods=['POST'])
+    def scorecard_check(self, request):
+        """
+        Event owner and admins can mark scorecards as checked after shooting
+        """
+        event = Event.objects.get(pk=request.data['eId'])
+
+        if (request.user in [event.creator, *event.admins.all()] and
+            'scId' in request.data):
+            scorecard = ScoreCard.objects.get(pk=request.data['scId'])
+            scorecard.checked = True
+            scorecard.save()
+            return Response([{ 'header': 'scorecard with pk:' + str(scorecard.id) + ' marked as checked!'}],
+                            status=status.HTTP_200_OK)
+        return Response({'details': 'You probably don\'t have the permission to do this'},
+                        status=status.HTTP_403_FORBIDDEN)
+
 
     @action(detail=False, methods=['POST'])
     def scorecards(self, request):
@@ -328,10 +358,19 @@ class ArrowViewSet(mixins.UpdateModelMixin,
                 args['spots'] = spots
             ScoreCard.objects.filter(pk = sc.id).update(**args)
 
-class RecordViewSet(viewsets.ReadOnlyModelViewSet):
+class RecordViewSet(mixins.ListModelMixin,
+                    mixins.CreateModelMixin,
+                    mixins.UpdateModelMixin,
+                    viewsets.GenericViewSet):
     """
-    List all records. Only list them, no update nor create currently implemented
+    List all records. Users with model permissions can also create and update
     """
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
     serializer_class = RecordSerializer
     queryset = Record.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(updated_by=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(updated_by=self.request.user)

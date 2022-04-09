@@ -36,17 +36,6 @@ Records update EE -> FAAE
 
 UPDATE api_record SET scope = REPLACE(scope, 'EE', 'FAAE') WHERE scope LIKE '%EE%';
 
-* write update database to fill new particiant gender, full_name and archer_rep
-* club associations need to be redone, due to schema change
-
-before release:
-* participant full_name from participant model, not archer. fill in in participant registration
- -> update api_participant p inner join api_archer a on p.archer_id = a.id set p.full_name = a.full_name;
-* participant gender from participant model, not archer. fill in in participant registration
- -> update api_participant p inner join api_archer a on p.archer_id = a.id set p.gender = a.gender;
-* participant club short --> particiant archer_rep. fill in in participant registration -- this
-  is more clomplicated as might need selections by user.
-  Probably one dropdown to choose club
 * add association also to the event - this will allow to filter competitions per association.
 
 * Add rule system for competitions, basically either WA or IFAA. It will change how bow
