@@ -122,12 +122,12 @@
 
   function getScore(r, p) {
     let r_sc = p.scorecards.find(sc => sc.round === r.id)
-    return r_sc ?  r_sc.arrows.map(a => a.score) : []
+    return r_sc ?  [r_sc.score] : []
   }
 
   function getSpots(r, p) {
     let r_sc = p.scorecards.find(sc => sc.round === r.id)
-    return r_sc ?  r_sc.arrows.map(a => a.x ? 1 : 0) : []
+    return r_sc ?  r_sc.spots : null
   }
 
   function getChecked(r, p) {
@@ -260,29 +260,29 @@
                 club: p.archer_rep.split('|')[0],
               }
               let sums = rounds.map(function(r) {
-                let r_ord = null, arrows = null, open = false, checked = false
+                let r_ord = null, score = null, open = false, checked = false
                 let format = null
                 if (Array.isArray(r)) {
                   // we have units that are combined into a round
                   r_ord = r.map(obj => obj.ord).join('_')
-                  arrows = r.map(u => getScore(u, p)).flat()
+                  score = r.map(u => getScore(u, p)).flat()
                   checked = r.every(u => getChecked(u, p) === true)
                   open = r.some(u => u.is_open === true)
                   format = r[0].course_details.format
                 } else {
                   // we have round object
                   r_ord = r.ord
-                  arrows = getScore(r, p)
+                  score = getScore(r, p)
                   checked = getChecked(r, p)
                   open = r.is_open
                   format = r.course_details.format
                 }
-                row[r_ord] = rankingService.sum( arrows )
-                if (open === true && arrows.length) {
+                row[r_ord] = rankingService.sum( score )
+                if (open === true && score) {
                   if (checked) {
                     row['pr' + r_ord] = 'checked'
                   } else {
-                    row['pr' + r_ord] = Math.round((arrows.filter(a => a !== null).length / arrows.length) * 100)
+                    row['pr' + r_ord] = 0 // Math.round((arrows.filter(a => a !== null).length / arrows.length) * 100)
                   }
                 }
                 if (p_style_records !== null) {
@@ -313,17 +313,16 @@
                 if (r.course_details.type === 's') {
                   return 0
                 }
-                return rankingService.sum( getSpots(r, p) )
+                return getSpots(r, p)
               })
               row.x = spots.length ? rankingService.sum( spots ) : 0
-              row.progress = sums.some(v => v !== null)
+              // row.progress = sums.some(v => v !== null)
 
               if (so) {
-                let so_arrows = getScore(so, p)
-                let so_sum = rankingService.sum( so_arrows )
+                let so_sum = getScore(so, p)
                 if (so_sum !== null) {
                   row.shootoff = so_sum
-                  let last_arrow = so_arrows[so_arrows.length - 1]
+                  let last_arrow = p.scorecards.find(sc => sc.round === so.id).last_arrow
                   if (last_arrow !== null) {
                     // we have last arrow
                     row[so.ord] = so_sum - last_arrow + '<sup>' + -last_arrow + '</sup>'
@@ -451,7 +450,7 @@
               name: p.full_name,
               club: p.archer_rep.split('|')[0],
               class: rankingService.getClass(p, this.event.ignore_gender),
-              progress: false,
+              // progress: false,
               sum: 0,
             }
             let spots = 0
@@ -462,7 +461,7 @@
                 let sc = p.scorecards.find(obj => obj.round === h.id)
                 let sum = 0
                 if (sc) {
-                  row.progress = true
+                  // row.progress = true
                   for (let e of c.ends) {
                     spots += rankingService.sum(sc.arrows.filter(a => a.end === e.id).map(a => a.x ? 1 : 0))
                     row[h.ord + '_' + e.ord] = rankingService.sum(sc.arrows.filter(a => a.end === e.id).map(a => a.score))
@@ -478,7 +477,7 @@
               let sc = p.scorecards.find(obj => obj.round === r.id)
               let sum = 0
               if (sc) {
-                row.progress = true
+                // row.progress = true
                 for (let e of c.ends) {
                   spots += rankingService.sum(sc.arrows.filter(a => a.end === e.id).map(a => a.x ? 1 : 0))
                   row[r.ord + '_' + e.ord] = rankingService.sum(sc.arrows.filter(a => a.end === e.id).map(a => a.score))

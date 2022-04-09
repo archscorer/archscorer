@@ -66,6 +66,7 @@ class ArrowSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         instance.score = validated_data.get('score', instance.score)
         instance.x = validated_data.get('x', instance.x)
+        instance.save()
         return instance
 
 class LevelClassSerializer(serializers.ModelSerializer):
@@ -78,7 +79,7 @@ class ParticipantScoreCardSerializer(serializers.ModelSerializer):
     last_arrow = serializers.SerializerMethodField()
     class Meta:
         model = ScoreCard
-        fields = ['id', 'participant', 'round', 'score', 'spots', 'last_arrow']
+        fields = ['id', 'participant', 'round', 'score', 'spots', 'last_arrow', 'checked']
         read_only_fields = fields
 
     def get_last_arrow(self, obj):
@@ -90,7 +91,7 @@ class ScoreCardSerializer(serializers.ModelSerializer):
     arrows = ArrowSerializer(many=True, read_only=True)
     class Meta:
         model = ScoreCard
-        fields = ['id', 'participant', 'round', 'arrows', 'score', 'spots', 'checked']
+        fields = ['id', 'participant', 'round', 'arrows', 'score', 'spots']
         read_only_fields = fields
 # class ScoreCardSerializer(serializers.Serializer):
 #     id = serializers.IntegerField(read_only=True)
@@ -118,7 +119,7 @@ class ParticipantArcherSerializer(serializers.ModelSerializer):
 
 class ParticipantSerializer(serializers.ModelSerializer):
     archer = ParticipantArcherSerializer(read_only=True)
-    scorecards = ScoreCardSerializer(many=True, read_only=True)
+    scorecards = ParticipantScoreCardSerializer(many=True, read_only=True)
     contact = serializers.SerializerMethodField()
     class Meta:
         model = Participant

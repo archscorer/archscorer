@@ -139,7 +139,7 @@ class EventViewSet(viewsets.ModelViewSet):
                                       (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
                                        Q(participants__in = user.archer.events.all()) |
                                        Q(admins__pk = user.id) |
-                                       Q(type = 'open')).distinct()
+                                       Q(type = 'open')).distinct().prefetch_related('rounds')
         else:
             if isinstance(user, AnonymousUser):
                 # not logged in users can discover 'open' and open for registration type of events
@@ -155,7 +155,7 @@ class EventViewSet(viewsets.ModelViewSet):
                                      Q(is_open = True)).distinct()
             return queryset.prefetch_related('participants',
                                              'participants__scorecards',
-                                             'participants__scorecards__arrows',
+                                             # 'participants__scorecards__arrows',
                                              'participants__archer',
                                              'participants__archer__user',
                                              'rounds')
