@@ -91,20 +91,25 @@ class SeriesViewSet(viewsets.ModelViewSet):
     Edit / create is privileged to registered users only.
     """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    serializer_class = SeriesSerializer
     queryset = Series.objects.all()
 
     def get_queryset(self):
         user = self.request.user
+        queryset = Series.objects.all()
         if isinstance(user, AnonymousUser):
             # not logged in users can see only 'open' type of events
-            return Series.objects.filter(Q(type = 'open'))
+            queryset = queryset.filter(Q(type = 'open'))
         else:
             # to list events that are associated with the user / archer
-            return Series.objects.filter(Q(creator__pk = user.id) |
-                                       (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
-                                        Q(stages__participants__in = user.archer.events.all()) |
-                                        Q(type = 'open')).distinct()
+            queryset = queryset.filter(Q(creator__pk = user.id) |
+                                      (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
+                                       Q(stages__participants__in = user.archer.events.all()) |
+                                       Q(type = 'open')).distinct()
+        if self.action == 'list':
+            return queryset
+        else:
+            return queryset.prefetch_related('stages__participants',
+                                             'stages__participants__scorecards')
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -123,30 +128,37 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        queryset = Event.objects.all()
         if self.action == 'list':
             if isinstance(user, AnonymousUser):
                 # not logged in users can see only 'open' type of events
-                return Event.objects.filter(Q(type = 'open'))
+                return queryset.filter(Q(type = 'open'))
             else:
                 # to list events that are associated with the user / archer
-                return Event.objects.filter(Q(creator__pk = user.id) |
-                                           (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
-                                            Q(participants__in = user.archer.events.all()) |
-                                            Q(admins__pk = user.id) |
-                                            Q(type = 'open')).distinct()
+                return queryset.filter(Q(creator__pk = user.id) |
+                                      (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
+                                       Q(participants__in = user.archer.events.all()) |
+                                       Q(admins__pk = user.id) |
+                                       Q(type = 'open')).distinct()
         else:
             if isinstance(user, AnonymousUser):
                 # not logged in users can discover 'open' and open for registration type of events
-                return Event.objects.filter(Q(type = 'open') | Q(is_open = True)).distinct()
+                queryset = queryset.filter(Q(type = 'open') | Q(is_open = True)).distinct()
             else:
                 # In addition to 'my' events allow to discover events that are open
                 # for registration
-                return Event.objects.filter(Q(creator__pk = user.id) |
-                                           (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
-                                            Q(participants__in = user.archer.events.all()) |
-                                            Q(type = 'open') |
-                                            Q(admins__pk = user.id) |
-                                            Q(is_open = True)).distinct()
+                queryset = queryset.filter(Q(creator__pk = user.id) |
+                                    (Q(creator__archer__club__pk = user.archer.club.id) & Q(type = 'club')) |
+                                     Q(participants__in = user.archer.events.all()) |
+                                     Q(type = 'open') |
+                                     Q(admins__pk = user.id) |
+                                     Q(is_open = True)).distinct()
+            return queryset.prefetch_related('participants',
+                                             'participants__scorecards',
+                                             'participants__scorecards__arrows',
+                                             'participants__archer',
+                                             'participants__archer__user',
+                                             'rounds')
 
     def get_serializer_class(self):
         if self.action == 'list':

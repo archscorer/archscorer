@@ -86,7 +86,7 @@
             <p v-if="[event.creator, ...event.admins].includes(user.email)">
               Export target assignments to <v-btn x-small color="primary" @click="endAssignments2pdfProxy()">PDF</v-btn><br/>
               Export all participant data to <v-btn x-small color="green" dark @click="export2excel()">EXCEL</v-btn>
-              <a @click="hide_extra_columns = !hide_extra_columns" class="float-right">{{
+              <a v-if="event.creator === user.email" @click="hide_extra_columns = !hide_extra_columns" class="float-right">{{
                 hide_extra_columns ? "show all" : "hide extra"
               }} columns</a>
             </p>

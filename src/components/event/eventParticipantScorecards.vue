@@ -67,7 +67,7 @@
         <v-card-actions v-if="edit">
           <v-spacer />
           <v-btn color="primary" text @click="edit_sc(round)">edit</v-btn>
-          <v-btn color="primary" v-if="!round.checked" @click="checkScoreCard({eId: eId, scId: round.sc})">mark checked</v-btn>
+          <v-btn color="green" text v-if="!round.checked" @click="checkScoreCard({eId: eId, scId: round.sc})">sign</v-btn>
         </v-card-actions>
       </v-card>
       <template v-else>

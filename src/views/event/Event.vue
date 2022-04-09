@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="event" :class="{'px-0': $vuetify.breakpoint.xsOnly}">
+  <v-container v-if="event && event.created" :class="{'px-0': $vuetify.breakpoint.xsOnly}">
     <v-tabs v-model="tab" grow>
       <v-tab v-for="label in tabs" :key="label">
         {{ label }}

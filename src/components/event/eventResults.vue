@@ -42,7 +42,9 @@
                 <newRecord :record="row['rec'+col.value]"/>
               </template>
               <template v-if="'pr'+col.value in row && event.archive === false">
+                <v-icon v-if="row['pr'+col.value] === 'checked'" color="green" size="12">mdi-check</v-icon>
                 <v-progress-circular
+                  v-else
                   v-model="row['pr'+col.value]"
                   :color="row['pr'+col.value] === 100 ? 'orange' : 'error'"
                   width="1"
@@ -77,7 +79,13 @@
     </v-card-actions>
     <v-dialog v-model="sc_dialog" max-width="650px">
       <v-card v-if="participant !== null">
-        <v-card-title>{{ participant.full_name }} {{ participant.class}} {{ participant.archer_rep.split('|')[0] }}</v-card-title>
+        <v-toolbar flat>
+          <v-toolbar-title>{{ participant.full_name }} {{ participant.class}}</v-toolbar-title>
+          <v-spacer />
+          <v-btn icon @click="sc_dialog = false">
+              <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <v-card-subtitle>{{ event.name }}</v-card-subtitle>
         <v-card-text>
           <eventParticipantScorecards :pId="participant.id"
@@ -120,6 +128,11 @@
   function getSpots(r, p) {
     let r_sc = p.scorecards.find(sc => sc.round === r.id)
     return r_sc ?  r_sc.arrows.map(a => a.x ? 1 : 0) : []
+  }
+
+  function getChecked(r, p) {
+    let r_sc = p.scorecards.find(sc => sc.round === r.id)
+    return r_sc ?  r_sc.checked : null
   }
 
   export default {
@@ -247,24 +260,30 @@
                 club: p.archer_rep.split('|')[0],
               }
               let sums = rounds.map(function(r) {
-                let r_ord = null, arrows = null, open = false
+                let r_ord = null, arrows = null, open = false, checked = false
                 let format = null
                 if (Array.isArray(r)) {
                   // we have units that are combined into a round
                   r_ord = r.map(obj => obj.ord).join('_')
-                  arrows = r.map(v => getScore(v, p)).flat()
-                  open = r.some(v => v.is_open === true)
+                  arrows = r.map(u => getScore(u, p)).flat()
+                  checked = r.every(u => getChecked(u, p) === true)
+                  open = r.some(u => u.is_open === true)
                   format = r[0].course_details.format
                 } else {
                   // we have round object
                   r_ord = r.ord
                   arrows = getScore(r, p)
+                  checked = getChecked(r, p)
                   open = r.is_open
                   format = r.course_details.format
                 }
                 row[r_ord] = rankingService.sum( arrows )
                 if (open === true && arrows.length) {
-                  row['pr' + r_ord] = Math.round((arrows.filter(a => a !== null).length / arrows.length) * 100)
+                  if (checked) {
+                    row['pr' + r_ord] = 'checked'
+                  } else {
+                    row['pr' + r_ord] = Math.round((arrows.filter(a => a !== null).length / arrows.length) * 100)
+                  }
                 }
                 if (p_style_records !== null) {
                   let seen_scope = null // NOTE this might still fail in some conditions
