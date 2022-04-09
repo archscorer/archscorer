@@ -66,6 +66,7 @@ class ArrowSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         instance.score = validated_data.get('score', instance.score)
         instance.x = validated_data.get('x', instance.x)
+        instance.save()
         return instance
 
 class LevelClassSerializer(serializers.ModelSerializer):
