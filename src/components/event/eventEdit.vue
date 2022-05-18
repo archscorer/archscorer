@@ -170,11 +170,16 @@
             </v-col>
           </v-row>
           <v-row>
-          <v-col cols="8">
+          <v-col cols="6">
             <v-text-field
               v-model="event.admins"
               hint="email addresses of users, comma separated"
               label="Event admins"></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-switch
+              v-model="event.show_association"
+              :label="event.show_association ? 'Show association' : 'Show club'"></v-switch>
           </v-col>
           <v-col cols="4">
             <v-text-field

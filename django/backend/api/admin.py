@@ -107,7 +107,7 @@ class myLevelClassAdmin(admin.ModelAdmin):
 @admin.register(Record)
 class myRecordAdmin(admin.ModelAdmin):
     list_display = ('scope', 'format', 'style', 'gender', 'age_group', 'score', 'archer', 'updated_by', 'updated_at')
-    search_fields = ('scope', 'format', 'style', 'age_group')
+    search_fields = ('scope', 'format', 'style', 'age_group', 'archer')
 
 @admin.register(Round)
 class myRoundAdmin(admin.ModelAdmin):

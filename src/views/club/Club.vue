@@ -8,7 +8,7 @@
         <template v-if="user_is_member_or_admin">
           <v-row>
             <v-col cols="8">
-              <template v-if="club.admins.includes(user.email)">
+              <template v-if="club.admins && club.admins.includes(user.email)">
                 <clubEdit />
                 <v-btn color="primary" class="mx-2" @click="addA()">Add member</v-btn>
               </template>
@@ -130,7 +130,7 @@
       user_is_member_or_admin() {
         if (!this.user.id || this.user.email === "") {
           return false
-        } else if (this.club.admins.includes(this.user.email)) {
+        } else if (this.club.admins && this.club.admins.includes(this.user.email)) {
           return true
         } else if (Array.isArray(this.club.members)) {
           return this.club.members.map(m => m.email).includes(this.user.email) ||

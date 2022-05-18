@@ -239,6 +239,7 @@ class Event(models.Model):
     catering_choices = models.CharField(max_length=255, blank=True)
     type = models.CharField('event type', max_length=10, default='private', choices=TYPE_CHOICES)
     association = models.ForeignKey(Association, related_name='events', null=True, blank=True, on_delete=models.SET_NULL)
+    show_association = models.BooleanField('Show association instead of club in participant list', default=False)
     tags = models.CharField('event tags', max_length=255, blank=True)
     admins = models.ManyToManyField(User, related_name='admin_events', blank=True)
     # TODO: recrords could also be joice, default beeing 'Training' -- no records
@@ -297,6 +298,7 @@ class ScoreCard(models.Model):
     score = models.IntegerField('Final score', default=None, null=True)
     spots = models.IntegerField('nr of "x" or equivalent', default=None, null=True)
     checked = models.BooleanField('Scorecards has been checked by organizer', default=False)
+    pr = models.FloatField('Progress', default=None, null=True)
 
     class Meta:
         ordering = ['round__ord', 'participant__target_pos']

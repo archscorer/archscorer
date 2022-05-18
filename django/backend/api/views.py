@@ -10,9 +10,9 @@ from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from .models import (User, Club, Course, Archer, Series, Event, Round, Participant, ScoreCard, Arrow, Record)
 from .serializers import (UserSerializer, ClubSerializer, ClubsSerializerList, CourseSerializer,
-                          ArcherSerializer, SeriesSerializer, EventSerializer, EventSerializerList,
-                          RoundSerializer, ParticipantSerializer,
-                          ScoreCardSerializer, ArrowSerializer, SeriesSerializerList,
+                          ArcherSerializer, ArcherSearchSerializer, SeriesSerializer, EventSerializer,
+                          EventSerializerList, RoundSerializer, ParticipantSerializer,
+                          ScoreCardSerializer, ArrowSerializer, ArrowFilterSerializer, SeriesSerializerList,
                           RecordSerializer)
 
 class ActiveEvent(permissions.BasePermission):
@@ -80,7 +80,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = CourseSerializer
-    queryset = Course.objects.all()
+    queryset = Course.objects.all().prefetch_related('ends')
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
@@ -155,7 +155,6 @@ class EventViewSet(viewsets.ModelViewSet):
                                      Q(is_open = True)).distinct()
             return queryset.prefetch_related('participants',
                                              'participants__scorecards',
-                                             # 'participants__scorecards__arrows',
                                              'participants__archer',
                                              'participants__archer__user',
                                              'rounds')
@@ -203,7 +202,7 @@ class ArcherViewSet(mixins.UpdateModelMixin,
         if len(archers) == 0:
             return Response([{ 'header': 'no matching archer profiles' }],
                             status=status.HTTP_200_OK)
-        return Response(ArcherSerializer(archers, many=True).data)
+        return Response(ArcherSearchSerializer(archers, many=True).data)
 
 class ParticipantViewSet(viewsets.ModelViewSet):
     """
@@ -338,9 +337,24 @@ class ArrowViewSet(mixins.UpdateModelMixin,
     serializer_class = ArrowSerializer
     queryset = Arrow.objects.all()
 
+    @action(detail=False, methods=['POST'], permission_classes=[permissions.AllowAny])
+    def filter(self, request):
+        arrows = Arrow.objects.none()
+        if 'pId' in request.data:
+            arrows = Arrow.objects.filter(scorecard__participant__id=request.data['pId']).order_by('scorecard', 'end', 'ord')
+        if 'rId' in request.data:
+            if isinstance(request.data['rId'],list):
+                arrows = Arrow.objects.filter(scorecard__round__id__in=request.data['rId']).order_by('scorecard', 'end', 'ord')
+            else:
+                arrows = Arrow.objects.filter(scorecard__round__id=request.data['rId']).order_by('scorecard', 'end', 'ord')
+        return Response(ArrowFilterSerializer(arrows, many=True).data)
+
+
     def perform_update(self, serializer):
         sc = self.get_object().scorecard
-        if not sc.participant.event.archive:
+        if (not sc.participant.event.archive and
+            (self.request.user in [sc.participant.event.creator, *sc.participant.event.admins.all()] or
+            sc.round.is_open)):
             # import random
             # import time
             # time.sleep(1) # use if needed to simulate slow net or smth
@@ -352,8 +366,12 @@ class ArrowViewSet(mixins.UpdateModelMixin,
             # existing model from the database
             serializer.save(updated_by=self.request.user.email)
             # update scorecard on arrow update
-            args = {'score': sum(a['score'] for a in sc.arrows.order_by().values('score') if a['score'])}
-            spots = sum(1 for a in sc.arrows.order_by().values('x') if a['x'])
+            arrows = sc.arrows.order_by()
+            args = {
+                'score': sum(a['score'] for a in arrows.values('score') if a['score']),
+                'pr': round(sum(1 for a in arrows.values('score') if a['score'] != None) / arrows.count(), 2)
+            }
+            spots = sum(1 for a in arrows.values('x') if a['x'])
             if spots:
                 args['spots'] = spots
             ScoreCard.objects.filter(pk = sc.id).update(**args)

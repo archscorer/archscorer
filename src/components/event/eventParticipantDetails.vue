@@ -48,8 +48,8 @@
           label="Affiliation*"
           :rules="[v => !!v || 'You need to choose which association you represent',
                    v => !!archer_affilitions.find(s => s.value === v) || 'Invalid choice']"
-          dense
-        ></v-select>
+          dense>
+        </v-select>
       </v-col>
       <v-col v-if="level_class" cols="4">
         <v-select
@@ -158,7 +158,7 @@
         for (let club of clubs) {
           for (let association of club.association) {
             let rep = club.name_short + '|' + association.name_short
-            affiliations.push({ text: association.name, value: rep })
+            affiliations.push({ text: association.name_short + ' -- ' + association.name, value: rep })
           }
         }
         return affiliations
