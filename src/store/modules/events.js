@@ -5,6 +5,7 @@ const state = {
   events: [],
   participantModel: null,
   scorecards: [],
+  arrows: [],
   participants: [],
 }
 
@@ -24,6 +25,9 @@ const getters = {
   },
   scorecardById: (state) => (id) => {
     return state.scorecards.find(obj => obj.id === id)
+  },
+  arrows: state => {
+    return state.arrows
   },
   participants: state => {
     return state.participants
@@ -168,6 +172,12 @@ const actions = {
   resetScoreCards({ commit }) {
     commit('setScoreCards', [])
   },
+  getArrows({ commit }, attr) {
+    return eventService.fetchArrows(attr)
+    .then(arrows => {
+      commit('setArrows', arrows)
+    })
+  },
   putArrow({ dispatch, commit }, attr) {
     // commit to be submitted arrow to local store
     commit('updateArrow', {scId: attr.scId, arrow: attr.arrow})
@@ -181,13 +191,8 @@ const actions = {
     })
   },
   checkScoreCard({ commit }, attr) {
-    eventService.checkScoreCard(attr)
-    .then(response => {
-      eventService.fetchEvents(attr.eId)
-      .then(event => {
-        commit('updateEvent', event)
-      })
-    }).catch(error => {
+    return eventService.checkScoreCard(attr)
+    .catch(error => {
       console.log(error.response ? error.response.data : error)
     })
   }
@@ -247,6 +252,9 @@ const mutations = {
   },
   setScoreCards(state, scorecards) {
     state.scorecards = scorecards
+  },
+  setArrows(state, arrows) {
+    state.arrows = arrows
   },
   updateArrow(state, attr) {
     const sci = state.scorecards.findIndex(obj => obj.id === attr.scId)

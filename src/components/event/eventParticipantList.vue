@@ -282,7 +282,7 @@
         }
         p_table.header.push(...[
           { text: 'Class', value: 'class' },
-          { text: 'Club', value: 'club' },
+          { text: this.event.show_association ? 'Association' : 'Club', value: 'club' },
           { text: 'Session', value: 'session',
             filter: value => {
               return value != null &&
@@ -316,7 +316,7 @@
               name: p.full_name,
               classification: p.level_class,
               class: rankingService.getClass(p, this.event.ignore_gender),
-              club: p.archer_rep.split('|')[0],
+              club: p.archer_rep.split('|')[this.event.show_association ? 1 : 0],
               session: p.session,
               target: p.target,
               pos: p.target_pos,

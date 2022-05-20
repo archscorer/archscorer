@@ -25,7 +25,6 @@ class EndSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CourseSerializer(serializers.ModelSerializer):
-    # creator = serializers.ReadOnlyField(source='creator.email')
     ends = EndSerializer(many=True, read_only=True)
     class Meta:
         model = Course
@@ -51,23 +50,17 @@ class RoundSerializer(serializers.ModelSerializer):
     def get_scorecards(self, obj):
         return obj.scorecards.all().count()
 
-# class ArrowSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Arrow
-#         fields = ['id', 'end', 'ord', 'score', 'x']
-#         read_only_fields = ['id', 'end', 'ord']
-class ArrowSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    end = serializers.PrimaryKeyRelatedField(read_only=True)
-    ord = serializers.IntegerField(read_only=True)
-    score = serializers.IntegerField()
-    x = serializers.BooleanField()
+class ArrowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Arrow
+        fields = ['id', 'end', 'ord', 'score', 'x']
+        read_only_fields = ['id', 'end', 'ord']
 
-    def update(self, instance, validated_data):
-        instance.score = validated_data.get('score', instance.score)
-        instance.x = validated_data.get('x', instance.x)
-        instance.save()
-        return instance
+class ArrowFilterSerializer(serializers.Serializer):
+    sc = serializers.PrimaryKeyRelatedField(source="scorecard", read_only=True)
+    e = serializers.PrimaryKeyRelatedField(source="end", read_only=True)
+    p = serializers.IntegerField(source="score", read_only=True)
+    x = serializers.BooleanField(read_only=True)
 
 class LevelClassSerializer(serializers.ModelSerializer):
     # this will serialize archer classification classes to be part of archer serializer
@@ -79,7 +72,7 @@ class ParticipantScoreCardSerializer(serializers.ModelSerializer):
     last_arrow = serializers.SerializerMethodField()
     class Meta:
         model = ScoreCard
-        fields = ['id', 'participant', 'round', 'score', 'spots', 'last_arrow']
+        fields = ['id', 'participant', 'round', 'score', 'spots', 'checked', 'last_arrow', 'pr']
         read_only_fields = fields
 
     def get_last_arrow(self, obj):
@@ -93,14 +86,6 @@ class ScoreCardSerializer(serializers.ModelSerializer):
         model = ScoreCard
         fields = ['id', 'participant', 'round', 'arrows', 'score', 'spots', 'checked']
         read_only_fields = fields
-# class ScoreCardSerializer(serializers.Serializer):
-#     id = serializers.IntegerField(read_only=True)
-#     participant = serializers.PrimaryKeyRelatedField(read_only=True)
-#     round = serializers.PrimaryKeyRelatedField(read_only=True)
-#     arrows = ArrowSerializer(many=True, read_only=True)
-#     score = serializers.IntegerField(read_only=True)
-#     spots = serializers.IntegerField(read_only=True)
-#     checked = serializers.BooleanField(read_only=True)
 
 class ArcherSerializer(serializers.ModelSerializer):
     events = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
@@ -109,6 +94,14 @@ class ArcherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Archer
         fields = '__all__'
+
+class ArcherSearchSerializer(serializers.ModelSerializer):
+    events = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    user = serializers.ReadOnlyField(source='user.is_active')
+    class Meta:
+        model = Archer
+        fields = ['id', 'user', 'club', 'full_name', 'gender', 'events']
+        read_only_fields = fields
 
 class ParticipantArcherSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.is_active')
@@ -119,7 +112,7 @@ class ParticipantArcherSerializer(serializers.ModelSerializer):
 
 class ParticipantSerializer(serializers.ModelSerializer):
     archer = ParticipantArcherSerializer(read_only=True)
-    scorecards = ScoreCardSerializer(many=True, read_only=True)
+    scorecards = ParticipantScoreCardSerializer(many=True, read_only=True)
     contact = serializers.SerializerMethodField()
     class Meta:
         model = Participant
@@ -180,7 +173,8 @@ class ClubsSerializerList(serializers.ModelSerializer):
 
     class Meta:
         model = Club
-        fields = '__all__'
+        fields = ['id', 'name', 'name_short', 'members', 'association']
+        read_only_fields = fields
 
     def get_members(self, obj):
         return obj.members.all().count()
@@ -189,6 +183,7 @@ class ClubSerializer(serializers.ModelSerializer):
     creator = serializers.ReadOnlyField(source='creator.email')
     members = ArcherSerializer(many=True, read_only=True)
     admins = ObjAdminSerializer(many=True, read_only=True)
+    association = AssociationSerializer(many=True, read_only=True)
 
     class Meta:
         model = Club

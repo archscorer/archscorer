@@ -33,9 +33,10 @@
           <tr v-for="row in props.items" :key="row.id">
             <td v-for="col in props.headers" :key="col.text">
               <template v-if="col.value === 'name'">
-                <v-btn icon @click="participant_sc(row.id)" small>
-                  <v-icon size="16">mdi-book-open-outline</v-icon>
-                </v-btn>
+                <eventParticipantScorecards :pId="row.id"
+                                            :eId="event.id"
+                                            :rounds="event.rounds"
+                                            :edit="sc_edit()"/>
               </template>
               <span :class="col.value === 'sum' ? 'font-weight-medium' : ''" v-html="row[col.value]"/>
               <template v-if="'rec'+col.value in row">
@@ -77,28 +78,6 @@
         </p>
       </v-col>
     </v-card-actions>
-    <v-dialog v-model="sc_dialog" max-width="650px">
-      <v-card v-if="participant !== null">
-        <v-toolbar flat>
-          <v-toolbar-title>{{ participant.full_name }} {{ participant.class}}</v-toolbar-title>
-          <v-spacer />
-          <v-btn icon @click="sc_dialog = false">
-              <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-toolbar>
-        <v-card-subtitle>{{ event.name }}</v-card-subtitle>
-        <v-card-text>
-          <eventParticipantScorecards :pId="participant.id"
-                                      :eId="event.id"
-                                      :rounds="event.rounds"
-                                      :edit="sc_edit()"/>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer/>
-          <v-btn text @click="sc_dialog = false">Close</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <v-btn v-if="scroll_loop"
       @click="scroll_loop = false"
       color="error"
@@ -112,7 +91,7 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+  import { mapState, mapActions } from 'vuex'
 
   import eventParticipantScorecards from '@/components/event/eventParticipantScorecards.vue'
   import newRecord from '@/components/statistics/newRecord.vue'
@@ -122,18 +101,24 @@
 
   function getScore(r, p) {
     let r_sc = p.scorecards.find(sc => sc.round === r.id)
-    return r_sc ?  r_sc.arrows.map(a => a.score) : []
+    return r_sc ?  [r_sc.score] : []
+  }
+
+  function getProgress(r, p) {
+    let r_sc = p.scorecards.find(sc => sc.round === r.id)
+    return r_sc ?  r_sc.pr : null
   }
 
   function getSpots(r, p) {
     let r_sc = p.scorecards.find(sc => sc.round === r.id)
-    return r_sc ?  r_sc.arrows.map(a => a.x ? 1 : 0) : []
+    return r_sc ?  r_sc.spots : null
   }
 
   function getChecked(r, p) {
     let r_sc = p.scorecards.find(sc => sc.round === r.id)
     return r_sc ?  r_sc.checked : null
   }
+
 
   export default {
     components: {
@@ -142,9 +127,7 @@
     },
     data: () => ({
       r_search: '',
-      sc_dialog: false,
       loading: false,
-      participant: null,
       scroll_loop: false,
     }),
     watch: {
@@ -161,6 +144,7 @@
         user: state => state.user.user,
         courses: state => state.courses.courses,
         records: state => state.statistics.records,
+        arrows: state => state.events.arrows,
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
@@ -210,7 +194,7 @@
           }
           r_table.header.push(
             { text: 'Name', value: 'name' },
-            { text: 'Club', value: 'club' },
+            { text: this.event.show_association ? 'Association' : 'Club', value: 'club' },
             { text: 'Class', value: 'class' })
           r_table.header.push(...rounds.map(function(r) {
             if (Array.isArray(r)) {
@@ -257,32 +241,34 @@
                 classification: p.level_class,
                 name: p.full_name,
                 class: rankingService.getClass(p, this.event.ignore_gender),
-                club: p.archer_rep.split('|')[0],
+                club: p.archer_rep.split('|')[this.event.show_association ? 1 : 0],
               }
               let sums = rounds.map(function(r) {
-                let r_ord = null, arrows = null, open = false, checked = false
+                let r_ord = null, score = null, open = false, checked = false, progress = null
                 let format = null
                 if (Array.isArray(r)) {
                   // we have units that are combined into a round
                   r_ord = r.map(obj => obj.ord).join('_')
-                  arrows = r.map(u => getScore(u, p)).flat()
+                  score = r.map(u => getScore(u, p)).flat()
+                  progress = rankingService.sum( r.map(u => getProgress(u, p)).flat() ) / 2
                   checked = r.every(u => getChecked(u, p) === true)
                   open = r.some(u => u.is_open === true)
                   format = r[0].course_details.format
                 } else {
                   // we have round object
                   r_ord = r.ord
-                  arrows = getScore(r, p)
+                  score = getScore(r, p)
+                  progress = getProgress(r, p)
                   checked = getChecked(r, p)
                   open = r.is_open
                   format = r.course_details.format
                 }
-                row[r_ord] = rankingService.sum( arrows )
-                if (open === true && arrows.length) {
+                row[r_ord] = rankingService.sum( score )
+                if (open === true && score) {
                   if (checked) {
                     row['pr' + r_ord] = 'checked'
                   } else {
-                    row['pr' + r_ord] = Math.round((arrows.filter(a => a !== null).length / arrows.length) * 100)
+                    row['pr' + r_ord] = Math.round(progress ? progress * 100 : 0)// Math.round((arrows.filter(a => a !== null).length / arrows.length) * 100)
                   }
                 }
                 if (p_style_records !== null) {
@@ -313,17 +299,18 @@
                 if (r.course_details.type === 's') {
                   return 0
                 }
-                return rankingService.sum( getSpots(r, p) )
+                return getSpots(r, p)
               })
               row.x = spots.length ? rankingService.sum( spots ) : 0
+              // NOTE progress is used by rankingService to determine if place column should be shown
               row.progress = sums.some(v => v !== null)
 
               if (so) {
-                let so_arrows = getScore(so, p)
-                let so_sum = rankingService.sum( so_arrows )
+                let so_sum = rankingService.sum( getScore(so, p) )
                 if (so_sum !== null) {
                   row.shootoff = so_sum
-                  let last_arrow = so_arrows[so_arrows.length - 1]
+                  row.progress = true
+                  let last_arrow = p.scorecards.find(sc => sc.round === so.id).last_arrow
                   if (last_arrow !== null) {
                     // we have last arrow
                     row[so.ord] = so_sum - last_arrow + '<sup>' + -last_arrow + '</sup>'
@@ -341,16 +328,14 @@
       },
     },
     methods: {
+      ...mapActions('events', [
+        'getArrows',
+      ]),
       update_r_table() {
         this.loading = true
         this.$store.dispatch('events/updateEvent', this.event.id).then(() => {
           this.loading = false
         })
-      },
-      participant_sc(pId) {
-        this.participant = this.event.participants.find(p => p.id === pId)
-        this.participant['class'] = rankingService.getClass(this.participant, this.event.ignore_gender)
-        this.sc_dialog = true
       },
       sc_edit() {
         return [this.event.creator, ...this.event.admins].includes(this.user.email) && !this.event.archive
@@ -384,10 +369,7 @@
           })
         })
       },
-      results2pdfProxy() {
-        pdfService.results2pdf(this.event, this.r_table)
-      },
-      roundResults2pdfProxy(r) {
+      roundResults_table(r) {
         let round_table = {
           header: [{ text: 'Place', value: 'place', pdf_width: 'auto' }],
           data: [],
@@ -463,9 +445,10 @@
                 let sum = 0
                 if (sc) {
                   row.progress = true
+                  let sc_arrows = this.arrows.filter(a => a.sc === sc.id)
                   for (let e of c.ends) {
-                    spots += rankingService.sum(sc.arrows.filter(a => a.end === e.id).map(a => a.x ? 1 : 0))
-                    row[h.ord + '_' + e.ord] = rankingService.sum(sc.arrows.filter(a => a.end === e.id).map(a => a.score))
+                    spots += rankingService.sum(sc_arrows.filter(a => a.e === e.id).map(a => a.x ? 1 : 0))
+                    row[h.ord + '_' + e.ord] = rankingService.sum(sc_arrows.filter(a => a.e === e.id).map(a => a.p))
                     sum += row[h.ord + '_' + e.ord]
                     row.sum += row[h.ord + '_' + e.ord]
                   }
@@ -479,9 +462,10 @@
               let sum = 0
               if (sc) {
                 row.progress = true
+                let sc_arrows = this.arrows.filter(a => a.sc === sc.id)
                 for (let e of c.ends) {
-                  spots += rankingService.sum(sc.arrows.filter(a => a.end === e.id).map(a => a.x ? 1 : 0))
-                  row[r.ord + '_' + e.ord] = rankingService.sum(sc.arrows.filter(a => a.end === e.id).map(a => a.score))
+                  spots += rankingService.sum(sc_arrows.filter(a => a.e === e.id).map(a => a.x ? 1 : 0))
+                  row[r.ord + '_' + e.ord] = rankingService.sum(sc_arrows.filter(a => a.e === e.id).map(a => a.p))
                   sum += row[r.ord + '_' + e.ord]
                   row.sum += row[r.ord + '_' + e.ord]
                   if (c.halves && e.ord === c.ends.length / 2) {
@@ -494,10 +478,22 @@
             }
             row.spots = spots
             return row
-          })
+          }, this)
           rankingService.participantRank(round_table.data)
         }
         pdfService.roundResults2pdf(this.event, round_table)
+      },
+      results2pdfProxy() {
+        pdfService.results2pdf(this.event, this.r_table)
+      },
+      roundResults2pdfProxy(r) {
+        let afilter = r.id
+        if (Array.isArray(r)) {
+          afilter = r.map(h => h.id)
+        }
+        this.getArrows({'rId': afilter}).then(() => {
+          this.roundResults_table(r)
+        })
       }
     },
   }
