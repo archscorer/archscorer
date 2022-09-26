@@ -89,3 +89,22 @@ def read_clubs():
 # from backend.api import models, serializers
 # event = models.Event.objects.get(pk = 274)
 # cProfile.runctx('serializers.EventSerializer(event).data', None, locals(), sort='cumtime')
+
+# update all latvian archers to have correct club and association
+from backend.api import models
+for a in models.Archer.objects.all():
+    ass = a.club.association.all()
+    if len(ass) == 1 and ass[0].id == 2:
+        for p in a.events.all():
+            archer_rep = a.club.name_short + '|' + ass[0].name_short
+            if archer_rep != p.archer_rep:
+                p.archer_rep = archer_rep
+                p.save()
+                print(p.full_name, p.archer_rep)
+
+
+# create new course
+c = models.Course.objects.create(name='IFAA Expert Field Round (4 Arrows, 28 Ends)',
+                                 description='28 ends / 4 arrows / 5,4,3,2,1', type='r', halves=True)
+for i in range(28):
+    models.End.objects.create(course=c, ord=i+1, nr_of_arrows=4, scoring='[5,4,3,2,1]', x=True)

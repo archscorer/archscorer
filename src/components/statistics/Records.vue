@@ -4,7 +4,10 @@
     </v-card-title>
     <v-card-text>
       <v-row>
-        <v-col>
+        <v-col
+          class="flex-grow-1 flex-shrink-0"
+          cols="4"
+          style="min-width: 180px; max-width: 100%;">
           <v-select
             v-model="group_by"
             dense
@@ -13,6 +16,9 @@
                     { text: 'Class', value: 'class'}]"
             label="organise archers by">
           </v-select>
+        </v-col>
+        <v-col cols="2" v-if="user.perms && user.perms.some(el => el === 'record')">
+          <newRecord :record="record" :vanilla="true"/>
         </v-col>
       </v-row>
       <v-data-table
@@ -131,12 +137,14 @@
 
 <script>
   import tableColumnFilter from '@/components/utils/tableColumnFilter.vue'
+  import newRecord from '@/components/statistics/newRecord.vue'
   import { mapState } from 'vuex'
 
   export default {
     // name: 'Series',
     components: {
       tableColumnFilter,
+      newRecord,
     },
     data: () => ({
       filters: {class: '',
@@ -156,11 +164,23 @@
         'flint': 'IFAA Flint Indoor',
         'indoor': 'IFAA Indoor'
       },
-      group_by: 'format'
+      group_by: 'format',
+      record: {
+        event: '',
+        date: '',
+        format: '',
+        archer: '',
+        age_group: '',
+        gender: '',
+        style: '',
+        score: '',
+        scope: '',
+      }
     }),
     computed: {
       ...mapState({
-        records: state => state.statistics.records
+        records: state => state.statistics.records,
+        user: state => state.user.user,
       }),
       r_table_header() {
         return [
