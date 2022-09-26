@@ -103,7 +103,6 @@
             if (p) {
               this.participant.age_group = p.age_group
               this.participant.style = p.style
-              this.participant.archer_rep = p.archer_rep
             }
           }
         }

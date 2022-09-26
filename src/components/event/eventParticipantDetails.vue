@@ -154,11 +154,22 @@
           }
           // TODO here if edit participant association selection does not work
           // it should be text field in this case, allowing direct edit (maybe by only admin / event organiser)
-        }
-        for (let club of clubs) {
-          for (let association of club.association) {
-            let rep = club.name_short + '|' + association.name_short
-            affiliations.push({ text: association.name_short + ' -- ' + association.name, value: rep })
+          for (let club of clubs) {
+            for (let association of club.association) {
+              let rep = club.name_short + '|' + association.name_short
+              affiliations.push({ text: association.name_short + ' -- ' + association.name, value: rep })
+            }
+          }
+          if (affiliations.length == 1) {
+            // latvian and other clubs with one association
+            this.participant.archer_rep = affiliations[0].value
+          }
+          if (affiliations.length == 2) {
+            // As exeption for the moment, make FAAE the default selection
+            let faae = affiliations.filter(obj => obj.value.includes('FAAE'))
+            if (faae.length == 1){
+              this.participant.archer_rep = faae[0].value
+            }
           }
         }
         return affiliations

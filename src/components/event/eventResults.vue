@@ -40,7 +40,7 @@
               </template>
               <span :class="col.value === 'sum' ? 'font-weight-medium' : ''" v-html="row[col.value]"/>
               <template v-if="'rec'+col.value in row">
-                <newRecord :record="row['rec'+col.value]"/>
+                <newRecord :record="row['rec'+col.value]" :vanilla="false"/>
               </template>
               <template v-if="'pr'+col.value in row && event.archive === false">
                 <v-icon v-if="row['pr'+col.value] === 'checked'" color="green" size="12">mdi-check</v-icon>
