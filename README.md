@@ -34,11 +34,12 @@ If all dependencies are there you should use docker as following:
 docker start Archer
 docker exec -ti Archer fish
 ```
-multiple container entries are need for convenience
+multiple container entries are needed for convenience
 start frontend (in project folder -- with package.json file)
 npm ports are in `vue.config.js` file
 `npm run serve`
 
+start mysql daemon if not already running (see above)
 start backend (in django folder -- with manage.py file)
 `python3 manage.py runserver 0:8008`
 

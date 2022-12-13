@@ -16,8 +16,6 @@ ja kui statistikat teha, siis ntg per võistlus: osalejaid kokku A/V osalejaid /
 
 Scorecard editing capability. Event creator or admin should be able to create scorecards without arrows
  (i.e. only scores and spots are marked on scorecard).
- As well there should be 'checked' flag on ScoreCard that event admin can click while checking scores
- on paper vs virtual. This click would also trigger class_level and record check!
 
 Make archer-club relation many to many. Same archer can have several clubs. It will
 be a bit more confusing when registration happens. When registering to an event archer
@@ -32,7 +30,6 @@ work for one possible duel system generation.
   Might need to think of another totally separate duel system (in separate tab on the
 event page?).
 
-Records update EE -> FAAE
 
 UPDATE api_record SET scope = REPLACE(scope, 'EE', 'FAAE') WHERE scope LIKE '%EE%';
 
