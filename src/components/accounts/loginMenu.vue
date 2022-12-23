@@ -5,57 +5,35 @@
     v-model="user_menu"
     transition="slide-y-transition"
   >
-    <template v-slot:activator="{ on }">
-      <v-btn text
-        v-on="on">
-        <span>{{ user.email }}</span>
-      </v-btn>
+    <template v-slot:activator="{ props }">
+      <v-btn v-bind="props">{{ user.email }}</v-btn>
     </template>
     <v-card
       class="mx-auto text-uppercase"
       tile>
       <v-list dense>
-        <v-subheader>user menu</v-subheader>
-        <v-list-item-group>
-          <v-list-item
-            inactive>
-            <v-list-item-content>
-                <v-list-item-title>Theme Dark</v-list-item-title>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-switch
-                small
-                v-model="$vuetify.theme.dark"
-                hide-details
-                ></v-switch>
-            </v-list-item-action>
-          </v-list-item>
-          <!-- this is a router link -->
-          <v-list-item to="/accounts/profile">
-            <v-list-item-icon>
-              <v-icon>mdi-account</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Profile</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list-item-group>
-        <v-list-item-group>
-          <!-- this is a normal hyperlink -->
-          <v-list-item href="/accounts/logout/">
-            <v-list-item-icon>
-              <v-icon>mdi-logout</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Logout</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list-item-group>
+        <v-list-item type="subheader" title="user menu"></v-list-item>
+        <v-list-item
+          inactive
+          title="Theme Dark">
+          <v-list-item-action>
+            <v-switch
+              small
+              v-model="$vuetify.theme.dark"
+              hide-details
+              ></v-switch>
+          </v-list-item-action>
+        </v-list-item>
+        <v-list-item type="divider"></v-list-item>
+        <!-- this is a router link -->
+        <v-list-item to="/accounts/profile" prepend-icon="mdi-account" title="Profile"></v-list-item>
+        <!-- this is a normal hyperlink -->
+        <v-list-item href="/accounts/logout/" prepend-icon="mdi-logout" title="Logout"></v-list-item>
       </v-list>
     </v-card>
   </v-menu>
   <!-- this is a normal hyperlink -->
-  <v-btn v-else text :href="'/accounts/login/?next=/%23' + $route.path">Login</v-btn>
+  <v-btn v-else :href="'/accounts/login/?next=/%23' + $route.path">Login</v-btn>
 </template>
 
 <script>
@@ -69,7 +47,7 @@
       user: {
         handler() {
           if (this.user.id !== null && this.user.archer.full_name === '') {
-            if (this.$route.name !== 'profile') this.$router.push('/accounts/profile')
+            if (this.$route.name !== 'profile') {this.$router.push('/accounts/profile')}
           }
         }
       }

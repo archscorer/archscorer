@@ -1,95 +1,50 @@
 <template>
   <v-app>
-    <v-app-bar app dark color="primary">
+    <v-toolbar
+      class="px-3"
+      color="primary"
+      flat
+      density="compact"
+    >
       <v-toolbar-title class="headline text-uppercase">
-        <router-link
-          :to="'/'"
-          style="cursor: pointer"
-          custom v-slot="{ navigate }">
-            <span @click="navigate" @keypress.enter="navigate" role="link">
-              arch[scor]er
-            </span>
+        <router-link :to="'/'" custom v-slot="{ navigate }">
+            <span @click="navigate" role="link"> arch[scor]er </span>
         </router-link>
       </v-toolbar-title>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"
-        class="hidden-sm-and-up"></v-app-bar-nav-icon>
-      <v-spacer></v-spacer>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="hidden-sm-and-up"/>
+
+      <v-spacer/>
+
       <v-toolbar-items class="hidden-xs-only">
-        <v-btn text
-          to="/events">
-          Events
-        </v-btn>
-        <v-btn text
-          to="/series">
-          Series
-        </v-btn>
-        <v-menu
-             open-on-hover offset-y
-             close-on-content-click
-             min-width="auto"
-             rounded="0"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn text v-bind="attrs" v-on="on">Statistics</v-btn>
+        <v-btn to="/events"> Events</v-btn>
+        <v-btn to="/series">Series</v-btn>
+        <v-menu open-on-hover offset-y>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props">Statistics</v-btn>
           </template>
             <v-list dark nav dense class="text-uppercase" color="primary">
-              <v-list-item
-                      link to="/statistics/archer/rounds">
-                  Archer Rounds
-              </v-list-item>
-              <v-list-item
-                      link to="/statistics/records">
-                  Records
-              </v-list-item>
+              <v-list-item link to="/statistics/archer/rounds" title="Archer Rounds"></v-list-item>
+              <v-list-item link to="/statistics/records" title="Records"></v-list-item>
             </v-list>
         </v-menu>
-        <v-btn text
-          to="/clubs">
-          Clubs
-        </v-btn>
+        <v-btn to="/clubs">Clubs</v-btn>
       </v-toolbar-items>
-      <v-spacer></v-spacer>
+      <v-spacer/>
       <loginMenu/>
-    </v-app-bar>
-    <v-navigation-drawer app disable-resize-watcher v-model="drawer">
-      <v-list dense>
-        <v-list-item to="/">
-          <v-list-item-icon>
-            <v-icon>mdi-home</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title>Home</v-list-item-title>
-        </v-list-item>
-        <v-list-item to="/events">
-          <v-list-item-icon>
-          </v-list-item-icon>
-          <v-list-item-title>Events</v-list-item-title>
-        </v-list-item>
-        <v-list-item to="/series">
-          <v-list-item-icon>
-          </v-list-item-icon>
-          <v-list-item-title>Series</v-list-item-title>
-        </v-list-item>
-        <v-list-group
-        :value="false"
-        no-action
-        prepend-icon="mdi-matrix"
-        >
-        <template v-slot:activator>
-          <v-list-item-title>Statistics</v-list-item-title>
-        </template>
-        <v-list-item to="/statistics/archer/rounds">
-          <v-list-item-title>Archer Rounds</v-list-item-title>
-        </v-list-item>
-          <v-list-item to="/statistics/records">
-          <v-list-item-title>Records</v-list-item-title>
-        </v-list-item>
+    </v-toolbar>
+    <v-navigation-drawer v-model="drawer">
+      <v-list>
+        <v-list-item to="/" prepend-icon="mdi-home" title="Home"></v-list-item>
+        <v-list-item to="/events" prepend-icon="mdi-bullseye-arrow" title="Events"></v-list-item>
+        <v-list-item to="/series" prepend-icon="mdi-trophy" title="Series"></v-list-item>
+        <v-list-group value="Statistics">
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" prepend-icon="mdi-matrix" title="Statistics"></v-list-item>
+          </template>
+          <v-list-item to="/statistics/archer/rounds" title="Archer Rounds"></v-list-item>
+          <v-list-item to="/statistics/records" title="Records"></v-list-item>
         </v-list-group>
-        <v-list-item to="/clubs">
-          <v-list-item-icon>
-            <v-icon>mdi-account-group</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title>Clubs</v-list-item-title>
-        </v-list-item>
+        <v-list-item to="/clubs" prepend-icon="mdi-account-group" title="Clubs"></v-list-item>
       </v-list>
     </v-navigation-drawer>
 

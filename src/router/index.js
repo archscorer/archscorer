@@ -1,28 +1,20 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Home from '@/views/Home.vue'
-
-Vue.use(VueRouter)
+import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home
+    component: () => import('@/views/Home.vue')
   },
   {
     path: '/events',
     name: 'events',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '@/views/Events.vue')
+    component: () => import('@/views/Events.vue')
   },
   {
     path: '/event/:id',
     name: 'event',
-    component: () => import('@/views/event/Event.vue'),
-    // props: (route) => ({ action: route.query.a })
+    component: () => import('@/views/event/Event.vue')
   },
   {
     path: '/series',
@@ -59,14 +51,15 @@ const routes = [
     name: 'profile',
     component: () => import('@/views/user/ArcherProfile.vue')
   },
-  {
-    path: '*',
-    component: Home
-  }
+  // {
+  //   path: '*',
+  //   component: () => import('@/views/Home.vue')
+  // }
 ]
 
-const router = new VueRouter({
-  routes
+const router = createRouter({
+  history: createWebHistory(),
+  routes: routes
 })
 
 export default router

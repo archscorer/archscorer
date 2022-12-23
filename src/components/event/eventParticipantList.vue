@@ -215,7 +215,7 @@
 </template>
 
 <script>
-  import { json2excel } from 'js2excel'
+  // import { json2excel } from 'js2excel'
 
   import { mapState, mapActions } from 'vuex'
 
@@ -407,7 +407,7 @@
             Comments: p.comments,
           }
         })
-        json2excel({data: data, name: 'participants'})
+        // json2excel({data: data, name: 'participants'})
       },
       endAssignments2pdfProxy() {
         pdfService.endAssignments2pdf(this.event, this.p_table, this.$route.path)

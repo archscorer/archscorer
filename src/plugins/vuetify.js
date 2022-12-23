@@ -1,19 +1,26 @@
-import Vue from 'vue';
-import Vuetify from 'vuetify/lib';
+/**
+ * plugins/vuetify.js
+ *
+ * Framework documentation: https://vuetifyjs.com`
+ */
 
-Vue.use(Vuetify);
+// Styles
+import '@mdi/font/css/materialdesignicons.css'
+import 'vuetify/styles'
 
-export default new Vuetify({
+// Composables
+import { createVuetify } from 'vuetify'
+
+// https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
+export default createVuetify({
   theme: {
-    dark: false,
-    options: {
-      themeCache: {
-        get: key => localStorage.getItem(key),
-        set: (key, value) => localStorage.setItem(key, value),
+    themes: {
+      light: {
+        colors: {
+          primary: '#1867C0',
+          secondary: '#5CBBF6',
+        },
       },
-     },
+    },
   },
-  icons: {
-    iconfont: 'mdi',
-  },
-});
+})

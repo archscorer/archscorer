@@ -43,38 +43,49 @@ start mysql daemon if not already running (see above)
 start backend (in django folder -- with manage.py file)
 `python3 manage.py runserver 0:8008`
 
-## Legacy howto npm and vue commands
+## Legacy howto npm, yarn and vue commands
 
-### Web UI for project management
-Vue has web based UI that among other things lets you serve, build and lint your project.
+# default
+
+## Project setup
+
 ```
-cd ..
-vue ui -H 0.0.0.0 -p 8000
-```
+# yarn
+yarn
 
-However web based UI is heavier on computer than not web based UI
-
-### List of commands that are otherwise useful
-
-#### Project setup
-```
+# npm
 npm install
+
+# pnpm
+pnpm install
 ```
 
-#### Compiles and hot-reloads for development
+### Compiles and hot-reloads for development
+
 ```
-npm run serve
+# yarn
+yarn dev
+
+# npm
+npm run dev
+
+# pnpm
+pnpm dev
 ```
 
-#### Compiles and minifies for production
+### Compiles and minifies for production
+
 ```
+# yarn
+yarn build
+
+# npm
 npm run build
+
+# pnpm
+pnpm build
 ```
 
-#### Lints and fixes files
-```
-npm run lint
-```
+### Customize configuration
 
-#### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+See [Configuration Reference](https://vitejs.dev/config/).
