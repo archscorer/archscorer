@@ -85,7 +85,7 @@
             </v-select>
             <p v-if="[event.creator, ...event.admins].includes(user.email)">
               Export target assignments to <v-btn x-small color="primary" @click="endAssignments2pdfProxy()">PDF</v-btn><br/>
-              Export all participant data to <v-btn x-small color="green" dark @click="export2excel()">EXCEL</v-btn>
+              Export all participant data to <v-btn x-small color="green" dark @click="export2csv()">CSV</v-btn>
               <a v-if="event.creator === user.email" @click="hide_extra_columns = !hide_extra_columns" class="float-right">{{
                 hide_extra_columns ? "show all" : "hide extra"
               }} columns</a>
@@ -103,6 +103,10 @@
           :items-per-page="4 * 28"
           multi-sort
         >
+          <template v-slot:item.classification="props">
+            <span v-if="props.item.classification === 'a'" class="text--disabled font-weight-thin">A</span>
+            <span v-else v-html="props.item.classification"></span>
+          </template>
           <template v-slot:header.session="{ header }">
             {{ header.text }}
             <tableColumnFilter v-bind:filter.sync="filters.session"/>
@@ -215,8 +219,8 @@
 </template>
 
 <script>
-  import { json2excel } from 'js2excel'
-
+  import Papa from 'papaparse';
+  import { saveAs } from 'file-saver';
   import { mapState, mapActions } from 'vuex'
 
   import eventEdit from '@/components/event/eventEdit.vue'
@@ -388,7 +392,7 @@
         ' (and their scorecards will be lost)') &&
         this.delParticipant({pId: p.id, eId: p.event})
       },
-      export2excel() {
+      export2csv() {
         let so = this.event.rounds.find(obj => obj.course_details.type === 's')
         so = so ? so.id : null
         let data = this.event.participants.map(p => {
@@ -407,7 +411,7 @@
             Comments: p.comments,
           }
         })
-        json2excel({data: data, name: 'participants'})
+        saveAs(new Blob([Papa.unparse(data)], {type: 'text/csv;charset=utf-8'}), 'participants.csv')
       },
       endAssignments2pdfProxy() {
         pdfService.endAssignments2pdf(this.event, this.p_table, this.$route.path)

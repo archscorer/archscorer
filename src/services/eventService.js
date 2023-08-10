@@ -62,6 +62,10 @@ export default {
     return api.post(`events/participants/arrows/filter/`, payload)
               .then(response => response.data)
   },
+  fetchParticipants(payload) {
+    return api.post(`events/participants/filter/`, payload)
+              .then(response => response.data)
+  },
   putArrow(aId, payload) {
     return api.put(`events/participants/arrows/${aId}/`, payload)
               .then(response => response.data)

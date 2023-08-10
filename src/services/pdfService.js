@@ -1,7 +1,7 @@
 import pdfMake from 'pdfmake/build/pdfmake'
-import pdfFonts from 'pdfmake/build/vfs_fonts'
+import 'pdfmake/build/vfs_fonts'
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs
+// pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 // page numbers
 
@@ -51,8 +51,12 @@ export default {
         }
       }, styles)
     }
-    for (let session of Array.from(new Set(p_table.data.map(p => p.session)))) {
-      docDefinition.content.push({text: session, style: 'styleheader'})
+    Array.from(new Set(p_table.data.map(p => p.session))).map((session, i) => {
+      if (i == 0) {
+        docDefinition.content.push({ text: session, style: 'header' })
+      } else {
+        docDefinition.content.push({ text: session, style: 'header', pageBreak: 'before' })
+      }
       let targetGrp = p_table.data.filter(p => p.session === session)
       docDefinition.content.push({
         table: {
@@ -75,7 +79,7 @@ export default {
           })
         }
       })
-    }
+    })
     pdfMake.createPdf(docDefinition).open()
   },
   results2pdf(event, r_table) {

@@ -4,3 +4,4 @@ whitenoise
 django-allauth
 django-widget-tweaks
 mysqlclient
+pylint-django

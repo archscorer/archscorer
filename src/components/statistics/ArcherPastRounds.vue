@@ -6,14 +6,38 @@
       <archerSearch v-model="archer" />
     </v-card-title>
     <v-card-text>
+      <v-row dense v-if="classifications.length">
+        <v-col>
+          Archer has the following classification levels:
+          <v-data-table
+            dense
+            :mobile-breakpoint="300"
+            :headers="c_table_header"
+            :items="c_table"
+            multi-sort
+          >
+          <template v-slot:item.level="props">
+            <span class="font-weight-medium">{{ props.item.level }}</span>
+          </template>
+          </v-data-table>
+        </v-col>
+      </v-row>
       <v-row dense>
         <v-col>
-          <p>
             <v-switch
               v-model="filter_official"
+              dense
               color="primary"
-              label="show only official rounds"/>
-          </p>
+              label="show only official rounds"
+              class="switch-label-size"/>
+        </v-col>
+        <v-col>
+              <v-switch
+              v-model="filter_best"
+              dense
+              color="primary"
+              label="show only my best rounds"
+              class="switch-label-size"/>
         </v-col>
       </v-row>
       <v-data-table
@@ -36,7 +60,6 @@
   import { mapState } from 'vuex'
 
   import archerSearch from '@/components/archer/archerSearch.vue'
-
   import rankingService from '@/services/rankingService'
 
   export default {
@@ -47,17 +70,14 @@
       archer: null,
       target_name: '',
       filter_official: null,
+      filter_best: null,
     }),
     watch: {
       archer: function(current_archer) {
         if (current_archer && current_archer.events) {
           this.target_name = this.archer.full_name
-          this.$store.dispatch('events/clearParticipants')
-          for (let pId of current_archer.events) {
-            if (!this.participants.find(obj => obj.id === pId)) {
-              this.$store.dispatch('events/getParticipant', pId)
-            }
-          }
+          this.$store.dispatch('events/getParticipants', {aId: current_archer.id})
+          this.$store.dispatch('user/getArcherClassification', {aId: current_archer.id, date: new Date().toISOString().slice(0, 10)})
         }
       }
     },
@@ -66,21 +86,16 @@
         user: state => state.user.user,
         participants: state => state.events.participants,
         events: state => state.events.events,
-        courses: state => state.courses.courses
+        courses: state => state.courses.courses,
+        classifications: state => state.user.classifications,
       }),
       p_table_header() {
         return [
           { text: 'Event', value: 'event' },
           { text: 'Date', value: 'date', width: '120px'},
           { text: 'Class', value: 'class'},
-          { text: 'Course', value: 'course'},
-          { text: 'Score', value: 'score'},
-          { text: 'Official', value: 'official', align: ' d-none',
-            filter: value => {
-              if (!this.filter_official) return true
-              return value
-            },
-          }
+          { text: 'Format', value: 'format'},
+          { text: 'Score', value: 'score'}
         ]
       },
       p_table() {
@@ -111,18 +126,34 @@
                 if (!score) {
                   continue
                 }
+                if (this.filter_official && !e.records) {
+                  continue
+                }
                 p_table.push({
                   'eId': e.id,
                   'event': e.name,
                   'date': e.date_start,
                   'class': rankingService.getClass(p, e.ignore_gender),
-                  'course': c_name.replace(/ (Round|Unit)( (Unm|M)arked Distances)? \(.*?\)/, '$2'),
-                  'score': score,
-                  'official': e.records ? true : false
+                  'format': c_name.replace(/ (Round|Unit)( (Unm|M)arked Distances)? \(.*?\)/, '$2'),
+                  'score': score
                 })
               }
             }
           }
+        }
+        if (this.filter_best) {
+          // show only the top score for each class / format combination
+          p_table = p_table.reduce((acc, cur) => {
+            let ci = acc.findIndex(obj => obj.class === cur.class && obj.format === cur.format)
+            if (ci === -1) {
+              acc.push(cur)
+            } else {
+              if (acc[ci].score < cur.score) {
+                acc[ci] = cur
+              }
+            }
+            return acc
+          }, [])
         }
         return p_table.sort(function (a, b) {
           if (a.date < b.date) {
@@ -134,6 +165,38 @@
           return 0
         })
       },
+      c_table_header() {
+        return [
+          { text: 'Age Group', value: 'age_group'},
+          { text: 'Style', value: 'style'},
+          { text: 'Level', value: 'level'},
+          { text: 'Date', value: 'date'},
+          { text: 'Valid for', value: 'valid_for'},
+        ]
+      },
+      c_table() {
+        let c_table = []
+        if (this.classifications.length) {
+          for (let c of this.classifications) {
+            c_table.push({
+              'date': c.date,
+              'age_group': c.age_group,
+              'style': c.style,
+              'level': c.level,
+              'valid_for': Math.round(365 - (new Date() - new Date(c.date)) / (1000 * 60 * 60 * 24)) + ' days'
+            })
+          }
+        }
+        return c_table.sort(function (a, b) {
+          if (a.date < b.date) {
+            return 1
+          }
+          if (a.date > b.date) {
+            return -1
+          }
+          return 0
+        })
+      }
     },
     created() {
       this.archer = this.user.archer
@@ -141,3 +204,9 @@
     }
   }
 </script>
+
+<style scoped>
+  .switch-label-size >>> .v-label {
+    font-size: 14px;
+  }
+</style>

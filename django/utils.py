@@ -1,5 +1,5 @@
-from backend.api import models
 from collections import namedtuple
+from backend.api import models
 
 def import_archers(club=None, file=None):
 

@@ -12,7 +12,7 @@ docker run -ti --name Archer -v ${PWD}:/opt/Archery:rw -p 8000-8100:8000-8100 de
 ```
 apt-get update
 apt-get upgrade
-apt-get install -y git-core curl build-essential openssl libssl-dev libffi-dev fish procps python3-pip mariadb-server-10.3 libmariadb-dev
+apt-get install -y git-core curl build-essential openssl libssl-dev libffi-dev fish procps python3-pip mariadb-server-10.3 libmariadb-dev pkg-config
 curl -sL https://deb.nodesource.com/setup_16.x | bash -
 apt-get install -y nodejs
 npm install -g @vue/cli
@@ -28,6 +28,16 @@ mysql_secure_installation
 Also need to create user and database in the database first. Then if available
 import some populated database if present.
 
+```
+mysql
+CREATE DATABASE my_new_database;
+CREATE USER 'your_db_user'@'localhost' IDENTIFIED BY '**sequre password**';
+GRANT ALL PRIVILEGES ON my_new_database.* TO 'my_new_user'@'localhost';
+FLUSH PRIVILEGES;
+quit
+mysql -u your_db_user -p your-database_name < file.sql
+```
+
 If all dependencies are there you should use docker as following:
 * to start and enter container
 ```
@@ -36,45 +46,11 @@ docker exec -ti Archer fish
 ```
 multiple container entries are needed for convenience
 start frontend (in project folder -- with package.json file)
-npm ports are in `vue.config.js` file
-`npm run serve`
+npm ports are in `vite.config.js` file
+`npm run dev` -- to start development server
+`npm run build` -- to build production version
+`npm run serve` -- to preview production??
 
 start mysql daemon if not already running (see above)
 start backend (in django folder -- with manage.py file)
 `python3 manage.py runserver 0:8008`
-
-## Legacy howto npm and vue commands
-
-### Web UI for project management
-Vue has web based UI that among other things lets you serve, build and lint your project.
-```
-cd ..
-vue ui -H 0.0.0.0 -p 8000
-```
-
-However web based UI is heavier on computer than not web based UI
-
-### List of commands that are otherwise useful
-
-#### Project setup
-```
-npm install
-```
-
-#### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-#### Compiles and minifies for production
-```
-npm run build
-```
-
-#### Lints and fixes files
-```
-npm run lint
-```
-
-#### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
