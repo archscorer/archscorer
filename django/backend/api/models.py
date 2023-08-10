@@ -72,7 +72,8 @@ STYLE_CHOICES = [
 LEVEL_CHOICES = [('A', 'A'),
                  ('B', 'B'),
                  ('C', 'C'),
-                 ('*', '*')]
+                 ('a', 'a'),
+                 (' ', ' ')]
 
 # NOTE also update src/statistics/Records.vue if changing these
 RECORD_CHOICES = [
@@ -133,21 +134,6 @@ class Archer(models.Model):
 
     class Meta:
         ordering = ['full_name']
-
-class LevelClass(models.Model):
-    # this is intended for level classes for archers (A, B, C, *)
-    archer = models.ForeignKey(Archer, related_name='level_classes', on_delete=models.CASCADE)
-    level = models.CharField('Level', max_length=1, blank=False, choices=LEVEL_CHOICES)
-    age_group = models.CharField('age group', max_length=3, blank=False, choices=AGEGROUP_CHOICES)
-    style = models.CharField('Shooting style', max_length=5, blank=False, choices=STYLE_CHOICES)
-    date = models.DateField('Date of achievement', blank=True, null=True)
-
-    updated_at = models.DateTimeField(auto_now=True)
-    updated_by = models.EmailField(blank=True, null=True)
-
-    class Meta:
-        ordering = ['style', 'age_group']
-        unique_together = ['style', 'age_group', 'archer']
 
 class Course(models.Model):
     creator = models.ForeignKey(User, related_name='courses_created', null=True, on_delete=models.SET_NULL)

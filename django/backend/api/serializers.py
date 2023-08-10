@@ -2,7 +2,6 @@ from .models import (User,
                      Association,
                      Club,
                      Archer,
-                     LevelClass,
                      Course,
                      End,
                      Series,
@@ -62,11 +61,12 @@ class ArrowFilterSerializer(serializers.Serializer):
     p = serializers.IntegerField(source="score", read_only=True)
     x = serializers.BooleanField(read_only=True)
 
-class LevelClassSerializer(serializers.ModelSerializer):
-    # this will serialize archer classification classes to be part of archer serializer
-    class Meta:
-        model = LevelClass
-        fields = '__all__'
+class LevelClassSerializer(serializers.Serializer):
+    # possibly should include archer name here, but maybe not necessary
+    age_group = serializers.CharField(read_only=True)
+    style = serializers.CharField(read_only=True)
+    level = serializers.CharField(read_only=True)
+    date = serializers.DateField(read_only=True) # last date the level class was updated
 
 class ParticipantScoreCardSerializer(serializers.ModelSerializer):
     last_arrow = serializers.SerializerMethodField()

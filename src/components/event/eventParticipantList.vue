@@ -103,6 +103,10 @@
           :items-per-page="4 * 28"
           multi-sort
         >
+          <template v-slot:item.classification="props">
+            <span v-if="props.item.classification === 'a'" class="text--disabled font-weight-thin">A</span>
+            <span v-else v-html="props.item.classification"></span>
+          </template>
           <template v-slot:header.session="{ header }">
             {{ header.text }}
             <tableColumnFilter v-bind:filter.sync="filters.session"/>

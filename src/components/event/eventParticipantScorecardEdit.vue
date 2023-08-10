@@ -49,11 +49,12 @@
         </v-sheet>
         <v-sheet class="sc-entering">
           <v-row v-if="currentFocus" dense justify="center">
-            <template v-for="score in sc_eval(currentFocus.end.scoring, currentFocus.end.x)">
-              <v-btn :key="'score' + currentFocus.end.id + '_' + score.text"
+            <v-col class="text-center">
+              <v-btn v-for="score in sc_eval(currentFocus.end.scoring, currentFocus.end.x)"
+              :key="'score' + currentFocus.end.id + '_' + score.text"
               class="sc-btn"
               @click.prevent="enter_score(score)">{{ score.text }}</v-btn>
-            </template>
+            </v-col>
           </v-row>
         </v-sheet>
       </v-card-text>

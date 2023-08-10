@@ -9,6 +9,7 @@ const state = {
     }
   },
   qresponse: [],
+  classifications: []
 }
 
 const getters = {
@@ -17,6 +18,9 @@ const getters = {
   },
   qresponse: state => {
     return state.qresponse
+  },
+  classifications: state => {
+    return state.classifications
   }
 }
 
@@ -41,6 +45,12 @@ const actions = {
   },
   clearSearch({ commit }, message) {
     commit('setQresponse', message)
+  },
+  getArcherClassification({ commit }, payload) {
+    userService.getArcherClassification(payload)
+    .then(response => {
+      commit('setArcherCassification', response)
+    })
   }
 }
 
@@ -53,6 +63,9 @@ const mutations = {
   },
   setQresponse(state, response) {
     state.qresponse = response
+  },
+  setArcherCassification(state, response) {
+    state.classifications = response
   }
 }
 

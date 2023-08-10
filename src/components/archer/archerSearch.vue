@@ -11,7 +11,6 @@
     return-object
     hide-no-data
     no-filter
-    clearable
   >
   </v-autocomplete>
 </template>

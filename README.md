@@ -12,7 +12,7 @@ docker run -ti --name Archer -v ${PWD}:/opt/Archery:rw -p 8000-8100:8000-8100 de
 ```
 apt-get update
 apt-get upgrade
-apt-get install -y git-core curl build-essential openssl libssl-dev libffi-dev fish procps python3-pip mariadb-server-10.3 libmariadb-dev
+apt-get install -y git-core curl build-essential openssl libssl-dev libffi-dev fish procps python3-pip mariadb-server-10.3 libmariadb-dev pkg-config
 curl -sL https://deb.nodesource.com/setup_16.x | bash -
 apt-get install -y nodejs
 npm install -g @vue/cli
@@ -27,6 +27,16 @@ mysql_secure_installation
 
 Also need to create user and database in the database first. Then if available
 import some populated database if present.
+
+```
+mysql
+CREATE DATABASE my_new_database;
+CREATE USER 'your_db_user'@'localhost' IDENTIFIED BY '**sequre password**';
+GRANT ALL PRIVILEGES ON my_new_database.* TO 'my_new_user'@'localhost';
+FLUSH PRIVILEGES;
+quit
+mysql -u your_db_user -p your-database_name < file.sql
+```
 
 If all dependencies are there you should use docker as following:
 * to start and enter container

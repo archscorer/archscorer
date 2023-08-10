@@ -17,5 +17,9 @@ export default {
   searchArcher(payload) {
     return api.post(`archer/search/`, payload)
               .then(response => response.data)
+  },
+  getArcherClassification(payload) {
+    return api.post(`archer/archer_classification/`, payload)
+              .then(response => response.data)
   }
 }

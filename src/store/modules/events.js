@@ -115,6 +115,12 @@ const actions = {
       commit('updateParticipant', participant)
     })
   },
+  getParticipants({ commit }, payload) {
+    eventService.fetchParticipants(payload)
+    .then(participants => {
+      commit('setParticipants', participants)
+    })
+  },
   clearParticipants({ commit }) {
     commit('clearParticipants')
   },
@@ -235,6 +241,9 @@ const mutations = {
         state.events[ei].rounds.splice(ri, 1)
       }
     }
+  },
+  setParticipants(state, participants) {
+    state.participants = participants
   },
   updateParticipant(state, participant) {
     const index = state.participants.findIndex(obj => obj.id === participant.id);

@@ -38,7 +38,8 @@
                                             :rounds="event.rounds"
                                             :edit="sc_edit()"/>
               </template>
-              <span :class="col.value === 'sum' ? 'font-weight-medium' : ''" v-html="row[col.value]"/>
+              <span v-if="col.value === 'classification' && row[col.value] === 'a'" class="text--disabled font-weight-thin">A</span>
+              <span v-else :class="col.value === 'sum' ? 'font-weight-medium' : ''" v-html="row[col.value]"></span>
               <template v-if="'rec'+col.value in row">
                 <newRecord :record="row['rec'+col.value]" :vanilla="false"/>
               </template>

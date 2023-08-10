@@ -8,12 +8,26 @@ from django.middleware.csrf import get_token
 from django.db.models import Q
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
+from datetime import datetime
+from .utilities import get_archer_class
 from .models import (User, Club, Course, Archer, Series, Event, Round, Participant, ScoreCard, Arrow, Record)
-from .serializers import (UserSerializer, ClubSerializer, ClubsSerializerList, CourseSerializer,
-                          ArcherSerializer, ArcherSearchSerializer, SeriesSerializer, EventSerializer,
-                          EventSerializerList, RoundSerializer, ParticipantSerializer,
-                          ScoreCardSerializer, ArrowSerializer, ArrowFilterSerializer, SeriesSerializerList,
-                          RecordSerializer)
+from .serializers import (ArcherSearchSerializer,
+                          ArcherSerializer,
+                          ArrowSerializer,
+                          ArrowFilterSerializer,
+                          ClubSerializer,
+                          ClubsSerializerList,
+                          CourseSerializer,
+                          EventSerializer,
+                          EventSerializerList,
+                          LevelClassSerializer,
+                          ParticipantSerializer,
+                          RecordSerializer,
+                          RoundSerializer,
+                          ScoreCardSerializer,
+                          SeriesSerializer,
+                          SeriesSerializerList,
+                          UserSerializer)
 
 class ActiveEvent(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -204,6 +218,16 @@ class ArcherViewSet(mixins.UpdateModelMixin,
                             status=status.HTTP_200_OK)
         return Response(ArcherSearchSerializer(archers, many=True).data)
 
+    @action(detail=False, methods=['POST'], permission_classes=[permissions.AllowAny])
+    def archer_classification(self, request):
+        """
+        Search archer profiles by name
+        """
+        archer = Archer.objects.get(pk=request.data['aId'])
+        date = datetime.strptime(request.data['date'], '%Y-%m-%d').date()
+        level_class = get_archer_class(archer, date)
+        return Response(LevelClassSerializer(level_class, many=True).data)
+
 class ParticipantViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows participants to be added or viewed.
@@ -211,6 +235,18 @@ class ParticipantViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated&ActiveEvent]
     serializer_class = ParticipantSerializer
     queryset = Participant.objects.all()
+
+    @action(detail=False, methods=['POST'])
+    def filter(self, request):
+        """
+        Filter participants by event and / or archer
+        """
+        queryset = Participant.objects.none()
+        if 'eId' in request.data:
+            queryset = Participant.objects.filter(event__pk=request.data['eId'])
+        if 'aId' in request.data:
+            queryset = Participant.objects.filter(archer__pk=request.data['aId'])
+        return Response(ParticipantSerializer(queryset, many=True).data)
 
     @action(detail=False, methods=['POST'])
     def scorecard_check(self, request):

@@ -1,16 +1,12 @@
 <template>
   <v-container>
-    <v-layout class="d-flex justify-space-around"
-      wrap
-    >
-      <v-card>
-        <v-card-text>
-          <p>Work in progress. Ideas what kind of statistics or graphs to collect
-            or show would be most wolcome.</p>
-        </v-card-text>
-      </v-card>
-      <ArcherPastRounds v-if="user.id !== null"/>
-    </v-layout>
+    <v-card>
+      <v-card-text>
+        <p>Work in progress. Ideas what kind of statistics or graphs to collect
+          or show would be most wolcome.</p>
+      </v-card-text>
+    </v-card>
+    <ArcherPastRounds v-if="user.id !== null"/>
   </v-container>
 </template>
 

@@ -1,10 +1,6 @@
 <template>
   <v-container>
-    <v-layout class="d-flex justify-space-around"
-      wrap
-    >
-      <Records/>
-    </v-layout>
+    <Records/>
   </v-container>
 </template>
 

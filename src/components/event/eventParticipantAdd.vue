@@ -15,7 +15,7 @@
               <archerSearch v-model="archer" />
             </v-row>
             <template v-if="archer ? false : true">
-              <!-- this should be somehow clear that by using this form form a
+              <!-- this should be somehow clear that by using this form a
                    *new* archer profile is created -->
               <v-alert
                 type="info">
@@ -25,7 +25,9 @@
               <archerDetails v-model="participant.archer" :clubs="clubs" v-if="new_archer" />
             </template>
           </v-container>
-          <eventParticipantDetails :participant="participant"
+          <eventParticipantDetails 
+            :action="action"
+            :participant="participant"
             :catering="event.catering"
             :level_class="event.use_level_class"
             :catering_choices="event.catering_choices.split('|')"
@@ -79,6 +81,9 @@
             this.$store.dispatch('events/getParticipant', pId)
           }
           this.participant.archer = obj
+          if (this.event.use_level_class) {
+            this.$store.dispatch('user/getArcherClassification', {aId: obj.id, date: this.event.date_start})
+          }
         } else {
           this.participant.age_group = ''
           this.participant.style = ''
@@ -106,17 +111,52 @@
             }
           }
         }
-      }
+      },
+      watch_classification: {
+        handler() {
+          const styles = ['FS-R','FS-C','FU','BB-R','BB-C','BL','BU','BH-C','BH-R','LB','TR']
+          const age_groups = ['S', 'V', 'C']
+          if (this.participant.style && this.participant.age_group) {
+            let style = this.participant.style
+            let age_group = this.participant.age_group
+            let c = this.classifications.find(c => c.style === style && c.age_group === age_group)
+            if (c) {
+              this.participant.level_class = c.level
+            } else {
+              if (styles.includes(this.participant.style) && !age_groups.includes(this.participant.age_group)) {
+                this.participant.level_class = 'a'
+              } else {
+                this.participant.level_class = ' '
+              }
+            }
+          }
+        }
+      } 
     },
     computed: {
       ...mapState({
         user: state => state.user.user,
         clubs: state => state.clubs.clubs,
         participants: state => state.events.participants,
+        classifications: state => state.user.classifications
       }),
       event() {
         return this.$store.getters['events/eventById'](parseInt(this.$route.params.id))
       },
+      watch_classification() {
+        if (this.event && 
+            this.event.use_level_class &&
+            this.participant.archer && 
+            this.participant.archer.events && 
+            this.classifications.length) {
+            let events = this.participant.archer.events
+            let classes = this.classifications.map(c => {
+              return c.style + '_' + c.age_group + ':' + c.level
+            }).join(',')
+          return events[events.length - 1] + '|' + this.participant.style + '|' + this.participant.age_group + '|' + classes
+        }
+        return {}
+      }
     },
     methods: {
       ...mapActions('events', [
