@@ -46,45 +46,11 @@ docker exec -ti Archer fish
 ```
 multiple container entries are needed for convenience
 start frontend (in project folder -- with package.json file)
-npm ports are in `vue.config.js` file
-`npm run serve`
+npm ports are in `vite.config.js` file
+`npm run dev` -- to start development server
+`npm run build` -- to build production version
+`npm run serve` -- to preview production??
 
 start mysql daemon if not already running (see above)
 start backend (in django folder -- with manage.py file)
 `python3 manage.py runserver 0:8008`
-
-## Legacy howto npm and vue commands
-
-### Web UI for project management
-Vue has web based UI that among other things lets you serve, build and lint your project.
-```
-cd ..
-vue ui -H 0.0.0.0 -p 8000
-```
-
-However web based UI is heavier on computer than not web based UI
-
-### List of commands that are otherwise useful
-
-#### Project setup
-```
-npm install
-```
-
-#### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-#### Compiles and minifies for production
-```
-npm run build
-```
-
-#### Lints and fixes files
-```
-npm run lint
-```
-
-#### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
