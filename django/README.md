@@ -48,8 +48,8 @@ cd public/
 rm index.html
 cp ../frontend/index.html .
 cd static/
-rm -r js/ css/
-cp -r ../../frontend/static/js ../../frontend/static/css .
+rm  *.js *.css *.png
+cp ../../frontend/static/* .
 cd ../..
 touch tmp/restart.txt
 ```

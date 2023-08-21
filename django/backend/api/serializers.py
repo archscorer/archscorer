@@ -67,6 +67,7 @@ class LevelClassSerializer(serializers.Serializer):
     style = serializers.CharField(read_only=True)
     level = serializers.CharField(read_only=True)
     date = serializers.DateField(read_only=True) # last date the level class was updated
+    valid_for = serializers.IntegerField(read_only=True) # number of days the level class is still valid for
 
 class ParticipantScoreCardSerializer(serializers.ModelSerializer):
     last_arrow = serializers.SerializerMethodField()

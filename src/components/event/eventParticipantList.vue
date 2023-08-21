@@ -411,7 +411,7 @@
             Comments: p.comments,
           }
         })
-        saveAs(new Blob([Papa.unparse(data)], {type: 'text/csv;charset=utf-8'}), 'participants.csv')
+        saveAs(new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), Papa.unparse(data, {delimiter: ';'})], {type: 'text/csv;charset=utf-8'}), 'participants.csv')
       },
       endAssignments2pdfProxy() {
         pdfService.endAssignments2pdf(this.event, this.p_table, this.$route.path)

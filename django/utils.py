@@ -104,7 +104,126 @@ for a in models.Archer.objects.all():
 
 
 # create new course
-c = models.Course.objects.create(name='IFAA Expert Field Round (4 Arrows, 28 Ends)',
-                                 description='28 ends / 4 arrows / 5,4,3,2,1', type='r', halves=True)
-for i in range(28):
-    models.End.objects.create(course=c, ord=i+1, nr_of_arrows=4, scoring='[5,4,3,2,1]', x=True)
+c = models.Course.objects.create(name='101 3D challenge (1 Arrows)',
+                                 description='34 ends / 3 arrows / 20,16,10', type='r', halves=False)
+for i in range(34):
+    models.End.objects.create(course=c, ord=i+1, nr_of_arrows=3, scoring='[20,16,10]', x=False)
+
+
+# handled lithuanian archers club assignments (also cleared some duplicate profiles)
+from backend.api import models
+from collections import namedtuple
+from django.db.models import Q
+notHandled = []
+with open('lit_archers.tsv') as fh:
+    header = fh.readline().rstrip().split('\t')
+    A = namedtuple('Archer', header, defaults=[None, None])
+    for line in fh.readlines():
+        a = A(*line.rstrip().split('\t'))
+        try:
+            archer = models.Archer.objects.get(full_name=a.full_name, email=a.email)
+            club = models.Club.objects.get(name_short=a.club_short)
+            archer.club = club
+            for p in archer.events.all():
+                if p.archer_rep == '|':
+                    p.archer_rep = club.name_short + '|' + club.association.first().name_short
+                p.save()
+                print(a.full_name, p.full_name, p.archer_rep)
+            archer.save()
+        except:
+            notHandled.append(a)
+
+stillNotHandled = []
+notDeleted = []
+for a in notHandled:
+    archers = models.Archer.objects.filter(Q(full_name=a.full_name))
+    if not archers:
+        stillNotHandled.append(a)
+        continue
+    user = []
+    events = []
+    for archer in archers.order_by('-id'):
+        if archer.user:
+            user.append(archer.user)
+        events.extend(archer.events.all())
+    if len(user) > 1:
+        stillNotHandled.append(a)
+        continue
+    archer = archers.last()
+    club = models.Club.objects.get(name_short=a.club_short)
+    archer.club = club
+    archer.full_name = a.full_name
+    archer.email = a.email
+    archer.phone = a.phone
+    for p in events:
+        p.archer = archer
+        if p.archer_rep == '|':
+            p.archer_rep = club.name_short + '|' + club.association.first().name_short
+        p.save()
+        print(archer.full_name, p.full_name, p.archer_rep)
+    for obj in archers.exclude(pk=archer.id):
+        obj.delete()
+    if user:
+        archer.user = user[0]
+    archer.save()
+
+for a in stillNotHandled:
+    print(a)
+
+# removes duplicate archer profiles (same name, email and club)
+# this should be safe to run also on live database (backup first, for sure!)
+from backend.api import models
+from django.db.models import Count
+duplicates = models.Archer.objects.values('full_name', 'email', 'club').annotate(dup_count=Count('id')).filter(dup_count__gt=1)
+
+for d in duplicates.order_by('-dup_count'):
+    print(d)
+
+for d in duplicates:
+    archers = models.Archer.objects.filter(full_name=d['full_name'], email=d['email'], club=d['club'])
+    user = []
+    events = []
+    for archer in archers.order_by('-id'):
+        if archer.user:
+            user.append(archer.user)
+        events.extend(archer.events.all())
+    if len(user) > 1:
+        print(d)
+        continue
+    archer = archers.last()
+    for p in events:
+        try:
+            if p.archer != archer:
+                p.archer = archer
+                p.save()
+                print(archer.full_name, p.full_name)
+        except:
+            print(archer.full_name, p.full_name, 'reassign failed', [p.id, p.archer.id, archer.id])
+    for obj in archers.exclude(pk=archer.id):
+        try:
+            obj.delete()
+        except:
+            print('delete failed:', obj.id, obj.full_name)
+    if user:
+        archer.user = user[0]
+        archer.save()
+
+
+# here for future reference, chatGPT suggestion how to find duplicate archers with fuzzy matching.
+# pip install fuzzywuzzy python-Levenshtein
+from backend.api import models
+from fuzzywuzzy import fuzz
+
+def find_duplicates(model, field_name, threshold=85):
+    records = model.objects.all()
+    duplicates = []
+
+    for i in range(len(records)):
+        for j in range(i+1, len(records)):
+            # Use fuzz.ratio() to get a similarity score
+            if fuzz.ratio(getattr(records[i], field_name), getattr(records[j], field_name)) > threshold:
+                duplicates.append((records[i], records[j]))
+
+    return duplicates
+
+duplicates = find_duplicates(models.Archer, 'name')

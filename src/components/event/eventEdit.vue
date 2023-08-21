@@ -157,7 +157,7 @@
             <v-col cols="4">
               <v-text-field
                 v-model="event.records"
-                disabled
+                :disabled="!(user.perms && user.perms.some(el => el === 'record'))"
                 hint="Currently managed by Arch[scor]er admins only"
                 label="Record category (nat/EM/MM)"></v-text-field>
             </v-col>

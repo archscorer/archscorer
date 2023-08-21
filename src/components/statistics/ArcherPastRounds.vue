@@ -14,12 +14,17 @@
             :mobile-breakpoint="300"
             :headers="c_table_header"
             :items="c_table"
-            multi-sort
+            hide-default-footer
           >
           <template v-slot:item.level="props">
             <span class="font-weight-medium">{{ props.item.level }}</span>
           </template>
           </v-data-table>
+          <small>
+            <p>
+              * See <a href="https://www.ifaa-archery.org/documents/rule-book/book-of-rules/" target="_blank">2021 Book of Rules</a> pages 61-62 for more information.
+            </p>
+          </small>
         </v-col>
       </v-row>
       <v-row dense>
@@ -183,7 +188,7 @@
               'age_group': c.age_group,
               'style': c.style,
               'level': c.level,
-              'valid_for': Math.round(365 - (new Date() - new Date(c.date)) / (1000 * 60 * 60 * 24)) + ' days'
+              'valid_for': (c.valid_for > 0 ? c.valid_for + (c.valid_for > 1 ? ' days': ' day') : 'ends today')
             })
           }
         }
