@@ -22,7 +22,13 @@
                   Or click <v-btn x-small @click="new_archer = (new_archer ? false : true)">here</v-btn> to add new archer profile
                   to the database!
               </v-alert>
-              <archerDetails v-model="participant.archer" :clubs="clubs" v-if="new_archer" />
+              <template v-if="new_archer">
+                <v-alert
+                type="warning">
+                This form is for adding *NEW* archers only! If you have competed before, use 'Find archer' search above.
+              </v-alert>
+              <archerDetails v-model="participant.archer" :clubs="clubs" />              
+              </template>
             </template>
           </v-container>
           <eventParticipantDetails 
