@@ -9,7 +9,7 @@
     <v-card>
       <v-card-title>{{ action }} to "{{ event.name }}"</v-card-title>
       <v-card-text>
-        <v-form ref="add_participant_form" v-model="valid">
+        <v-form ref="add_participant_form" autocomplete="off" v-model="valid">
           <v-container v-if="action !== 'Add Me'">
             <v-row>
               <archerSearch v-model="archer" />

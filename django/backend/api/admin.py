@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Count
 from django.contrib.auth.admin import UserAdmin
 
 from .models import (User, Club, Archer, Course, End,
@@ -27,16 +28,18 @@ class myUserAdmin(UserAdmin):
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
 
-class myParticipantInline(admin.TabularInline):
-    raw_id_fields = ('archer', 'event')
-    model = Participant
+# take it out, as it is more trouble than it is worth
+# class myParticipantInline(admin.TabularInline):
+#     raw_id_fields = ('archer', 'event',)
+#     readonly_fields = ('style',)
+#     model = Participant
 
 @admin.register(Archer)
 class myArcherAdmin(admin.ModelAdmin):
-    raw_id_fields = ('club', 'user')
-    list_display = ('full_name', 'id', 'gender', 'email', 'club_name', 'user')
-    search_fields = ('full_name', 'club__name')
-    inlines = (myParticipantInline,)
+    raw_id_fields = ('club', 'user',)
+    list_display = ('full_name', 'id', 'events_count', 'gender', 'email', 'club_name', 'user')
+    search_fields = ('full_name', 'club__name', 'club__name_short', 'user__email',)
+    # inlines = (myParticipantInline,)
 
     def club_name(self, obj):
         if isinstance(obj.club, Club):
@@ -45,6 +48,15 @@ class myArcherAdmin(admin.ModelAdmin):
             return ''
     club_name.short_description = 'Club'
     club_name.admin_order_field = 'club'
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(events_count=Count('events'))  # Assume 'event' is the related name
+
+    def events_count(self, obj):
+        return obj.events_count
+    events_count.short_description = 'Number of Events'
+    events_count.admin_order_field = 'events_count'  # Allow sorting by count
 
 class myArcherInline(admin.TabularInline):
     raw_id_fields = ('club',)
@@ -75,8 +87,8 @@ class myCourseAdmin(admin.ModelAdmin):
 @admin.register(Participant)
 class myParticipantAdmin(admin.ModelAdmin):
     raw_id_fields = ('archer', 'event')
-    list_display = ('archer_name', 'event_name', 'style', 'age_group')
-    search_fields = ('archer__full_name', 'event__name')
+    list_display = ('archer_name', 'event_name', 'archer_rep', 'style', 'age_group')
+    search_fields = ('archer__full_name', 'full_name', 'event__name')
 
     def archer_name(self, obj):
         return obj.archer.full_name + '[' + str(obj.archer.id) + ']'
@@ -91,8 +103,8 @@ class myParticipantAdmin(admin.ModelAdmin):
 @admin.register(Event)
 class myEventAdmin(admin.ModelAdmin):
     raw_id_fields = ('association', 'series')
-    list_display = ('name', 'creator', 'archive')
-    search_fields = ('name', 'tags')
+    list_display = ('name', 'creator', 'archive',)
+    search_fields = ('name', 'tags', 'creator__email')
 
 @admin.register(Series)
 class mySeriesAdmin(admin.ModelAdmin):

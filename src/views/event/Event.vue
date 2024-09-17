@@ -38,6 +38,7 @@
   import eventParticipantList from '@/components/event/eventParticipantList.vue'
   import eventResults from '@/components/event/eventResults.vue'
   import eventScoring from '@/components/event/eventScoring.vue'
+  import DOMPurify from 'dompurify'
   import { mapState } from 'vuex'
 
   export default {
@@ -90,7 +91,7 @@
       event_desciption() {
         // TODO this is probably temp fix. some kind of html editor like https://www.vuetoolbox.com/projects/tiptap
         // or already ready made solution https://github.com/iliyaZelenko/tiptap-vuetify
-        return this.event.description.split('\n\n').join('</p><p>').split('\n').join('<br/>')
+        return DOMPurify.sanitize(this.event.description.split('\n\n').join('</p><p>').split('\n').join('<br/>'))
       },
     },
     created() {

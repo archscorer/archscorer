@@ -1,7 +1,7 @@
 <template>
   <v-container v-if="s">
     <v-card>
-      <v-card-title v-text="s.name"></v-card-title>
+      <v-card-title>{{ s.name }}</v-card-title>
       <v-card-text>
         <p v-html="series_desciption"></p>
         <template v-if="s_table.body.length">
@@ -12,9 +12,9 @@
             :headers="s_table.header"
             :items="s_table.body"
             hide-default-header
-            hide-defualt-footer>
-            <template v-slot:item.event="props">
-              <router-link :to="{ name: 'event', params: { 'id': props.item.eId }}">{{ props.item.event }}</router-link>
+            hide-default-footer>
+            <template v-slot:item.event="{ item }">
+              <router-link :to="{ name: 'event', params: { 'id': item.eId }}">{{ item.event }}</router-link>
             </template>
           </v-data-table>
         </template>
@@ -29,6 +29,7 @@
 
 <script>
   import seriesSummary from '@/components/series/seriesSummary.vue'
+  import DOMPurify from 'dompurify'
   import { mapState } from 'vuex'
 
   export default {
@@ -44,7 +45,7 @@
       }),
       series_desciption() {
         // TODO this is probably temp fix. See event description for additional details
-        return this.s.description.split('\n\n').join('</p><p>').split('\n').join('<br/>')
+        return DOMPurify.sanitize(this.s.description.split('\n\n').join('</p><p>').split('\n').join('<br/>'))
       },
       s() {
         return this.$store.getters['series/seriesById'](parseInt(this.$route.params.id))

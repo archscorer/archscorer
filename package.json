@@ -9,6 +9,7 @@
         "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src"
     },
     "dependencies": {
+        "dompurify": "^3.0.5",
         "file-saver": "^2.0.5",
         "papaparse": "^5.4.1",
         "pdfmake": "^0.2.0",
@@ -18,6 +19,7 @@
         "vuex": "^3.6.2"
     },
     "devDependencies": {
+        "@types/dompurify": "^3.0.2",
         "@vitejs/plugin-vue": "^1.6.1",
         "axios": "^0.21.1",
         "eslint": "^8.46.0",

@@ -3,8 +3,8 @@
     <v-card>
       <v-card-title v-text="club.name + ' ('+ club.name_short +')'"></v-card-title>
       <v-card-text>
-        <p v-html="club.contact"></p>
-        <p v-html="club.description"></p>
+        <p v-html="club_contact"></p>
+        <p v-html="club_description"></p>
         <template v-if="user_is_member_or_admin">
           <v-row>
             <v-col cols="8">
@@ -73,6 +73,7 @@
 <script>
   import clubEdit from '@/components/club/clubEdit.vue'
   import archerDetails from '@/components/archer/archerDetails.vue'
+  import DOMPurify from 'dompurify'
   import { mapState, mapActions } from 'vuex'
 
   export default {
@@ -137,7 +138,13 @@
                  this.club.members.map(m => m.email).includes(this.user.archer.email)
         }
         return false
-      }
+      },
+      club_contact() {
+        return DOMPurify.sanitize(this.club.contact)
+      },
+      club_description() {
+        return DOMPurify.sanitize(this.club.description)
+      },
     },
     methods: {
       ...mapActions('clubs', [

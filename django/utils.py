@@ -104,10 +104,10 @@ for a in models.Archer.objects.all():
 
 
 # create new course
-c = models.Course.objects.create(name='101 3D challenge (1 Arrows)',
-                                 description='34 ends / 3 arrows / 20,16,10', type='r', halves=False)
-for i in range(34):
-    models.End.objects.create(course=c, ord=i+1, nr_of_arrows=3, scoring='[20,16,10]', x=False)
+c = models.Course.objects.create(name='GSL 3D Hunting Unit (3 arrows, 14 Ends)',
+                                 description='28 ends / 3 arrows / 10,8,5', type='u', halves=False)
+for i in range(14):
+    models.End.objects.create(course=c, ord=i+1, nr_of_arrows=3, scoring='[10,8,5]', x=False)
 
 
 # handled lithuanian archers club assignments (also cleared some duplicate profiles)

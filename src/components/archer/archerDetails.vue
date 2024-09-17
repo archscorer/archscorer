@@ -21,7 +21,7 @@
         <v-select
           v-if="clubs"
           v-model="value.club"
-          :disabled="value.events && value.events.length ? true : false"
+          :disabled="value.events && value.events.length && new Date().getMonth() !== 0 ? true : false"
           :items="clubs"
           label="Choose Club*"
           :rules="[v => !!v || 'Choose ..no club.. if other options are not suitable']"
@@ -60,6 +60,7 @@
 </template>
 
 <script>
+  // TODO: test january as club changing month before making it public
   export default {
     props: {
       value: Object,

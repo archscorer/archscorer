@@ -45,7 +45,6 @@
 </template>
 
 <script>
-  /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
   import rankingService from '@/services/rankingService'
   import { mapState } from 'vuex'
 
