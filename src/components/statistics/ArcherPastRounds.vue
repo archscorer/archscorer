@@ -82,6 +82,7 @@
         if (current_archer && current_archer.events) {
           this.target_name = this.archer.full_name
           this.$store.dispatch('events/getParticipants', {aId: current_archer.id})
+          this.$store.dispatch('events/queryEvents', {aId: current_archer.id})
           this.$store.dispatch('user/getArcherClassification', {aId: current_archer.id, date: new Date().toISOString().slice(0, 10)})
         }
       }
@@ -205,7 +206,7 @@
     },
     created() {
       this.archer = this.user.archer
-      this.$store.dispatch('events/getEvents')
+      this.$store.dispatch('events/queryEvents', {aId: this.archer.id})
     }
   }
 </script>

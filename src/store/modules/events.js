@@ -44,10 +44,17 @@ const actions = {
       commit('setEvents', events)
     })
   },
+  queryEvents({ commit }, attr) {
+    // console.log(attr)
+    eventService.queryEvents(attr)
+    .then(events => {
+      commit('updateEvents', events)
+    })
+  },
   updateEvent({ commit }, eId) {
     return eventService.fetchEvents(eId)
     .then(event => {
-      commit('updateEvent', event)
+      commit('updateEvents', [event])
     })
   },
   addEvent({ commit }, event) {
@@ -211,12 +218,14 @@ const mutations = {
   addEvent(state, event) {
     state.events.unshift(event)
   },
-  updateEvent(state, event) {
-    const index = state.events.findIndex(obj => obj.id === event.id);
-    if (index !== -1) {
-      state.events.splice(index, 1, event)
-    } else {
-      state.events.push(event)
+  updateEvents(state, events) {
+    for (let event of events) {
+      const index = state.events.findIndex(obj => obj.id === event.id);
+      if (index !== -1) {
+        state.events.splice(index, 1, event)
+      } else {
+        state.events.push(event)
+      }
     }
   },
   delEvent(state, eId) {

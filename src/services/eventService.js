@@ -2,9 +2,14 @@ import api from '@/services/api'
 
 export default {
   fetchEvents(eId = '') {
-    // given argument - if omitter allows to get a list of all events or
-    // if defined just single events
+    // Either fetch all events or a specific event
+    // Here all events is by default all events from beginning from current year
     return api.get(`events/${eId ? eId + '/' : ''}`)
+              .then(response => response.data)
+  },
+  queryEvents(attr) {
+    // Query events by year
+    return api.get(`events/?` + new URLSearchParams(attr).toString())
               .then(response => response.data)
   },
   postEvent(payload) {

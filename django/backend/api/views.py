@@ -144,6 +144,18 @@ class EventViewSet(viewsets.ModelViewSet):
         user = self.request.user
         queryset = Event.objects.all()
         if self.action == 'list':
+            year = self.request.query_params.get('year')
+            association = self.request.query_params.get('association')
+            aId = self.request.query_params.get('aId')
+            if year is not None:
+                queryset = queryset.filter(date_start__year=year)
+            else:
+                if aId is not None:
+                    queryset = queryset.filter(participants__archer__pk=aId)
+                else:
+                    queryset = queryset.filter(date_start__year__gte=datetime.now().year)
+            if association is not None:
+                queryset = queryset.filter(association__name_short=association)
             if isinstance(user, AnonymousUser):
                 # not logged in users can see only 'open' type of events
                 return queryset.filter(Q(type = 'open'))

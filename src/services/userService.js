@@ -18,8 +18,8 @@ export default {
     return api.post(`archer/search/`, payload)
               .then(response => response.data)
   },
-  getArcherClassification(payload) {
-    return api.post(`archer/archer_classification/`, payload)
+  getArcherClassification(attr) {
+    return api.post(`archer/archer_classification/`, attr)
               .then(response => response.data)
   }
 }

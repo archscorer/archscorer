@@ -27,7 +27,9 @@
       </v-list-item>
     </v-list>
     <v-list subheader dense v-for="label in Object.keys(events_list[1]).reverse()" :key="label">
-      <v-list-group>
+      <v-list-group
+        @click="loadOldEvents(label)"
+      >
         <template v-slot:activator>
             <v-list-item-content>
               <v-list-item-title>{{ label }}</v-list-item-title>
@@ -75,6 +77,9 @@
           past: []
         }
         let e_list_old = {}
+        for (let year = new Date().getFullYear() - 1; year >= 2019; year--) {
+          e_list_old[year] = []; // Initialize each year as an empty list (array)
+        }
         if (this.events) {
           for (let event of this.events) {
             if (new Date(event.date_start) > new Date()) {
@@ -83,9 +88,6 @@
               e_list.upcoming.push(event)
             } else if (new Date(event.date_end).getFullYear() != new Date().getFullYear()) {
               let year = new Date(event.date_end).getFullYear()
-              if (!Object.prototype.hasOwnProperty.call(e_list_old, year)) {
-                e_list_old[year] = []
-              }
               e_list_old[year].push(event)
             } else if (new Date(event.date_end).setHours(23, 59) < new Date()) {
               e_list.past.push(event)
@@ -109,6 +111,9 @@
           })
         }
         return []
+      },
+      loadOldEvents(year) {
+        this.$store.dispatch('events/queryEvents', {'year': year})
       }
     },
     created() {
