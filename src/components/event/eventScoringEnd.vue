@@ -34,11 +34,11 @@
         <v-btn @click="currentFocus = null; $emit('end_nav', '-')" class="arr-btn"><v-icon>mdi-chevron-left</v-icon></v-btn>
       </v-col>
       <v-col cols="8">
-        <template v-for="score in sc_eval(end.scoring, end.x)">
-          <v-btn :key="'score' + end.id + '_' + score.text"
+        <v-btn v-for="score in sc_eval(end.scoring, end.x)"
+          :key="'score' + end.id + '_' + score.text"
           class="sc-btn"
-          @click.prevent="enter_score(score)">{{ score.text }}</v-btn>
-        </template>
+          @click.prevent="enter_score(score)">{{ score.text }}
+        </v-btn>
       </v-col>
       <v-col cols="2">
         <v-btn @click="currentFocus = null; $emit('end_nav', '+')" ref="next_end" class="arr-btn"><v-icon>mdi-chevron-right</v-icon></v-btn>
@@ -169,10 +169,10 @@
   .v-input >>> .v-text-field__details {
     display: none;
   }
-  .v-text-field--outlined.v-input--dense >>> .v-input__control .v-input__slot {
-    min-height: 30px;
-    max-height: 30px;
-    padding: 0 5px;
+  .v-input >>> .v-input__slot {
+    min-height: 30px!important;
+    max-height: 30px!important;
+    padding: 0 5px!important;
   }
   .v-input >>> input {
     max-width: 100%;
@@ -210,6 +210,7 @@
   .arr-btn {
     min-height: 119px;
     min-width: 48px!important;
-    padding: 0 10px!important;
+    padding: 2px 10px!important;
+    margin: 5px;
   }
 </style>

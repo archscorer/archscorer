@@ -74,7 +74,7 @@ const actions = {
           // might not return correct (latest) event instance?
           eventService.fetchEvents(event.id)
           .then(event => {
-            commit('updateEvent', event)
+            commit('updateEvents', [event])
           })
         }).catch(error => {
           console.log(error.response.data)
@@ -87,7 +87,7 @@ const actions = {
     // should have .id
     eventService.putEvent(attr.eId, attr.event)
     .then(event => {
-      commit('updateEvent', event)
+      commit('updateEvents', [event])
     }).catch(error => {
       console.log(error.response.data)
     })
@@ -142,7 +142,7 @@ const actions = {
     .then(participant => {
       eventService.fetchEvents(participant.event)
       .then(event => {
-        commit('updateEvent', event)
+        commit('updateEvents', [event])
       })
     }).catch(error => {
       // TODO this should not be here
@@ -158,7 +158,7 @@ const actions = {
     .then(() => {
       eventService.fetchEvents(attr.eId)
       .then(event => {
-        commit('updateEvent', event)
+        commit('updateEvents', event)
       })
     }).catch(error => {
       // TODO this should not be here
@@ -170,7 +170,7 @@ const actions = {
     .then(participant => {
       eventService.fetchEvents(participant.event)
       .then(event => {
-        commit('updateEvent', event)
+        commit('updateEvents', [event])
       })
     }).catch(error => {
       console.log(error.response.data)
