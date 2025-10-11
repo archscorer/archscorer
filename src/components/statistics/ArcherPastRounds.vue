@@ -206,7 +206,6 @@
     },
     created() {
       this.archer = this.user.archer
-      this.$store.dispatch('events/queryEvents', {aId: this.archer.id})
     }
   }
 </script>

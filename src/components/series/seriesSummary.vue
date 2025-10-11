@@ -299,15 +299,20 @@
               return 1
             }
             return 0
-          }).map(club => {
-            if (club.points < this.points) {
-              this.place = this.ord
+          }).reduce((acc, e) => {
+            if (acc.length === 0) {
+              e.place = 1
+              acc.push(e)
+            } else {
+              if (e.points < acc[acc.length - 1].points) {
+                e.place = acc.length + 1
+              } else {
+                e.place = acc[acc.length - 1].place
+              }
+              acc.push(e)
             }
-            club.place = this.place
-            this.points = club.points
-            this.ord += 1
-            return club
-          }, {place: 1, ord: 1, points: null})
+            return acc
+          }, [])
         }
         return []
       }
