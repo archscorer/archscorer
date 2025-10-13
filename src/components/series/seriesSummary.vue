@@ -169,7 +169,14 @@
           for (let p of s_table) {
             // This sorts and scores participant points based on best stages and series
             // participant_max and participant_min limits
-            p.sum.sort(function (a, b) { return p.points[p.sum.indexOf(b)] - p.points[p.sum.indexOf(a)] })
+            p.sum.sort(function (a, b) { 
+              const A = p.points[p.sum.indexOf(a)]
+              const B = p.points[p.sum.indexOf(b)]
+              if (B === A) {
+                return b - a
+              }
+              return B - A
+            })
             p.points.sort(function (a, b) { return b - a })
             if (p.points.length >= this.s.participant_min) {
               // this is initialised here as later is trickier to figure out the number of stages
