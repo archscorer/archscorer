@@ -227,3 +227,27 @@ def find_duplicates(model, field_name, threshold=85):
     return duplicates
 
 duplicates = find_duplicates(models.Archer, 'name')
+
+
+# in case we need to update archer classification, or it was not available upon registration.
+import backend.api.models as m
+import backend.api.utilities as u
+from datetime import datetime
+
+my_e = m.Event.objects.get(id=731)
+
+for my_p in my_e.participants.all():
+    my_a = my_p.archer
+    if my_p.age_group not in ["A", "YA", "J"] or my_p.style not in ["BB-R", "BB-C", "FS-R", "FS-C", "FU", "BH-R", "BH-C", "BL", "BU", "LB", "TR"]:
+        continue 
+    classif = u.get_archer_class(my_a, my_e.date_start)
+    my_cl = None
+    for cl in classif:
+        if cl["age_group"] == my_p.age_group and cl["style"] == my_p.style:
+            my_cl = cl
+            print(my_p.full_name, my_cl["level"])
+            my_p.level_class = my_cl["level"]
+    if not my_cl:
+        print(my_p.full_name, "a")
+        my_p.level_class = "a"
+    my_p.save()
